@@ -198,15 +198,6 @@ Exit_Function:
 End Function
 
 Public Function FindAllKeys() As String()
-    Dim fnPattern As String: fnPattern = "FNBX\(([^,]+,)+([^)])\)"
-    Dim regex As New RegExp
-    
-    With regex
-        .Global = True
-        .IgnoreCase = True
-        .pattern = fnPattern
-    End With
-    
     Dim fnd As String, FirstFound As String
     Dim FoundCell As Range, rng As Range
     Dim myRange As Range, LastCell As Range
@@ -216,27 +207,45 @@ Public Function FindAllKeys() As String()
     
     ReDim allKeys(0)
     
+    Dim MacExcel2011 As Boolean: MacExcel2011 = False
     Dim sheet As Worksheet
     Dim curSheet As String
     
     curSheet = ActiveSheet.name
     
+    #If Mac Then
+        #If MAC_OFFICE_VERSION < 15 Then
+            MacExcel2011 = True
+        #End If
+    #End If
+    
     For Each book In Workbooks
         For Each sheet In book.Worksheets
             fnd = "FNBX("
             Set myRange = sheet.UsedRange
-            Set LastCell = myRange.Cells(myRange.Cells.Count)
-            Set FoundCell = myRange.Find(What:=fnd, After:=LastCell)
-            If Not FoundCell Is Nothing Then
-                FirstFound = FoundCell.address
-                Set rng = FoundCell
-                On Error Resume Next
-                Do Until FoundCell Is Nothing
-                    Set FoundCell = myRange.Find(What:=fnd, After:=FoundCell)
-                    formula = FoundCell.formula
-                    ParseKeys formula, sheet, allKeys
-                    If FoundCell.address = FirstFound Then Exit Do
-                Loop
+            If MacExcel2011 Then
+                Dim cell As Range
+                For Each cell In myRange
+                    If cell.HasFormula Then
+                        ParseKeys cell.formula, sheet, allKeys
+                    End If
+                Next cell
+            Else
+                Set LastCell = myRange.Cells(myRange.Cells.Count)
+                Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell)
+                If Not FoundCell Is Nothing Then
+                    FirstFound = FoundCell.address
+                    Set rng = FoundCell
+                    On Error Resume Next
+                    Do Until FoundCell Is Nothing
+                        Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell)
+                        If cell.HasFormula Then
+                            formula = FoundCell.formula
+                            ParseKeys formula, sheet, allKeys
+                        End If
+                        If FoundCell.address = FirstFound Then Exit Do
+                    Loop
+                End If
             End If
         Next sheet
     Next book
