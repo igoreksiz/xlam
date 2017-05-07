@@ -61,16 +61,7 @@ Public Sub AddCustomMenu()
     Dim bd As Integer
     Dim butdefs() As String
     
-    Dim MacExcel2011 As Boolean
-    MacExcel2011 = False
-    
-    #If Mac Then
-        #If MAC_OFFICE_VERSION < 15 Then
-            MacExcel2011 = True
-        #End If
-    #End If
-        
-    If MacExcel2011 Then
+    If EXCEL_VERSION = "Mac2011" Then
      
         ' Office 2003 and earlier or Mac 2011
         ' Add (or retrieve) top level menu "Add-Ins"
@@ -118,20 +109,11 @@ Public Sub DeleteCustomMenu()
     Dim bd As Integer
     Dim butdefs() As String
     
-    Dim MacExcel2011 As Boolean
-    MacExcel2011 = False
-    
-    #If Mac Then
-        #If MAC_OFFICE_VERSION < 15 Then
-            MacExcel2011 = True
-        #End If
-    #End If
-    
     For bd = UBound(ButtonDefs) To LBound(ButtonDefs) Step -1
         On Error Resume Next
         butdefs = Split(ButtonDefs(bd), ",")
           
-        If MacExcel2011 Then
+        If EXCEL_VERSION = "Mac2011" Then
             ' Delete buttons and top level menu "Custom"
             With Application.CommandBars("Worksheet Menu Bar").Controls("Add-Ins")
                 .Controls(Replace(butdefs(0), "&", "")).Delete

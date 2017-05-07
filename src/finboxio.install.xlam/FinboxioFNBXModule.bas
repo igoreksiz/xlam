@@ -207,23 +207,16 @@ Public Function FindAllKeys() As String()
     
     ReDim allKeys(0)
     
-    Dim MacExcel2011 As Boolean: MacExcel2011 = False
     Dim sheet As Worksheet
     Dim curSheet As String
     
     curSheet = ActiveSheet.name
     
-    #If Mac Then
-        #If MAC_OFFICE_VERSION < 15 Then
-            MacExcel2011 = True
-        #End If
-    #End If
-    
     For Each book In Workbooks
         For Each sheet In book.Worksheets
             fnd = "FNBX("
             Set myRange = sheet.UsedRange
-            If MacExcel2011 Then
+            If EXCEL_VERSION = "Mac2011" Then
                 Dim cell As Range
                 For Each cell In myRange
                     If cell.HasFormula Then

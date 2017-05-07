@@ -17,3 +17,8 @@ Public Const UPDATES_URL = "https://api.staging.finbox.io/v2/add-ons/excel/lates
 
 Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
 
+#If Mac Then
+    #If MAC_OFFICE_VERSION < 15 Then
+        Public Const EXCEL_VERSION = "Mac2011"
+    #End If
+#End If
