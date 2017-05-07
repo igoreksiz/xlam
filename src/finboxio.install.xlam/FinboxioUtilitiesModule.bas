@@ -108,3 +108,26 @@ Public Function GetAPIHeader()
     
     GetAPIHeader = APIHeader
 End Function
+
+Public Function FixAddinLinks()
+    Dim Sht As Worksheet
+    Application.ScreenUpdating = False
+    For Each Sht In Worksheets
+        Sht.Cells.Replace _
+            What:="'*finboxio.install.xlam'!", _
+            Replacement:="", _
+            LookAt:=xlPart, _
+            SearchOrder:=xlByRows, _
+            MatchCase:=False
+    Next Sht
+    For Each Sht In Worksheets
+        Sht.Cells.Replace _
+            What:="'*finboxio.xlam'!", _
+            Replacement:="", _
+            LookAt:=xlPart, _
+            SearchOrder:=xlByRows, _
+            MatchCase:=False
+    Next Sht
+    Application.Run "ResetFindReplace"
+    Application.ScreenUpdating = True
+End Function
