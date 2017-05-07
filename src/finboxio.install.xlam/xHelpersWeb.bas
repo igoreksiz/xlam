@@ -536,7 +536,7 @@ End Sub
 ''
 Public Sub LogRequest(Client As webClient, Request As webRequest)
     If EnableLogging Then
-        Debug.Print "--> Request - " & Format(Now, "Long Time")
+        Debug.Print "--> Request - " & VBA.Format(Now, "Long Time")
         Debug.Print MethodToName(Request.Method) & " " & Client.GetFullUrl(Request)
 
         Dim web_KeyValue As Dictionary
@@ -568,7 +568,7 @@ Public Sub LogResponse(Client As webClient, Request As webRequest, Response As w
     If EnableLogging Then
         Dim web_KeyValue As Dictionary
 
-        Debug.Print "<-- Response - " & Format(Now, "Long Time")
+        Debug.Print "<-- Response - " & VBA.Format(Now, "Long Time")
         Debug.Print Response.statusCode & " " & Response.StatusDescription
 
         For Each web_KeyValue In Response.Headers
