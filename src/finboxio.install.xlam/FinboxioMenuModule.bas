@@ -94,7 +94,7 @@ Public Sub AddCustomMenu()
                     .Style = 3
                     .FaceId = CInt(butdefs(3))
                     
-                    If LCase(butdefs(4)) = "true" Then
+                    If VBA.LCase(butdefs(4)) = "true" Then
                         .BeginGroup = True
                     Else
                         .BeginGroup = False
