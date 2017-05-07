@@ -38,7 +38,7 @@ Public Function GetAPIKey()
     If keyToStore <> "" Then
         GetAPIKey = keyToStore
     Else
-        GetAPIKey = Trim(ThisWorkbook.Sheets("API_Credentials").Range("APIkey").value)
+        GetAPIKey = VBA.Trim(ThisWorkbook.Sheets("API_Credentials").Range("APIkey").value)
     End If
 End Function
 

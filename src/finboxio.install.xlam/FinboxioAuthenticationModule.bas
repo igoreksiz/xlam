@@ -62,7 +62,7 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             End If
         Case Else
             MsgBox "The finbox.io API returned http status code " & webResponse.statusCode & " = " & vbCr & _
-                Trim(webResponse.StatusDescription), vbCritical, AppTitle
+                VBA.Trim(webResponse.StatusDescription), vbCritical, AppTitle
     End Select
 
     Set jsonReqObj = Nothing

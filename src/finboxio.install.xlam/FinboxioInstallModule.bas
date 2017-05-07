@@ -28,9 +28,9 @@ Public Sub InstallAddin(self)
         sStandardPath = Application.UserLibraryPath
     #End If
     
-    If InStr(1, self.name, ".install.xlam", vbTextCompare) Then
+    If VBA.InStr(1, self.name, ".install.xlam", vbTextCompare) Then
         ' This is an install version, so let’s pick the proper AddIn name
-        sAddInName = VBA.Left(self.name, InStr(1, self.name, ".install.xlam", vbTextCompare) - 1)
+        sAddInName = VBA.Left(self.name, VBA.InStr(1, self.name, ".install.xlam", vbTextCompare) - 1)
         sAddInFileName = sAddInName & ".xlam"
         
         ' Avoid the re-entry of script after activating the addin

@@ -397,8 +397,8 @@ Private Function web_FindStatusLine(web_CurlResponseLines() As String) As Long
 
     ' find last HTTP status line; replacement function written by Michael Chambers March 2017
     For web_FindStatusLine = UBound(web_CurlResponseLines) To LBound(web_CurlResponseLines) Step -1
-        If Len(web_CurlResponseLines(web_FindStatusLine)) >= 7 Then
-            If Left(web_CurlResponseLines(web_FindStatusLine), 7) = "HTTP/1." Or Left(web_CurlResponseLines(web_FindStatusLine), 6) = "HTTP/2" Then
+        If VBA.Len(web_CurlResponseLines(web_FindStatusLine)) >= 7 Then
+            If VBA.Left(web_CurlResponseLines(web_FindStatusLine), 7) = "HTTP/1." Or VBA.Left(web_CurlResponseLines(web_FindStatusLine), 6) = "HTTP/2" Then
                 Exit Function
             End If
         End If

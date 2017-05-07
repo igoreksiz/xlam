@@ -30,7 +30,7 @@ Public Function MSOffVer() As Integer
     MSOffVer = 0
         
     verStr = Application.Version
-    startPos = InStr(verStr, ".")
+    startPos = VBA.InStr(verStr, ".")
         
         On Error Resume Next
     If startPos > 0 Then

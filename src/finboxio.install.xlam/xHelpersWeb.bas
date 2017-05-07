@@ -677,7 +677,7 @@ Public Function ConvertToUrlEncoded(Obj As Variant, Optional EncodingMode As Url
         Dim web_Key As Variant
 
         For Each web_Key In Obj.keys()
-            If Len(web_Encoded) > 0 Then: web_Encoded = web_Encoded & "&"
+            If VBA.Len(web_Encoded) > 0 Then: web_Encoded = web_Encoded & "&"
             web_Encoded = web_Encoded & web_GetUrlEncodedKeyValue(web_Key, Obj(web_Key), EncodingMode)
         Next web_Key
     End If
@@ -1237,11 +1237,11 @@ End Function
 ' @return {String} Joined url
 ''
 Public Function JoinUrl(LeftSide As String, RightSide As String) As String
-    If Left(RightSide, 1) = "/" Then
-        RightSide = Right(RightSide, Len(RightSide) - 1)
+    If VBA.Left(RightSide, 1) = "/" Then
+        RightSide = VBA.Right(RightSide, VBA.Len(RightSide) - 1)
     End If
-    If Right(LeftSide, 1) = "/" Then
-        LeftSide = Left(LeftSide, Len(LeftSide) - 1)
+    If VBA.Right(LeftSide, 1) = "/" Then
+        LeftSide = VBA.Left(LeftSide, VBA.Len(LeftSide) - 1)
     End If
 
     If LeftSide <> "" And RightSide <> "" Then
@@ -1297,9 +1297,9 @@ Public Function GetUrlParts(Url As String) As Dictionary
     Dim web_Value As String
 
     ' Add Protocol if missing
-    If InStr(1, Url, "://") <= 0 Then
+    If VBA.InStr(1, Url, "://") <= 0 Then
         web_AddedProtocol = True
-        If InStr(1, Url, "//") = 1 Then
+        If VBA.InStr(1, Url, "//") = 1 Then
             Url = "http" & Url
         Else
             Url = "http://" & Url
@@ -1317,16 +1317,16 @@ Public Function GetUrlParts(Url As String) As Dictionary
 
     web_Results = Split(ExecuteInShell(web_Command).Output, " | ")
     For Each web_ResultPart In web_Results
-        web_EqualsIndex = InStr(1, web_ResultPart, "=")
-        web_Key = Trim(VBA.Mid$(web_ResultPart, 1, web_EqualsIndex - 1))
-        web_Value = Trim(VBA.Mid$(web_ResultPart, web_EqualsIndex + 1))
+        web_EqualsIndex = VBA.InStr(1, web_ResultPart, "=")
+        web_Key = VBA.Trim(VBA.Mid$(web_ResultPart, 1, web_EqualsIndex - 1))
+        web_Value = VBA.Trim(VBA.Mid$(web_ResultPart, web_EqualsIndex + 1))
 
         If web_Key = "FullPath" Then
             ' For properly escaped path and querystring, need to use full_path
             ' But, need to split FullPath into Path...?Querystring
             Dim QueryIndex As Integer
 
-            QueryIndex = InStr(1, web_Value, "?")
+            QueryIndex = VBA.InStr(1, web_Value, "?")
             If QueryIndex > 0 Then
                 web_Parts.Add "Path", Mid$(web_Value, 1, QueryIndex - 1)
                 web_Parts.Add "Querystring", Mid$(web_Value, QueryIndex + 1)
@@ -1368,7 +1368,7 @@ Public Function GetUrlParts(Url As String) As Dictionary
         web_Parts("Host") = "localhost"
         web_Parts("Path") = Replace(web_Parts("Path"), web_Parts("Port"), "", Count:=1)
     End If
-    If Left(web_Parts("Path"), 1) <> "/" Then
+    If VBA.Left(web_Parts("Path"), 1) <> "/" Then
         web_Parts("Path") = "/" & web_Parts("Path")
     End If
 
@@ -1650,7 +1650,7 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
 
     Do While web_feof(web_File) = 0
         web_Chunk = VBA.Space$(50)
-        web_Read = CLng(web_fread(web_Chunk, 1, Len(web_Chunk) - 1, web_File))
+        web_Read = CLng(web_fread(web_Chunk, 1, VBA.Len(web_Chunk) - 1, web_File))
         If web_Read > 0 Then
             web_Chunk = VBA.Left$(web_Chunk, web_Read)
             ExecuteInShell.Output = ExecuteInShell.Output & web_Chunk
@@ -2397,7 +2397,7 @@ Private Function json_ParseString(json_String As String, ByRef json_Index As Lon
     json_Quote = VBA.Mid$(json_String, json_Index, 1)
     json_Index = json_Index + 1
 
-    Do While json_Index > 0 And json_Index <= Len(json_String)
+    Do While json_Index > 0 And json_Index <= VBA.Len(json_String)
         json_Char = VBA.Mid$(json_String, json_Index, 1)
 
         Select Case json_Char
@@ -2450,7 +2450,7 @@ Private Function json_ParseNumber(json_String As String, ByRef json_Index As Lon
 
     json_SkipSpaces json_String, json_Index
 
-    Do While json_Index > 0 And json_Index <= Len(json_String)
+    Do While json_Index > 0 And json_Index <= VBA.Len(json_String)
         json_Char = VBA.Mid$(json_String, json_Index, 1)
 
         If VBA.InStr("+-0123456789.eE", json_Char) Then
@@ -2464,7 +2464,7 @@ Private Function json_ParseNumber(json_String As String, ByRef json_Index As Lon
             '
             ' Fix: Parse -> String, Convert -> String longer than 15/16 characters containing only numbers and decimal points -> Number
             ' (decimal doesn't factor into significant digit count, so if present check for 15 digits + decimal = 16)
-            json_IsLargeNumber = IIf(InStr(json_Value, "."), Len(json_Value) >= 17, Len(json_Value) >= 16)
+            json_IsLargeNumber = IIf(VBA.InStr(json_Value, "."), VBA.Len(json_Value) >= 17, VBA.Len(json_Value) >= 16)
             If Not JsonOptions.UseDoubleForLargeNumbers And json_IsLargeNumber Then
                 json_ParseNumber = json_Value
             Else
@@ -2482,7 +2482,7 @@ Private Function json_ParseKey(json_String As String, ByRef json_Index As Long) 
         json_ParseKey = json_ParseString(json_String, json_Index)
     ElseIf JsonOptions.AllowUnquotedKeys Then
         Dim json_Char As String
-        Do While json_Index > 0 And json_Index <= Len(json_String)
+        Do While json_Index > 0 And json_Index <= VBA.Len(json_String)
             json_Char = VBA.Mid$(json_String, json_Index, 1)
             If (json_Char <> " ") And (json_Char <> ":") Then
                 json_ParseKey = json_ParseKey & json_Char
@@ -2854,7 +2854,7 @@ Public Function ParseIso(utc_IsoString As String) As Date
             If utc_OffsetIndex > 0 Then
                 utc_HasOffset = True
                 utc_TimeParts = VBA.Split(VBA.Left$(utc_Parts(1), utc_OffsetIndex - 1), ":")
-                utc_OffsetParts = VBA.Split(VBA.Right$(utc_Parts(1), Len(utc_Parts(1)) - utc_OffsetIndex), ":")
+                utc_OffsetParts = VBA.Split(VBA.Right$(utc_Parts(1), VBA.Len(utc_Parts(1)) - utc_OffsetIndex), ":")
 
                 Select Case UBound(utc_OffsetParts)
                 Case 0
@@ -2969,7 +2969,7 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
 
     Do While utc_feof(utc_File) = 0
         utc_Chunk = VBA.Space$(50)
-        utc_Read = CLng(utc_fread(utc_Chunk, 1, Len(utc_Chunk) - 1, utc_File))
+        utc_Read = CLng(utc_fread(utc_Chunk, 1, VBA.Len(utc_Chunk) - 1, utc_File))
         If utc_Read > 0 Then
             utc_Chunk = VBA.Left$(utc_Chunk, utc_Read)
             utc_ExecuteInShell.utc_Output = utc_ExecuteInShell.utc_Output & utc_Chunk

@@ -433,7 +433,7 @@ Public Property Get ContentLength() As Long
     If web_pContentLength >= 0 Then
         ContentLength = web_pContentLength
     Else
-        ContentLength = Len(Me.Body)
+        ContentLength = VBA.Len(Me.Body)
     End If
 End Property
 Public Property Let ContentLength(value As Long)

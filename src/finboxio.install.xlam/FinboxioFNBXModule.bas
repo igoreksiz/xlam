@@ -135,7 +135,7 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         ' Return error if HTTP response code not 200
         If webResponse.statusCode >= 400 Or webResponse.Data Is Nothing Then
             LogMessage "The finbox.io API returned http status code " & webResponse.statusCode & " = " & _
-                    Trim(webResponse.StatusDescription), key
+                    VBA.Trim(webResponse.StatusDescription), key
     
             FNBX = CVErr(xlErrNA) ' return #N/A
             GoTo Exit_Function
@@ -249,7 +249,7 @@ Public Function FindAllKeys() As String()
 End Function
 
 Sub ParseKeys(formula As String, sheet As Worksheet, ByRef keys)
-    Dim argIndex As String: argIndex = InStr(formula, "(")
+    Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
     Dim name As String: name = VBA.Left(formula, argIndex - 1)
     Dim args() As String: args = GetParameters(formula)
     Dim argsCount As Long: argsCount = NumElements(args)
@@ -305,13 +305,13 @@ Function GetParameters(func As String) As String()
     Dim c As String
     Dim i As Long, pdepth As Long
 
-    func = Trim(func)
-    i = InStr(func, "(")
-    func = Mid(func, i + 1)
-    func = Mid(func, 1, Len(func) - 1)
+    func = VBA.Trim(func)
+    i = VBA.InStr(func, "(")
+    func = VBA.Mid(func, i + 1)
+    func = VBA.Mid(func, 1, VBA.Len(func) - 1)
 
-    For i = 1 To Len(func)
-        c = Mid(func, i, 1)
+    For i = 1 To VBA.Len(func)
+        c = VBA.Mid(func, i, 1)
         If c = "(" Then
             pdepth = pdepth + 1
         ElseIf c = ")" Then
