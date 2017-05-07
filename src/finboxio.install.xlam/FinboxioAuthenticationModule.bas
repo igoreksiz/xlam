@@ -20,6 +20,10 @@ End Function
 Public Function Login(ByVal email As String, ByVal password As String) As Boolean
     Login = False
     
+    If APIKeyStore Is Nothing Then
+        Set APIKeyStore = New APIKeyHandler
+    End If
+    
     ' build json request and convert to postData string
     Dim jsonReqObj As Object
     Set jsonReqObj = ParseJson("{}")
@@ -87,6 +91,9 @@ ErrorHandler:
 End Function
 
 Public Sub Logout()
+    If APIKeyStore Is Nothing Then
+        Set APIKeyStore = New APIKeyHandler
+    End If
     APIKeyStore.ClearAPIKey
 End Sub
 
@@ -103,5 +110,8 @@ Public Function IsLoggedOut()
 End Function
 
 Public Function GetAPIKey() As String
+    If APIKeyStore Is Nothing Then
+        Set APIKeyStore = New APIKeyHandler
+    End If
     GetAPIKey = APIKeyStore.GetAPIKey()
 End Function
