@@ -234,7 +234,7 @@ Public Function FindAllKeys() As String()
         For Each sheet In book.Worksheets
             fnd = "FNBX("
             Set myRange = sheet.UsedRange
-            If EXCEL_VERSION = "Mac2011" Then
+            #If Mac Then
                 Dim cell As Range
                 On Error Resume Next
                 For Each cell In myRange
@@ -242,7 +242,7 @@ Public Function FindAllKeys() As String()
                         ParseKeys cell.formula, sheet, allKeys
                     End If
                 Next cell
-            Else
+            #Else
                 Set LastCell = myRange.Cells(myRange.Cells.count)
                 Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell)
                 If Not FoundCell Is Nothing Then
@@ -258,7 +258,7 @@ Public Function FindAllKeys() As String()
                         If FoundCell.address = FirstFound Then Exit Do
                     Loop
                 End If
-            End If
+            #End If
         Next sheet
     Next book
     Sheets(curSheet).Select
