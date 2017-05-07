@@ -1,7 +1,7 @@
 Attribute VB_Name = "FinboxioUpdateModule"
 Option Explicit
 
-Public Sub FinboxioUpdate(Optional control As IRibbonControl)
+Public Sub CheckUpdates(Optional explicit As Boolean = False)
     Dim latest As String
     Dim answer As Integer
     latest = latestVersion()
@@ -12,7 +12,7 @@ Public Sub FinboxioUpdate(Optional control As IRibbonControl)
         If answer = vbYes Then
             ThisWorkbook.FollowHyperlink HELP_URL
         End If
-    ElseIf Not control Is Nothing And latest = AppVersion Then
+    ElseIf explicit And latest = AppVersion Then
         answer = MsgBox("You're already running the latest version of the finbox.io add-on! Please enjoy responsibly.", vbOKOnly, AppTitle)
     End If
 End Sub

@@ -29,7 +29,7 @@ Option Explicit
 ' SOFTWARE.
 '
 
-Public Sub FinboxioUnlink(Optional control As IRibbonControl)
+Public Sub UnlinkFormulas()
     Dim ws As Worksheet
     Dim Ans As Variant
     Dim fileSaveName As Variant

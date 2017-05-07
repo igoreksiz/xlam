@@ -10,7 +10,7 @@ Option Explicit
 
 Private CachedMessages As New Collection
 
-Public Sub FinboxioMessages(Optional control As IRibbonControl)
+Public Sub ShowMessages()
     Dim msgs As Long
     msgs = CachedMessages.Count
     

@@ -1,22 +1,15 @@
 Attribute VB_Name = "FinboxioCacheModule"
 ' finbox.io API Integration
 
-' Written by Michael Chambers, April 2017
-' michael@mrchambers.f9.co.uk
-
-' Upwork Contract Id 17916950
-
 Option Explicit
 
 Private CachedValues As New Dictionary
 Private CachedTimestamp As New Dictionary
 
-
-Public Function ClearCache(Optional control As IRibbonControl)
+Public Function ClearCache()
     CachedValues.RemoveAll
     CachedTimestamp.RemoveAll
 End Function
-
 
 Public Function IsCached(ByVal key As String, Optional skip As Boolean = False) As Boolean
 

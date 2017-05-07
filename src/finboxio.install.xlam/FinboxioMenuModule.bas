@@ -1,27 +1,47 @@
 Attribute VB_Name = "FinboxioMenuModule"
 Option Explicit
 
-Public AppRibbon As IRibbonUI
+Public AppRibbon
 Private ButtonDefs(1 To 7) As String
 
-Public Sub FinboxioRibbonLoad(ribbon As IRibbonUI)
+Public Sub FinboxioRibbonLoad(ribbon)
     Set AppRibbon = ribbon
 End Sub
 
-Public Sub FinboxioLoggedIn(control As IRibbonControl, ByRef enabled)
+Public Sub FinboxioLoggedIn(control, ByRef enabled)
     enabled = IsLoggedIn()
 End Sub
 
-Public Sub FinboxioLoggedOut(control As IRibbonControl, ByRef enabled)
+Public Sub FinboxioLoggedOut(control, ByRef enabled)
     enabled = IsLoggedOut()
 End Sub
 
-Public Sub FinboxioShowLogin(Optional control As IRibbonControl)
+Public Sub FinboxioShowLogin(Optional control)
     CredentialsForm.Show
 End Sub
 
-Public Sub FinboxioLogout(Optional control As IRibbonControl)
+Public Sub FinboxioLogout(Optional control)
     Call Logout
+End Sub
+
+Public Sub FinboxioMessages(Optional control)
+    Call ShowMessages
+End Sub
+
+Public Sub FinboxioHelp(Optional control)
+    Call LoadHelp
+End Sub
+
+Public Sub FinboxioRefresh(Optional control)
+    Call RefreshData
+End Sub
+
+Public Sub FinboxioUnlink(Optional control)
+    Call UnlinkFormulas
+End Sub
+
+Public Sub FinboxioUpdate(Optional control)
+    Call CheckUpdates(True)
 End Sub
 
 Public Sub AddCustomMenu()
