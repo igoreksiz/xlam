@@ -14,5 +14,5 @@ Private Sub Workbook_Open()
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
-    Call DeleteCustomMenu
+    ' Call DeleteCustomMenu
 End Sub

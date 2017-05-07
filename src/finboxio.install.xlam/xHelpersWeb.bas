@@ -1350,12 +1350,12 @@ Public Function GetUrlParts(Url As String) As Dictionary
     End If
 
     web_pElHelper.href = Url
-    web_Parts.Add "Protocol", Replace(web_pElHelper.Protocol, ":", "", Count:=1)
+    web_Parts.Add "Protocol", Replace(web_pElHelper.Protocol, ":", "", count:=1)
     web_Parts.Add "Host", web_pElHelper.hostname
     web_Parts.Add "Port", web_pElHelper.port
     web_Parts.Add "Path", web_pElHelper.PathName
-    web_Parts.Add "Querystring", Replace(web_pElHelper.Search, "?", "", Count:=1)
-    web_Parts.Add "Hash", Replace(web_pElHelper.Hash, "#", "", Count:=1)
+    web_Parts.Add "Querystring", Replace(web_pElHelper.Search, "?", "", count:=1)
+    web_Parts.Add "Hash", Replace(web_pElHelper.Hash, "#", "", count:=1)
 #End If
 
     If web_Parts("Protocol") = "localhost" Then
@@ -1366,7 +1366,7 @@ Public Function GetUrlParts(Url As String) As Dictionary
         web_Parts("Port") = PathParts(0)
         web_Parts("Protocol") = ""
         web_Parts("Host") = "localhost"
-        web_Parts("Path") = Replace(web_Parts("Path"), web_Parts("Port"), "", Count:=1)
+        web_Parts("Path") = Replace(web_Parts("Path"), web_Parts("Port"), "", count:=1)
     End If
     If VBA.Left(web_Parts("Path"), 1) <> "/" Then
         web_Parts("Path") = "/" & web_Parts("Path")
@@ -1521,9 +1521,9 @@ Public Sub AddOrReplaceInKeyValues(KeyValues As Collection, key As Variant, valu
             ' Replace existing
             KeyValues.Remove web_Index
 
-            If KeyValues.Count = 0 Then
+            If KeyValues.count = 0 Then
                 KeyValues.Add web_NewKeyValue
-            ElseIf web_Index > KeyValues.Count Then
+            ElseIf web_Index > KeyValues.count Then
                 KeyValues.Add web_NewKeyValue, After:=web_Index - 1
             Else
                 KeyValues.Add web_NewKeyValue, Before:=web_Index

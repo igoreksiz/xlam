@@ -78,12 +78,12 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     Set webRequest = Nothing
     Set webResponse = Nothing
     
-    AppRibbon.Invalidate
+    InvalidateAppRibbon
     Exit Function
 ErrorHandler:
+    InvalidateAppRibbon
     Dim answer As Integer
     answer = MsgBox("Failed to authenticate with finbox.io. Contact support@finbox.io if this problem persists.", vbCritical, "finbox.io Addin")
-    AppRibbon.Invalidate
 End Function
 
 Public Sub Logout()

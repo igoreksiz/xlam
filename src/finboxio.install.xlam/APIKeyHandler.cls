@@ -54,7 +54,7 @@ Private Sub StoreKey()
     ThisWorkbook.Save
     Application.DisplayAlerts = True
     keyToStore = ""
-    AppRibbon.Invalidate
+    InvalidateAppRibbon
     Exit Sub
 EnableEvents:
     App.EnableEvents = True

@@ -524,7 +524,7 @@ Public Property Get FormattedResource() As String
     Next web_Segment
 
     ' Add querystring
-    If Me.QuerystringParams.Count > 0 Then
+    If Me.QuerystringParams.count > 0 Then
         If VBA.InStr(FormattedResource, "?") <= 0 Then
             FormattedResource = FormattedResource & "?"
         Else

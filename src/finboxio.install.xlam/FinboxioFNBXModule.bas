@@ -3,6 +3,8 @@ Attribute VB_Name = "FinboxioFNBXModule"
 
 Option Explicit
 
+Public RedisplayDataLimit
+
 Public Sub AddUDFCategoryDescription()
     #If Mac Then
         'Excel for Mac does not support the property .MacroOptions
@@ -55,6 +57,16 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
     Dim loggedIn As Boolean
     If Not IsLoggedIn() Then
         ShowLoginForm
+    End If
+    
+    ' check if user was recently notified of limit overage
+    If TypeName(RedisplayDataLimit) = "Date" Then
+        If RedisplayDataLimit > Now() Then
+            FNBX = CVErr(xlErrNA)
+            Exit Function
+        Else
+            RedisplayDataLimit = True
+        End If
     End If
     
     ' check for null API key
@@ -132,8 +144,13 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         
         If errStr <> "" Then LogMessage "errors: " & errStr
         
+        If webResponse.statusCode = 429 Then
+            DisplayDataLimit
+            LogMessage "Finbox.io Data Limit Reached"
+            FNBX = CVErr(xlErrNA)
+            GoTo Exit_Function
         ' Return error if HTTP response code not 200
-        If webResponse.statusCode >= 400 Or webResponse.Data Is Nothing Then
+        ElseIf webResponse.statusCode >= 400 Or webResponse.Data Is Nothing Then
             LogMessage "The finbox.io API returned http status code " & webResponse.statusCode & " = " & _
                     VBA.Trim(webResponse.StatusDescription), key
     
@@ -141,9 +158,10 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
             GoTo Exit_Function
         End If
         
+        RedisplayDataLimit = True
+        
         Dim resStr As String
         resStr = ConvertToJson(webResponse.Data("data"), Whitespace:=2)
-        Debug.Print "Got Response " & resStr
         
         ' Extract data value from json response
         Dim dataVal As Variant
@@ -218,13 +236,14 @@ Public Function FindAllKeys() As String()
             Set myRange = sheet.UsedRange
             If EXCEL_VERSION = "Mac2011" Then
                 Dim cell As Range
+                On Error Resume Next
                 For Each cell In myRange
                     If cell.HasFormula Then
                         ParseKeys cell.formula, sheet, allKeys
                     End If
                 Next cell
             Else
-                Set LastCell = myRange.Cells(myRange.Cells.Count)
+                Set LastCell = myRange.Cells(myRange.Cells.count)
                 Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell)
                 If Not FoundCell Is Nothing Then
                     FirstFound = FoundCell.address
@@ -250,6 +269,8 @@ End Function
 
 Sub ParseKeys(formula As String, sheet As Worksheet, ByRef keys)
     Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
+    If argIndex = 0 Then Exit Sub
+    
     Dim name As String: name = VBA.Left(formula, argIndex - 1)
     Dim args() As String: args = GetParameters(formula)
     Dim argsCount As Long: argsCount = NumElements(args)

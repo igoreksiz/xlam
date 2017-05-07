@@ -20,5 +20,9 @@ Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
 #If Mac Then
     #If MAC_OFFICE_VERSION < 15 Then
         Public Const EXCEL_VERSION = "Mac2011"
+    #Else
+        Public Const EXCEL_VERSION = "Mac2016"
     #End If
+#Else
+    Public Const EXCEL_VERSION = "Win"
 #End If

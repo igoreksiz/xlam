@@ -16,7 +16,6 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-
 Private Sub SignUpLabel_Click()
     ThisWorkbook.FollowHyperlink SIGNUP_URL
 End Sub
@@ -38,7 +37,6 @@ Private Sub LoginButton_Click()
     success = Login(Me.emailBox.value, Me.passBox.value)
     If success Then
         Unload Me
-        Application.CalculateFull
     End If
 End Sub
 
@@ -47,7 +45,6 @@ Private Sub LoginButtonBg_Click()
     success = Login(Me.emailBox.value, Me.passBox.value)
     If success Then
         Unload Me
-        Application.CalculateFull
     End If
 End Sub
 

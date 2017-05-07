@@ -10,7 +10,7 @@ Option Explicit
 
 Public Function CollectionToString(ByVal dataCol As Variant) As String
     Dim i As Integer
-    For i = 1 To dataCol.Count
+    For i = 1 To dataCol.count
         If CollectionToString <> "" Then CollectionToString = CollectionToString & ", "
         CollectionToString = CollectionToString & dataCol(i)
     Next i

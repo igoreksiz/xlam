@@ -15,7 +15,6 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-
 Private Sub SignUpLabel_Click()
     ThisWorkbook.FollowHyperlink SIGNUP_URL
 End Sub

@@ -64,7 +64,7 @@ Public Sub UnlinkFormulas()
             Application.DisplayAlerts = False
             ActiveWorkbook.Save
             
-            For i = 1 To Sheets.Count
+            For i = 1 To Sheets.count
             On Error Resume Next
             For Each r In Sheets(i).UsedRange.SpecialCells(xlCellTypeFormulas)
             If r.formula Like "*FNBX*" Then r.value = r.value

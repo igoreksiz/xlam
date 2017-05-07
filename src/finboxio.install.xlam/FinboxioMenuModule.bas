@@ -4,6 +4,14 @@ Option Explicit
 Public AppRibbon
 Private ButtonDefs(1 To 7) As String
 
+Public Sub InvalidateAppRibbon()
+    If Not TypeName(AppRibbon) = "Empty" Then
+        If Not AppRibbon Is Nothing Then
+            AppRibbon.Invalidate
+        End If
+    End If
+End Sub
+
 Public Sub FinboxioRibbonLoad(ribbon)
     Set AppRibbon = ribbon
 End Sub
@@ -50,13 +58,15 @@ Public Sub AddCustomMenu()
     ' Button definitions:  Cap&tion,MacroName,ToolTip,IconId,BeginGroupBool
     '      (IconId 39 is blue right arrow, and is a good default option)
     
-    ButtonDefs(1) = "finbox.io Log&in,FinboxioShowLogin,Login to finbox.io API,39,True"
-    ButtonDefs(2) = "finbox.io Log&out,FinboxioLogout,Logout from finbox.io API,39,True"
-    ButtonDefs(3) = "finbox.io &Messages,FinboxioMessages,Display message log,39,True"
-    ButtonDefs(4) = "finbox.io Re&calculate,FinboxioRefresh,Recalculate open Excel Workbooks,39,True"
-    ButtonDefs(5) = "finbox.io Updates,FinboxioUpdate,Check for updates,39,True"
-    ButtonDefs(6) = "finbox.io Unlink,FinboxioUnlink,Unlink finbox.io formulas,39,True"
-    ButtonDefs(7) = "finbox.io Help,FinboxioHelp,Read the finbox.io add-in guide,39,True"
+    ButtonDefs(1) = "Log&in,FinboxioShowLogin,Login to finbox.io API,39,True"
+    ButtonDefs(2) = "Log&out,FinboxioLogout,Logout from finbox.io API,39,False"
+    
+    ButtonDefs(3) = "&Refresh data,FinboxioRefresh,Recalculate open Excel Workbooks,39,True"
+    ButtonDefs(4) = "Un&link Formulas,FinboxioUnlink,Unlink finbox.io formulas,39,False"
+    
+    ButtonDefs(5) = "&Message Log,FinboxioMessages,Display message log,39,True"
+    ButtonDefs(6) = "Check For &Updates,FinboxioUpdate,Check for updates,39,False"
+    ButtonDefs(7) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,39,False"
 
     Dim bd As Integer
     Dim butdefs() As String
@@ -67,20 +77,15 @@ Public Sub AddCustomMenu()
         ' Add (or retrieve) top level menu "Add-Ins"
         Dim CustomMenu As CommandBarPopup
         
-        On Error Resume Next
-        Set CustomMenu = Application.CommandBars("Worksheet Menu Bar").Controls("Add-Ins")
         On Error GoTo 0
-        
-        If CustomMenu Is Nothing Then
-                Set CustomMenu = Application.CommandBars("Worksheet Menu Bar").Controls.Add(msoControlPopup, _
-                        temporary:=True, Before:=7)  ' before "Data"
-                With CustomMenu
-                    .Caption = "&Add-Ins"
-                    .Tag = "Add-Ins"
-                    .enabled = True
-                    .Visible = True
-                End With
-        End If
+        Set CustomMenu = Application.CommandBars("Worksheet Menu Bar").Controls.Add(msoControlPopup, _
+                temporary:=True)  ' before "Data"
+        With CustomMenu
+            .Caption = "&finbox.io"
+            .Tag = "finbox.io"
+            .enabled = True
+            .Visible = True
+        End With
     
         ' Add buttons to top level menu "Add-Ins"
         With CustomMenu.Controls
@@ -117,7 +122,7 @@ Public Sub DeleteCustomMenu()
             ' Delete buttons and top level menu "Custom"
             With Application.CommandBars("Worksheet Menu Bar").Controls("Add-Ins")
                 .Controls(Replace(butdefs(0), "&", "")).Delete
-                If .Controls.Count = 0 Then .Delete
+                If .Controls.count = 0 Then .Delete
             End With
         End If
         On Error GoTo 0
