@@ -34,7 +34,7 @@ Public Function MSOffVer() As Integer
         
         On Error Resume Next
     If startPos > 0 Then
-        MSOffVer = CInt(Left(verStr, startPos - 1))
+        MSOffVer = CInt(VBA.Left(verStr, startPos - 1))
     Else
         MSOffVer = CInt(verStr)
     End If

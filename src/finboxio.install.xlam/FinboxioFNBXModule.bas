@@ -250,7 +250,7 @@ End Function
 
 Sub ParseKeys(formula As String, sheet As Worksheet, ByRef keys)
     Dim argIndex As String: argIndex = InStr(formula, "(")
-    Dim name As String: name = Left(formula, argIndex - 1)
+    Dim name As String: name = VBA.Left(formula, argIndex - 1)
     Dim args() As String: args = GetParameters(formula)
     Dim argsCount As Long: argsCount = NumElements(args)
     
