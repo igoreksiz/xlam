@@ -65,13 +65,16 @@ Public Sub InstallAddin(self)
                     self.SaveCopyAs sStandardPath & sAddInFileName
                     Set oAddIn = oXLApp.AddIns.Add(sStandardPath & sAddInFileName, True)
                     oAddIn.Installed = True
-                    MsgBox ("‘" & sAddInName & "' AddIn Installed and Activated")
                 End If
-                oWorkbook.Close (False) ' Close the workbook opened by the install script
-                oXLApp.Quit ' Close the app opened by the install script
-                Set oWorkbook = Nothing ' Free memory
-                Set oXLApp = Nothing ' Free memory
-                self.Close (False)
+                Dim restart As Integer
+                restart = MsgBox("The finbox.io add-in was successfully installed! You must quit and restart Excel to activate it. Would you like to quit Excel now?", vbYesNo)
+                If restart = vbYes Then
+                    oWorkbook.Close (False) ' Close the workbook opened by the install script
+                    oXLApp.Quit ' Close the app opened by the install script
+                    Set oWorkbook = Nothing ' Free memory
+                    Set oXLApp = Nothing ' Free memory
+                    self.Close (False)
+                End If
             End If
         Else
             DebugBox ("Called from:'" & sCurrentPath & "' Already Run")

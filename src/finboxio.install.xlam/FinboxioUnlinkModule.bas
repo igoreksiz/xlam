@@ -56,9 +56,14 @@ Public Sub UnlinkFormulas()
     Select Case Ans
               
     Case vbYes
-        fileSaveName = Application.GetSaveAsFilename( _
-            InitialFileName:=wbName & " - UNLINKED", _
-            fileFilter:="Excel Workbook (*.xlsx), *.xlsx")
+        #If Mac Then
+            fileSaveName = Application.GetSaveAsFilename( _
+                InitialFileName:=wbName & " - UNLINKED")
+        #Else
+            fileSaveName = Application.GetSaveAsFilename( _
+                InitialFileName:=wbName & " - UNLINKED", _
+                fileFilter:="Excel Workbook (*.xlsx), *.xlsx")
+        #End If
 
         If TypeName(fileSaveName) <> "Boolean" Then
             Application.DisplayAlerts = False
