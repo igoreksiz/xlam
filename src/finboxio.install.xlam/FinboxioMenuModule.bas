@@ -17,7 +17,7 @@ Public Sub FinboxioLoggedOut(control, ByRef enabled)
 End Sub
 
 Public Sub FinboxioShowLogin(Optional control)
-    CredentialsForm.Show
+    ShowLoginForm
 End Sub
 
 Public Sub FinboxioLogout(Optional control)

@@ -9,6 +9,14 @@ Public Sub SetAPIKeyHandler(handler As APIKeyHandler)
     Set APIKeyStore = handler
 End Sub
 
+Public Function ShowLoginForm()
+    If EXCEL_VERSION = "Mac2011" Then
+        MacCredentialsForm.Show
+    Else
+        CredentialsForm.Show
+    End If
+End Function
+
 Public Function Login(ByVal email As String, ByVal password As String) As Boolean
     Login = False
     

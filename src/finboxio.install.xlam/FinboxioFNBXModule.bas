@@ -54,7 +54,7 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
     
     Dim loggedIn As Boolean
     If Not IsLoggedIn() Then
-        FinboxioShowLogin
+        ShowLoginForm
     End If
     
     ' check for null API key
