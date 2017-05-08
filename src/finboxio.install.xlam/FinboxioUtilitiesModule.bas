@@ -113,10 +113,8 @@ End Function
 
 Public Function FixAddinLinks()
     IsReplacingLinks = True
-    Dim calc As Integer
+    Dim calc As Long
     Dim Sht As Worksheet
-    calc = Application.calculation
-    Application.calculation = xlCalculationManual
     Application.ScreenUpdating = False
     For Each Sht In Worksheets
         Sht.Cells.Replace _
@@ -136,6 +134,5 @@ Public Function FixAddinLinks()
     Next Sht
     Application.Run "ResetFindReplace"
     Application.ScreenUpdating = True
-    Application.calculation = calc
     IsReplacingLinks = False
 End Function
