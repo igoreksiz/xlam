@@ -256,7 +256,7 @@ Public Function FindAllKeys() As String()
                     On Error Resume Next
                     Do Until FoundCell Is Nothing
                         Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell)
-                        If cell.HasFormula Then
+                        If FoundCell.HasFormula Then
                             formula = FoundCell.formula
                             ParseKeys formula, sheet, allKeys
                         End If
