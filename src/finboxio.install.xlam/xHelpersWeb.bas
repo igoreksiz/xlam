@@ -1280,7 +1280,7 @@ End Function
 '   Protocol, Host, Port, Path, Querystring, Hash
 ' @throws 11003 - Error while getting url parts
 ''
-Public Function GetUrlParts(Url As String) As Dictionary
+Public Function GetUrlParts(url As String) As Dictionary
     Dim web_Parts As New Dictionary
 
     On Error GoTo web_ErrorHandling
@@ -1297,17 +1297,17 @@ Public Function GetUrlParts(Url As String) As Dictionary
     Dim web_Value As String
 
     ' Add Protocol if missing
-    If VBA.InStr(1, Url, "://") <= 0 Then
+    If VBA.InStr(1, url, "://") <= 0 Then
         web_AddedProtocol = True
-        If VBA.InStr(1, Url, "//") = 1 Then
-            Url = "http" & Url
+        If VBA.InStr(1, url, "//") = 1 Then
+            url = "http" & url
         Else
-            Url = "http://" & Url
+            url = "http://" & url
         End If
     End If
 
     web_Command = "perl -e '{use URI::URL;" & vbNewLine & _
-        "$url = new URI::URL """ & Url & """;" & vbNewLine & _
+        "$url = new URI::URL """ & url & """;" & vbNewLine & _
         "print ""Protocol="" . $url->scheme;" & vbNewLine & _
         "print "" | Host="" . $url->host;" & vbNewLine & _
         "print "" | Port="" . $url->port;" & vbNewLine & _
@@ -1349,7 +1349,7 @@ Public Function GetUrlParts(Url As String) As Dictionary
         Set web_pElHelper = web_pDocumentHelper.createElement("a")
     End If
 
-    web_pElHelper.href = Url
+    web_pElHelper.href = url
     web_Parts.Add "Protocol", Replace(web_pElHelper.Protocol, ":", "", count:=1)
     web_Parts.Add "Host", web_pElHelper.hostname
     web_Parts.Add "Port", web_pElHelper.port
@@ -3028,7 +3028,7 @@ End Function
 ' @param[out] {String} ProxyServer
 ' @param[out] {String} ProxyBypass
 ''
-Public Sub GetAutoProxy(ByVal Url As String, ByRef ProxyServer As String, ByRef ProxyBypass As String)
+Public Sub GetAutoProxy(ByVal url As String, ByRef ProxyServer As String, ByRef ProxyBypass As String)
 #If Mac Then
     ' (Windows only)
 #ElseIf VBA7 Then
@@ -3054,7 +3054,7 @@ Public Sub GetAutoProxy(ByVal Url As String, ByRef ProxyServer As String, ByRef 
     ProxyBypass = ""
 
     ' WinHttpGetProxyForUrl returns unexpected errors if Url is empty
-    If Url = "" Then Url = " "
+    If url = "" Then url = " "
 
     On Error GoTo AutoProxy_Cleanup
 
@@ -3095,7 +3095,7 @@ Public Sub GetAutoProxy(ByVal Url As String, ByRef ProxyServer As String, ByRef 
         AutoProxy_hSession = AutoProxy_HttpOpen(0, 1, 0, 0, 0)
 
         If (AutoProxy_GetProxyForUrl( _
-            AutoProxy_hSession, StrPtr(Url), AutoProxy_AutoProxyOptions, AutoProxy_ProxyInfo) > 0) Then
+            AutoProxy_hSession, StrPtr(url), AutoProxy_AutoProxyOptions, AutoProxy_ProxyInfo) > 0) Then
 
             AutoProxy_ProxyStringPtr = AutoProxy_ProxyInfo.AutoProxy_lpszProxy
         Else
