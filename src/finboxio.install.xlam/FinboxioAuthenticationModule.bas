@@ -4,6 +4,7 @@ Attribute VB_Name = "FinboxioAuthenticationModule"
 Option Explicit
 
 Private APIKeyStore As APIKeyHandler
+Private tier As String
 
 Public Sub SetAPIKeyHandler(handler As APIKeyHandler)
     Set APIKeyStore = handler
@@ -78,7 +79,9 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             MsgBox "The finbox.io API returned http status code " & webResponse.statusCode & " = " & vbCr & _
                 VBA.Trim(webResponse.StatusDescription), vbCritical, AppTitle
     End Select
-
+    
+    tier = ""
+    
     Set jsonReqObj = Nothing
     Set webClient = Nothing
     Set webRequest = Nothing
@@ -87,9 +90,43 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     InvalidateAppRibbon
     Exit Function
 ErrorHandler:
+    tier = ""
     InvalidateAppRibbon
     Dim answer As Integer
     answer = MsgBox("Failed to authenticate with finbox.io. Contact support@finbox.io if this problem persists.", vbCritical, "finbox.io Addin")
+End Function
+
+Public Function GetTier()
+    If Not tier = "" Then
+        GoTo OnError
+    End If
+    
+    On Error GoTo OnError
+    
+    Dim APIkey As String
+    
+    tier = "anonymous"
+    APIkey = GetAPIKey()
+    
+    Dim webClient As New webClient
+    
+    webClient.BaseUrl = TIER_URL
+    
+    Dim Auth As New HttpBasicAuthenticator
+    Auth.Setup APIkey, ""
+    Set webClient.Authenticator = Auth
+    
+    Dim webRequest As New webRequest
+    webRequest.Method = WebMethod.HttpGet
+    webRequest.ResponseFormat = WebFormat.Json
+    webRequest.AddHeader "X-Finboxio-Addon", GetAPIHeader()
+    
+    Dim webResponse As webResponse
+    Set webResponse = webClient.Execute(webRequest)
+
+    tier = webResponse.Data("data")("tier")
+OnError:
+    GetTier = tier
 End Function
 
 Public Function StoreApiKey(key As String)
@@ -105,6 +142,7 @@ Public Sub Logout()
         Set APIKeyStore = New APIKeyHandler
     End If
     APIKeyStore.ClearAPIKey
+    tier = ""
 End Sub
 
 Public Function IsLoggedIn()

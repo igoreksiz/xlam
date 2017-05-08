@@ -22,6 +22,6 @@ Public Sub DisplayDataLimit(Optional reset As Boolean = True)
         RedisplayDataLimit = Now() + (5 / (60 * 24))
     End If
     If ack = vbOK Then
-        ActiveWorkbook.FollowHyperlink USAGE_URL
+        ThisWorkbook.FollowHyperlink USAGE_URL
     End If
 End Sub

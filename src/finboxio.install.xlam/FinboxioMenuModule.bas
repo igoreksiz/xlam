@@ -24,6 +24,21 @@ Public Sub FinboxioLoggedOut(control, ByRef enabled)
     enabled = IsLoggedOut()
 End Sub
 
+Public Sub FinboxioIsFree(control, ByRef free)
+    Dim key As String
+    Dim tier As String
+    
+    key = GetAPIKey()
+    tier = GetTier()
+    
+    free = False
+    If key <> "" Then
+        If tier = "anonymous" Or tier = "free" Then
+            free = True
+        End If
+    End If
+End Sub
+
 Public Sub FinboxioShowLogin(Optional control)
     ShowLoginForm
 End Sub
@@ -38,6 +53,26 @@ End Sub
 
 Public Sub FinboxioHelp(Optional control)
     Call LoadHelp
+End Sub
+
+Public Sub FinboxioUpgrade(Optional control)
+    ThisWorkbook.FollowHyperlink UPGRADE_URL
+End Sub
+
+Public Sub FinboxioProfile(Optional control)
+    ThisWorkbook.FollowHyperlink PROFILE_URL
+End Sub
+
+Public Sub FinboxioWatchlist(Optional control)
+    ThisWorkbook.FollowHyperlink WATCHLIST_URL
+End Sub
+
+Public Sub FinboxioScreener(Optional control)
+    ThisWorkbook.FollowHyperlink SCREENER_URL
+End Sub
+
+Public Sub FinboxioTemplates(Optional control)
+    ThisWorkbook.FollowHyperlink TEMPLATES_URL
 End Sub
 
 Public Sub FinboxioRefresh(Optional control)
@@ -84,7 +119,7 @@ Public Sub AddCustomMenu()
             .Caption = "&finbox.io"
             .Tag = "finbox.io"
             .enabled = True
-            .Visible = True
+            .visible = True
         End With
     
         ' Add buttons to top level menu "Add-Ins"
