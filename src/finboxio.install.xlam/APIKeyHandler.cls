@@ -24,7 +24,7 @@ Private Sub Class_Initialize()
     keyToStore = ""
 End Sub
 
-Public Sub StoreAPIKey(key As String)
+Public Sub StoreApiKey(key As String)
     keyToStore = key
     StoreKey
 End Sub

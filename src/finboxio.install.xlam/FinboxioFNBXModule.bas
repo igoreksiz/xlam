@@ -16,6 +16,11 @@ End Sub
 
 Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional ByRef period = "") As Variant
     On Error GoTo Error_Handler
+    
+    If IsReplacingLinks Then
+        FNBX = CVErr(xlErrName)
+        Exit Function
+    End If
 
     Dim cell As String
     cell = CurrentCaller()

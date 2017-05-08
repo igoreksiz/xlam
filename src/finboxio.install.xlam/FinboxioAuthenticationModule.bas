@@ -12,6 +12,8 @@ End Sub
 Public Function ShowLoginForm()
     If EXCEL_VERSION = "Mac2011" Then
         MacCredentialsForm.Show
+    ElseIf EXCEL_VERSION = "Mac2016" Then
+        Mac2016CredentialsForm.Show
     Else
         CredentialsForm.Show
     End If
@@ -69,7 +71,7 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
                     "To resend the verification email, visit https://finbox.io/profile.", _
                     vbCritical, AppTitle
             Else
-                APIKeyStore.StoreAPIKey (APIkey)
+                APIKeyStore.StoreApiKey (APIkey)
                 Login = True
             End If
         Case Else
@@ -88,6 +90,14 @@ ErrorHandler:
     InvalidateAppRibbon
     Dim answer As Integer
     answer = MsgBox("Failed to authenticate with finbox.io. Contact support@finbox.io if this problem persists.", vbCritical, "finbox.io Addin")
+End Function
+
+Public Function StoreApiKey(key As String)
+    If APIKeyStore Is Nothing Then
+        Set APIKeyStore = New APIKeyHandler
+    End If
+    APIKeyStore.StoreApiKey (key)
+    StoreApiKey = True
 End Function
 
 Public Sub Logout()

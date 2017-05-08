@@ -21,12 +21,8 @@ Public Sub InstallAddin(self)
     Dim bAlreadyInstalled As Boolean
     Dim sAddInName As String, sAddInFileName As String, sCurrentPath As String, sStandardPath As String
     
-    sCurrentPath = self.Path & Application.PathSeparator
-    #If Mac Then
-        sStandardPath = Application.LibraryPath
-    #Else
-        sStandardPath = Application.UserLibraryPath
-    #End If
+    sCurrentPath = self.path & Application.PathSeparator
+    sStandardPath = SavePath()
     
     If VBA.InStr(1, self.name, ".install.xlam", vbTextCompare) Then
         ' This is an install version, so let’s pick the proper AddIn name
@@ -53,16 +49,16 @@ Public Sub InstallAddin(self)
                     If self.Application.AddIns.Item(iAddIn).Installed Then
                         ' Deactivate the add-in to be able to overwrite the file
                         self.Application.AddIns.Item(iAddIn).Installed = False
-                        self.SaveCopyAs sStandardPath & sAddInFileName
+                        SaveCopy self, sAddInFileName
                         self.Application.AddIns.Item(iAddIn).Installed = True
                     Else
-                        self.SaveCopyAs sStandardPath & sAddInFileName
+                        SaveCopy self, sAddInFileName
                         self.Application.AddIns.Item(iAddIn).Installed = True
                     End If
                 Else
                     ' Not yet installed
                     DebugBox ("Called from:'" & sCurrentPath & "' Not installed")
-                    self.SaveCopyAs sStandardPath & sAddInFileName
+                    SaveCopy self, sAddInFileName
                     Set oAddIn = oXLApp.AddIns.Add(sStandardPath & sAddInFileName, True)
                     oAddIn.Installed = True
                 End If
@@ -86,6 +82,70 @@ Public Sub InstallAddin(self)
     End If
 End Sub
 
+Function SavePath()
+    #If Mac Then
+        If EXCEL_VERSION = "Mac2016" Then
+            SavePath = MacScript("return POSIX path of (path to desktop folder) as string")
+            SavePath = Replace(SavePath, "/Desktop", "") & "/Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/Office/15.0/"
+            SavePath = SavePath & "Add-Ins/"
+        Else
+            SavePath = Application.LibraryPath
+        End If
+    #Else
+        SavePath = Application.UserLibraryPath
+    #End If
+End Function
+
+Sub SaveCopy(wb, name As String)
+    If EXCEL_VERSION = "Mac2016" Then
+        SaveCopyAsExcel2016 wb, name
+    Else
+        Dim path As String
+        path = SavePath()
+        wb.SaveCopyAs path & name
+    End If
+End Sub
+
 Sub DebugBox(sText As String)
     If bVerboseMessages Then MsgBox (sText)
 End Sub
+
+Function CreateFolderinMacOffice2016() As String
+    'Function to create folder if it not exists in the Microsoft Office Folder
+    'Ron de Bruin : 8-Jan-2016
+    Dim PathToFolder As String
+    Dim TestStr As String
+
+    PathToFolder = SavePath()
+
+    On Error Resume Next
+    TestStr = Dir(PathToFolder, vbDirectory)
+    On Error GoTo 0
+    If TestStr = vbNullString Then
+        MkDir PathToFolder
+        'You can use this msgbox line for testing if you want
+        'MsgBox "You find the new folder in this location :" & PathToFolder
+    End If
+    CreateFolderinMacOffice2016 = PathToFolder
+End Function
+
+Sub SaveCopyAsExcel2016(wb, name As String)
+    'Save a copy of the file with a Date/time stamp in a sub folder
+    'in the Microsoft Office Folder
+    'This macro use the custom function named : CreateFolderinMacOffice2016
+    Dim Folderstring As String
+    Dim StrFilePath As String
+    Dim StrFileName As String
+    Dim FileExtStr As String
+
+    'Create folder if it not exists in the Microsoft Office Folder
+    Folderstring = CreateFolderinMacOffice2016()
+
+    StrFilePath = Folderstring
+    StrFileName = name
+
+    With wb
+        .SaveCopyAs StrFilePath & StrFileName
+    End With
+End Sub
+

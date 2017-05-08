@@ -35,12 +35,12 @@ Public Sub UnlinkFormulas()
     Dim fileSaveName As Variant
     Dim wbName As String
     Dim Msg As String
-    Dim fileName As String
+    Dim FileName As String
     Dim i As Integer
     Dim r As Range
     
     Application.EnableCancelKey = xlDisabled
-    Application.Calculation = xlCalculationManual
+    Application.calculation = xlCalculationManual
     
     wbName = ActiveWorkbook.name
     wbName = Replace(wbName, ".xlsm", "")
@@ -77,11 +77,11 @@ Public Sub UnlinkFormulas()
             Next i
             On Error GoTo 0
 
-            ActiveWorkbook.SaveAs fileName:=fileSaveName, FileFormat:=xlOpenXMLWorkbook
+            ActiveWorkbook.SaveAs FileName:=fileSaveName, FileFormat:=xlOpenXMLWorkbook
             Application.DisplayAlerts = True
         End If
     
     End Select
     Application.EnableCancelKey = xlInterrupt
-    Application.Calculation = xlCalculationAutomatic
+    Application.calculation = xlCalculationAutomatic
 End Sub
