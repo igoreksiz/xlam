@@ -2,7 +2,7 @@ Attribute VB_Name = "FinboxioMenuModule"
 Option Explicit
 
 Public AppRibbon
-Private ButtonDefs(1 To 7) As String
+Private ButtonDefs(1 To 11) As String
 
 Public Sub InvalidateAppRibbon()
     If Not TypeName(AppRibbon) = "Empty" Then
@@ -95,13 +95,18 @@ Public Sub AddCustomMenu()
     
     ButtonDefs(1) = "Log&in,FinboxioShowLogin,Login to finbox.io API,39,True"
     ButtonDefs(2) = "Log&out,FinboxioLogout,Logout from finbox.io API,39,False"
+    ButtonDefs(3) = "&Pro,FinboxioUpgrade,Upgrade to premium access,39,False"
     
-    ButtonDefs(3) = "&Refresh data,FinboxioRefresh,Recalculate open Excel Workbooks,39,True"
-    ButtonDefs(4) = "Un&link Formulas,FinboxioUnlink,Unlink finbox.io formulas,39,False"
+    ButtonDefs(4) = "&Watchlist,FinboxioWatchlist,Go to your watchlist,39,True"
+    ButtonDefs(5) = "&Screener,FinboxioScreener,Go to the online screener,39,False"
+    ButtonDefs(6) = "&Templates,FinboxioTemplates,Download pre-built templates,39,False"
     
-    ButtonDefs(5) = "&Message Log,FinboxioMessages,Display message log,39,True"
-    ButtonDefs(6) = "Check For &Updates,FinboxioUpdate,Check for updates,39,False"
-    ButtonDefs(7) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,39,False"
+    ButtonDefs(7) = "&Refresh data,FinboxioRefresh,Recalculate open Excel Workbooks,39,True"
+    ButtonDefs(8) = "Un&link Formulas,FinboxioUnlink,Unlink finbox.io formulas,39,False"
+    
+    ButtonDefs(9) = "&Message Log,FinboxioMessages,Display message log,39,True"
+    ButtonDefs(10) = "Check For &Updates,FinboxioUpdate,Check for updates,39,False"
+    ButtonDefs(11) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,39,False"
 
     Dim bd As Integer
     Dim butdefs() As String
