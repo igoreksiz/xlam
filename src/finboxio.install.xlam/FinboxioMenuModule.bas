@@ -72,7 +72,9 @@ Public Sub FinboxioScreener(Optional control)
 End Sub
 
 Public Sub FinboxioTemplates(Optional control)
-    ThisWorkbook.FollowHyperlink TEMPLATES_URL
+    MsgBox "Coming Soon!"
+    Exit Sub
+    ' ThisWorkbook.FollowHyperlink TEMPLATES_URL
 End Sub
 
 Public Sub FinboxioRefresh(Optional control)
