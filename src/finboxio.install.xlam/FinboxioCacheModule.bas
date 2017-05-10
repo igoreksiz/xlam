@@ -30,7 +30,11 @@ Public Sub SetCachedValue(ByVal key As String, ByVal dataValue As Variant)
 
 
     ' Set cached value and timestamp for key
-    CachedValues(key) = dataValue
+    If TypeName(dataValue) = "Collection" Then
+        Set CachedValues(key) = dataValue
+    Else
+        CachedValues(key) = dataValue
+    End If
     CachedTimestamp(key) = Now()
 
 End Sub
@@ -39,7 +43,11 @@ Public Function GetCachedValue(ByVal key As String) As Variant
 
     ' Retrieve cached value for key
     If CachedValues.Exists(key) Then
-        GetCachedValue = CachedValues(key)
+        If TypeName(CachedValues(key)) = "Collection" Then
+            Set GetCachedValue = CachedValues(key)
+        Else
+            GetCachedValue = CachedValues(key)
+        End If
     Else
         GetCachedValue = CVErr(xlErrNA) ' return #NA
     End If
