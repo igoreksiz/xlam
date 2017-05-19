@@ -24,10 +24,9 @@ Public Sub InstallAddin(self)
     sCurrentPath = self.path & Application.PathSeparator
     sStandardPath = SavePath()
     
-    If VBA.InStr(1, self.name, ".install.xlam", vbTextCompare) Then
+    If VBA.InStr(1, self.name, "finboxio.install", vbTextCompare) Then
         ' This is an install version, so let’s pick the proper AddIn name
-        sAddInName = VBA.Left(self.name, VBA.InStr(1, self.name, ".install.xlam", vbTextCompare) - 1)
-        sAddInFileName = sAddInName & ".xlam"
+        sAddInFileName = "finboxio.xlam"
         
         ' Avoid the re-entry of script after activating the addin
         If Not (bAlreadyRun) Then
