@@ -38,6 +38,7 @@ Public Sub InstallAddin(self)
                 Set oWorkbook = oXLApp.Workbooks.Add
                 ' Test if AddIn already installed
                 For i = 1 To self.Application.AddIns.count
+                    On Error Resume Next
                     If self.Application.AddIns.Item(i).FullName = sStandardPath & sAddInFileName Then
                         bAlreadyInstalled = True
                         iAddIn = i

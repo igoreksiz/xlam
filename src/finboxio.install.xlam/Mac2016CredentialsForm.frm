@@ -4,7 +4,7 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Mac2016CredentialsForm
    ClientHeight    =   3735
    ClientLeft      =   45
    ClientTop       =   390
-   ClientWidth     =   8700.001
+   ClientWidth     =   8700
    OleObjectBlob   =   "Mac2016CredentialsForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

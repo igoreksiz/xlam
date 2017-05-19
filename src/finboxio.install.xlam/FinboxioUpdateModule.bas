@@ -3,7 +3,6 @@ Option Explicit
 
 Public Sub CheckUpdates(Optional explicit As Boolean = False)
     Dim latest As String
-    Dim url As String
     Dim answer As Integer
     
     latest = ""
@@ -23,14 +22,13 @@ Public Sub CheckUpdates(Optional explicit As Boolean = False)
     Select Case webResponse.statusCode
     Case 200
         latest = webResponse.Data("version")
-        url = webResponse.Data("download_url")
     End Select
     
 Confirmation:
     If latest = "" Then
         answer = MsgBox("Unable to check for updates to the finbox.io add-on at this time. Please contact support@finbox.io if this problem persists.", vbCritical, AppTitle)
-    ElseIf latest > AppVersion Then
-        answer = MsgBox("A new version of the finbox.io add-on is available! Would you like to upgrade to " & latest & " now?", vbYesNo + vbQuestion, AppTitle)
+    ElseIf Not latest = AppVersion Then
+        answer = MsgBox("A newer version of the finbox.io add-on is available! Would you like to upgrade to " & latest & " now?", vbYesNo + vbQuestion, AppTitle)
         If answer = vbYes Then
             ThisWorkbook.FollowHyperlink UPDATE_URL
         End If
