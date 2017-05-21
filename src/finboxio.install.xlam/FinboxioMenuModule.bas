@@ -1,7 +1,12 @@
 Attribute VB_Name = "FinboxioMenuModule"
 Option Explicit
 
-Public AppRibbon
+#If Mac Then
+    Public AppRibbon
+#Else
+    Public AppRibbon As IRibbonUI
+#End If
+
 Private ButtonDefs(1 To 11) As String
 
 Public Sub InvalidateAppRibbon()
@@ -12,9 +17,15 @@ Public Sub InvalidateAppRibbon()
     End If
 End Sub
 
+#If Mac Then
 Public Sub FinboxioRibbonLoad(ribbon)
     Set AppRibbon = ribbon
 End Sub
+#Else
+Public Sub FinboxioRibbonLoad(ByRef ribbon As IRibbonUI)
+    Set AppRibbon = ribbon
+End Sub
+#End If
 
 Public Sub FinboxioLoggedIn(control, ByRef enabled)
     enabled = IsLoggedIn()
@@ -170,3 +181,5 @@ Public Sub DeleteCustomMenu()
         On Error GoTo 0
     Next bd
 End Sub
+
+
