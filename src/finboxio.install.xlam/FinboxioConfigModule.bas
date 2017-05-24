@@ -3,7 +3,7 @@ Attribute VB_Name = "FinboxioConfigModule"
 
 Option Explicit
 
-Public Const AppVersion = "v0.13"
+Public Const AppVersion = "v0.14"
 Public Const AppTitle = "finbox.io Add-In " & AppVersion
 
 Public Const CACHE_TIMEOUT_MINUTES = 60
