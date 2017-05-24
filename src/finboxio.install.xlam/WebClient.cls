@@ -657,7 +657,7 @@ Public Function PrepareCurlRequest(Request As webRequest) As String
 
     ' Add method, data, and url
     web_Curl = web_Curl & " -X " & xHelpersWeb.MethodToName(Request.Method)
-    web_Curl = web_Curl & " -d '" & Request.Body & "'"
+    web_Curl = web_Curl & " -d '" & xHelpersWeb.PrepareBodyForShell(Request.Body) & "'"
     web_Curl = web_Curl & " '" & Me.GetFullUrl(Request) & "'"
 
     ' Give authenticator opportunity to update cURL

@@ -1699,6 +1699,20 @@ Public Function PrepareTextForShell(ByVal web_Text As String) As String
     PrepareTextForShell = web_Text
 End Function
 
+''
+' Prepare json body for shell (escape single quotes)
+'
+' @internal
+' @method PrepareBodyForShell
+' @param {String} Text
+' @return {String}
+''
+Public Function PrepareBodyForShell(ByVal web_Text As String) As String
+    ' Escape single quotes
+    web_Text = VBA.Replace(web_Text, "'", "'""'""'")
+    PrepareBodyForShell = web_Text
+End Function
+
 ' ============================================= '
 ' 8. Cryptography
 ' ============================================= '

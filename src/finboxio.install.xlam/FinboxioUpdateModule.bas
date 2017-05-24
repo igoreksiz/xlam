@@ -1,7 +1,7 @@
 Attribute VB_Name = "FinboxioUpdateModule"
 Option Explicit
 
-Public Sub CheckUpdates(Optional explicit As Boolean = False)
+Public Sub CheckUpdates(Optional explicit As Boolean = False, Optional wb As Workbook)
     Dim latest As String
     Dim answer As Integer
     
@@ -30,7 +30,12 @@ Confirmation:
     ElseIf Not latest = AppVersion Then
         answer = MsgBox("A newer version of the finbox.io add-on is available! Would you like to upgrade to " & latest & " now?", vbYesNo + vbQuestion, AppTitle)
         If answer = vbYes Then
-            ThisWorkbook.FollowHyperlink UPDATE_URL
+            If TypeName(wb) = "Empty" Then
+                wb = ThisWorkbook
+            End If
+            If Not TypeName(wb) = "Empty" Then
+                wb.FollowHyperlink UPDATE_URL
+            End If
         End If
     ElseIf explicit And latest = AppVersion Then
         answer = MsgBox("You're already running the latest version of the finbox.io add-on! Please enjoy responsibly.", vbOKOnly, AppTitle)

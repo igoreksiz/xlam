@@ -8,7 +8,7 @@ Private Sub Workbook_Open()
     Call SetAPIKeyHandler(New APIKeyHandler)
     
     Call AddCustomMenu
-    Call CheckUpdates
+    Call CheckUpdates(False, Me)
 
     LogMessage "Welcome to " & AppTitle
 End Sub
