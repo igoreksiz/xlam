@@ -165,12 +165,12 @@ End Sub
 ' @param {String} Result
 ' @throws 11031 / 80042b17 / -2147210473 - Error creating from cURL
 ''
-Public Sub CreateFromCurl(Client As webClient, Request As webRequest, Result As String)
+Public Sub CreateFromCurl(Client As webClient, Request As webRequest, result As String)
     On Error GoTo web_ErrorHandling
 
     Dim web_Lines() As String
 
-    web_Lines = VBA.Split(Result, web_CrLf)
+    web_Lines = VBA.Split(result, web_CrLf)
 
     Me.statusCode = web_ExtractStatusFromCurlResponse(web_Lines)
     Me.StatusDescription = web_ExtractStatusTextFromCurlResponse(web_Lines)

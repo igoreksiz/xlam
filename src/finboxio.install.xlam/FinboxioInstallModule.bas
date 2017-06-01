@@ -29,7 +29,7 @@ Public Sub InstallAddin(self)
         
         ' Avoid the re-entry of script after activating the addin
         If Not (bAlreadyRun) Then
-            bAlreadyRun = True ' Ensure we wonít install it multiple times (because Excel reopen files after an XLAM installation)
+            bAlreadyRun = True ' Ensure we won’t install it multiple times (because Excel reopen files after an XLAM installation)
             If MsgBox("Do you want to install the finbox.io excel add-in? This will overwrite any previously installed versions.", vbYesNo) = vbYes Then
                 ' Create a workbook otherwise, we get into troubles as Application.AddIns may not exist
                 Set oXLApp = Application

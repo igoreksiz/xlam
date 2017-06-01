@@ -112,6 +112,7 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
 
     ReDim requestedKeys(0)
     allKeys = FindAllKeys()
+    added = InsertElementIntoArray(allKeys, UBound(allKeys) + 1, key)
 
     For i = 1 To UBound(allKeys)
         k = allKeys(i)
@@ -288,7 +289,7 @@ Public Function FindAllKeys() As String()
                 On Error Resume Next
                 For Each cell In myRange
                     If cell.HasFormula Then
-                        ParseKeys cell.formula, sheet, allKeys
+                        ParseFormula cell.formula, cell, sheet, allKeys
                     End If
                 Next cell
             #Else
@@ -302,7 +303,7 @@ Public Function FindAllKeys() As String()
                         Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell)
                         If FoundCell.HasFormula Then
                             formula = FoundCell.formula
-                            ParseKeys formula, sheet, allKeys
+                            ParseFormula formula, FoundCell, sheet, allKeys
                         End If
                         If FoundCell.address = FirstFound Then Exit Do
                     Loop
@@ -316,7 +317,44 @@ Public Function FindAllKeys() As String()
     FindAllKeys = allKeys()
 End Function
 
-Sub ParseKeys(formula As String, sheet As Worksheet, ByRef keys)
+Sub ParseFormula(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
+    Dim fn As String: fn = ""
+    Dim quotes As Boolean: quotes = False
+    Dim parens As Long: parens = 0
+    Dim i As Long
+    For i = 1 To VBA.Len(formula)
+        Dim char As String
+        char = VBA.Mid(formula, i, 1)
+        If char = """" Then
+            quotes = Not quotes
+            If VBA.Len(fn) > 0 Then
+                fn = fn & char
+            End If
+        ElseIf quotes Then
+            If VBA.Len(fn) > 0 Then
+                fn = fn & char
+            End If
+        ElseIf char = "(" Then
+            parens = parens + 1
+            fn = fn & char
+        ElseIf char = ")" Then
+            parens = parens - 1
+            fn = fn & char
+            If parens = 0 Then
+                ParseKeys fn, cell, sheet, keys
+                fn = ""
+            End If
+        ElseIf parens = 0 And char Like "[A-Za-z_]" Then
+            fn = fn & char
+        ElseIf parens = 0 Then
+            fn = ""
+        Else
+            fn = fn & char
+        End If
+    Next i
+End Sub
+
+Sub ParseKeys(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
     Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
     If argIndex = 0 Then Exit Sub
 
@@ -324,18 +362,19 @@ Sub ParseKeys(formula As String, sheet As Worksheet, ByRef keys)
     Dim args() As String: args = GetParameters(formula)
     Dim argsCount As Long: argsCount = NumElements(args)
 
-    If name = "FNBX" Or name = "=FNBX" Then
+    If name = "FNBX" Or name = "=FNBX" Or name = "=-FNBX" Then
         Dim success As Boolean
         Dim ticker As String
         Dim metric As String
+        Dim activated As Boolean
         Dim period
-
-        ticker = EvalArgument(args(0), sheet)
-        metric = EvalArgument(args(1), sheet)
+        
+        ticker = EvalArgument(args(0), cell, sheet)
+        metric = EvalArgument(args(1), cell, sheet)
         period = ""
 
         If argsCount > 2 Then
-            period = EvalArgument(args(2), sheet)
+            period = EvalArgument(args(2), cell, sheet)
             Dim pType As String: pType = TypeName(period)
             If pType = "Double" Then
                 period = ""
@@ -354,17 +393,71 @@ Sub ParseKeys(formula As String, sheet As Worksheet, ByRef keys)
     End If
 End Sub
 
-Function EvalArgument(arg As String, sheet As Worksheet)
+Function EvalArgument(arg As String, cell As Range, sheet As Worksheet)
     Dim value
     Dim address As String
     If ValidAddress(arg) Then
         address = sheet.Range(arg).address(External:=True)
         value = Range(address).value
         EvalArgument = value
+    ElseIf IsTableAddress(arg) Then
+        value = EvalTableAddress(arg, cell)
+        EvalArgument = value
     Else
         value = Application.Evaluate(arg)
         EvalArgument = value
     End If
+End Function
+
+Function IsTableAddress(arg As String) As Boolean
+    Dim i As Long
+    Dim c As String
+    Dim result As Boolean
+    result = False
+    
+    For i = 1 To VBA.Len(arg)
+        c = VBA.Mid(arg, i, 1)
+        If c = """" Then
+            result = False
+            i = VBA.Len(arg)
+        ElseIf c = "[" Then
+            result = True
+            i = VBA.Len(arg)
+        End If
+    Next i
+    
+    IsTableAddress = result
+End Function
+
+Function EvalTableAddress(arg As String, cell As Range)
+    Dim i As Long
+    Dim j As Long
+    Dim c As String
+    Dim table As ListObject
+    
+    i = VBA.InStr(arg, "[")
+    If (i = 1) Then
+        Set table = cell.ListObject
+    Else
+        Dim name As String: name = VBA.Left(arg, i)
+        Set table = cell.Worksheet.ListObjects(name)
+    End If
+    
+    j = VBA.InStr(i, arg, "]")
+    Dim header As String
+    header = VBA.Mid(arg, i + 1, j - i - 1)
+    header = VBA.Replace(header, "@", "")
+    
+    Dim row As Long
+    Dim first As Range
+    Set first = table.DataBodyRange.Cells(1, 1)
+    row = first.row - 1
+    
+    Dim row2 As Long
+    row2 = cell.row
+    
+    Dim focus
+    EvalTableAddress = table.DataBodyRange(row2 - row, table.ListColumns(header).index)
 End Function
 
 Function GetParameters(func As String) As String()

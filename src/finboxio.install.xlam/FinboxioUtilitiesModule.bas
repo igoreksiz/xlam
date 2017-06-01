@@ -111,27 +111,36 @@ Public Function GetAPIHeader()
     GetAPIHeader = APIHeader
 End Function
 
-Public Function FixAddinLinks()
+Public Function FixAddinLinks(Optional wb As Workbook)
     IsReplacingLinks = True
+    
     Dim calc As Long
-    Dim Sht As Worksheet
+    Dim sheet As Worksheet
+    
+    Dim ws
+    If TypeName(wb) = "Empty" Or wb Is Nothing Then
+        Set ws = Worksheets
+    Else
+        Set ws = wb.Worksheets
+    End If
+    
     Application.ScreenUpdating = False
-    For Each Sht In Worksheets
-        Sht.Cells.Replace _
+    For Each sheet In ws
+        sheet.Cells.Replace _
             What:="'*finboxio.install.xlam'!", _
             Replacement:="", _
             LookAt:=xlPart, _
             SearchOrder:=xlByRows, _
             MatchCase:=False
-    Next Sht
-    For Each Sht In Worksheets
-        Sht.Cells.Replace _
+    Next sheet
+    For Each sheet In ws
+        sheet.Cells.Replace _
             What:="'*finboxio.xlam'!", _
             Replacement:="", _
             LookAt:=xlPart, _
             SearchOrder:=xlByRows, _
             MatchCase:=False
-    Next Sht
+    Next sheet
     Application.Run "ResetFindReplace"
     Application.ScreenUpdating = True
     IsReplacingLinks = False
