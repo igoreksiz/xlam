@@ -30,10 +30,10 @@ Confirmation:
     ElseIf Not latest = AppVersion Then
         answer = MsgBox("A newer version of the finbox.io add-on is available! Would you like to upgrade to " & latest & " now?", vbYesNo + vbQuestion, AppTitle)
         If answer = vbYes Then
-            If TypeName(wb) = "Empty" Then
-                wb = ThisWorkbook
+            If wb Is Nothing Or TypeName(wb) = "Nothing" Or TypeName(wb) = "Empty" Then
+                Set wb = ThisWorkbook
             End If
-            If Not TypeName(wb) = "Empty" Then
+            If Not (wb Is Nothing Or TypeName(wb) = "Nothing" Or TypeName(wb) = "Empty") Then
                 wb.FollowHyperlink UPDATE_URL
             End If
         End If

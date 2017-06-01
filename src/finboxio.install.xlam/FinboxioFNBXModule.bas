@@ -4,6 +4,7 @@ Attribute VB_Name = "FinboxioFNBXModule"
 Option Explicit
 
 Public RedisplayDataLimit
+Public CheckedForUpdates As Boolean
 
 Public Sub AddUDFCategoryDescription()
     #If Mac Then
@@ -16,6 +17,11 @@ End Sub
 
 Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional ByRef period = "") As Variant
     On Error GoTo Error_Handler
+
+    If Not CheckedForUpdates Then
+        CheckedForUpdates = True
+        CheckUpdates
+    End If
 
     If IsReplacingLinks Then
         FNBX = CVErr(xlErrName)

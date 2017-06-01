@@ -11,7 +11,6 @@ Private Sub Workbook_Open()
     Call SetWorkbookLinkReplacer(New WorkbookLinkReplacer)
     
     Call AddCustomMenu
-    Call CheckUpdates(False, Me)
 
     LogMessage "Welcome to " & AppTitle
 End Sub
