@@ -18,3 +18,5 @@ Private Sub App_WorkbookOpen(ByVal wb As Workbook)
     FinboxioUtilitiesModule.FixAddinLinks wb
 End Sub
 
+
+

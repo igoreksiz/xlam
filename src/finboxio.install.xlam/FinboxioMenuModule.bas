@@ -7,7 +7,7 @@ Option Explicit
     Public AppRibbon As IRibbonUI
 #End If
 
-Private ButtonDefs(1 To 11) As String
+Private ButtonDefs(1 To 12) As String
 
 Public Sub InvalidateAppRibbon()
     If Not TypeName(AppRibbon) = "Empty" Then
@@ -56,6 +56,13 @@ End Sub
 
 Public Sub FinboxioLogout(Optional control)
     Call Logout
+End Sub
+
+Public Sub FinboxioAbout(Optional control)
+    MsgBox "You are using " & AppTitle & " (" & EXCEL_VERSION & " edition)." & vbCrLf & _
+        "This add-on is installed as " & ThisWorkbook.path & Application.PathSeparator & ThisWorkbook.name & "." & vbCrLf & _
+        "You can contact support@finbox.io with any questions or concerns." & vbCrLf & vbCrLf & _
+        "Happy investing!"
 End Sub
 
 Public Sub FinboxioMessages(Optional control)
@@ -120,6 +127,7 @@ Public Sub AddCustomMenu()
     ButtonDefs(9) = "&Message Log,FinboxioMessages,Display message log,39,True"
     ButtonDefs(10) = "Check For &Updates,FinboxioUpdate,Check for updates,39,False"
     ButtonDefs(11) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,39,False"
+    ButtonDefs(12) = "&About,FinboxioAbout,Information about the add-on,39,False"
 
     Dim bd As Integer
     Dim butdefs() As String

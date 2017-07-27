@@ -37,21 +37,23 @@ Public Sub UnlinkFormulas()
     Dim Msg As String
     Dim FileName As String
     Dim i As Integer
-    Dim r As Range
+    Dim r As range
+    Dim calcType
     
-    Application.EnableCancelKey = xlDisabled
-    Application.calculation = xlCalculationManual
+    calcType = Application.Calculation
+    
+    On Error GoTo RestoreSettings
+    
+    Application.Calculation = xlCalculationManual
     
     wbName = ActiveWorkbook.name
     wbName = Replace(wbName, ".xlsm", "")
     wbName = Replace(wbName, ".xlsx", "")
     wbName = Replace(wbName, ".xls", "")
 
-    Msg = "Unlinking " & wbName & " from the finbox.io add-in will remove all references to finbox.io formulas. This will allow you to share the document with colleagues who do not have our add-in, but you will no longer be able to update this workbook with the latest data from finbox.io. " _
-            & "This change cannot be reversed - therefore, you will be prompted to save as a new unlinked workbook. " + vbNewLine + vbNewLine _
-            & "Do you wish to continue and unlink " + wbName + " from the finbox.io add-in?"
+    Msg = "This will save the current workbook and create a copy with all finbox.io formulas replaced by their current values. Do you wish to continue?"
 
-    Ans = MsgBox(Msg, vbYesNo, "Unlink finbox.io Excel Add-in?")
+    Ans = MsgBox(Msg, vbYesNo, "Save and unlink?")
      
     Select Case Ans
               
@@ -70,18 +72,18 @@ Public Sub UnlinkFormulas()
             ActiveWorkbook.Save
             
             For i = 1 To Sheets.count
-            On Error Resume Next
-            For Each r In Sheets(i).UsedRange.SpecialCells(xlCellTypeFormulas)
-            If r.formula Like "*FNBX*" Then r.value = r.value
-            Next r
+                On Error Resume Next
+                For Each r In Sheets(i).UsedRange.SpecialCells(xlCellTypeFormulas)
+                    If r.formula Like "*FNBX*" Then r.value = r.value
+                Next r
             Next i
-            On Error GoTo 0
 
             ActiveWorkbook.SaveAs FileName:=fileSaveName, FileFormat:=xlOpenXMLWorkbook
             Application.DisplayAlerts = True
         End If
-    
     End Select
-    Application.EnableCancelKey = xlInterrupt
-    Application.calculation = xlCalculationAutomatic
+    
+RestoreSettings:
+    Application.DisplayAlerts = True
+    Application.Calculation = calcType
 End Sub

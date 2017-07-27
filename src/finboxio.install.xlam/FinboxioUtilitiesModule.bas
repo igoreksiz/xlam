@@ -31,7 +31,7 @@ Public Function MSOffVer() As Integer
     Dim startPos As Integer
     MSOffVer = 0
         
-    verStr = Application.Version
+    verStr = Application.version
     startPos = VBA.InStr(verStr, ".")
         
         On Error Resume Next
@@ -46,7 +46,7 @@ End Function
 
 Public Sub ResetFindReplace()
    'Resets the find/replace dialog box options
-   Dim r As Range
+   Dim r As range
 
    On Error Resume Next
 
@@ -71,13 +71,6 @@ Public Sub ResetFindReplace()
    On Error GoTo 0
 End Sub
 
-Public Function ValidAddress(strAddress As String) As Boolean
-    Dim r As Range
-    On Error Resume Next
-    Set r = Range(strAddress)
-    If Not r Is Nothing Then ValidAddress = True
-End Function
-
 Public Function EscapeQuotes(str As String) As String
     EscapeQuotes = Replace(str, """", "\""")
 End Function
@@ -87,8 +80,8 @@ Public Function DescapeQuotes(str As String) As String
 End Function
 
 Public Function CurrentCaller() As String
-    If TypeOf Application.Caller Is Range Then
-        Dim rng As Range
+    If TypeOf Application.Caller Is range Then
+        Dim rng As range
         Set rng = Application.Caller
 
         CurrentCaller = rng.address(External:=True)
@@ -112,10 +105,15 @@ Public Function GetAPIHeader()
 End Function
 
 Public Function FixAddinLinks(Optional wb As Workbook)
+    On Error GoTo CleanExit
+    
     IsReplacingLinks = True
     
     Dim calc As Long
     Dim sheet As Worksheet
+    Dim replaced As Boolean
+    
+    replaced = False
     
     Dim ws
     If TypeName(wb) = "Empty" Or wb Is Nothing Then
@@ -126,22 +124,30 @@ Public Function FixAddinLinks(Optional wb As Workbook)
     
     Application.ScreenUpdating = False
     For Each sheet In ws
-        sheet.Cells.Replace _
-            What:="'*finboxio.install.xlam'!", _
-            Replacement:="", _
-            LookAt:=xlPart, _
-            SearchOrder:=xlByRows, _
-            MatchCase:=False
+        If Not sheet.Cells.Find("'*finboxio.install.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
+            sheet.Cells.Replace _
+                What:="'*finboxio.install.xlam'!", _
+                Replacement:="", _
+                LookAt:=xlPart, _
+                SearchOrder:=xlByRows, _
+                MatchCase:=False
+            replaced = True
+        End If
+        
+        If Not sheet.Cells.Find("'*finboxio.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
+            sheet.Cells.Replace _
+                What:="'*finboxio.xlam'!", _
+                Replacement:="", _
+                LookAt:=xlPart, _
+                SearchOrder:=xlByRows, _
+                MatchCase:=False
+            replaced = True
+        End If
     Next sheet
-    For Each sheet In ws
-        sheet.Cells.Replace _
-            What:="'*finboxio.xlam'!", _
-            Replacement:="", _
-            LookAt:=xlPart, _
-            SearchOrder:=xlByRows, _
-            MatchCase:=False
-    Next sheet
+
+CleanExit:
     Application.Run "ResetFindReplace"
     Application.ScreenUpdating = True
     IsReplacingLinks = False
+    If replaced Then Application.CalculateFull
 End Function

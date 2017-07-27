@@ -18,7 +18,7 @@ Public Sub InstallAddin(self)
     Dim oAddIn As Object, oXLApp As Object, oWorkbook As Workbook
     Dim i As Integer
     Dim iAddIn As Integer
-    Dim bAlreadyInstalled As Boolean
+    Dim bAlreadyInstalled As Boolean, bLegacyInstalled As Boolean
     Dim sAddInName As String, sAddInFileName As String, sCurrentPath As String, sStandardPath As String
     
     sCurrentPath = self.path & Application.PathSeparator
@@ -29,7 +29,7 @@ Public Sub InstallAddin(self)
         
         ' Avoid the re-entry of script after activating the addin
         If Not (bAlreadyRun) Then
-            bAlreadyRun = True ' Ensure we won’t install it multiple times (because Excel reopen files after an XLAM installation)
+            bAlreadyRun = True ' Ensure we wont install it multiple times (because Excel reopen files after an XLAM installation)
             If MsgBox("Do you want to install the finbox.io excel add-in? This will overwrite any previously installed versions.", vbYesNo) = vbYes Then
                 ' Create a workbook otherwise, we get into troubles as Application.AddIns may not exist
                 Set oXLApp = Application
@@ -39,6 +39,9 @@ Public Sub InstallAddin(self)
                     On Error Resume Next
                     If self.Application.AddIns.Item(i).FullName = sStandardPath & sAddInFileName Then
                         bAlreadyInstalled = True
+                        iAddIn = i
+                    ElseIf self.Application.AddIns.Item(i).name = "finboxio.xlam" Then
+                        bLegacyInstalled = True
                         iAddIn = i
                     End If
                 Next i
@@ -54,6 +57,13 @@ Public Sub InstallAddin(self)
                         SaveCopy self, sAddInFileName
                         self.Application.AddIns.Item(iAddIn).Installed = True
                     End If
+                ElseIf bLegacyInstalled Then
+                    ' Installed in an old location
+                    DebugBox ("Called from:'" & sCurrentPath & "' Legacy installed")
+                    self.Application.AddIns.Item(iAddIn).Installed = False
+                    SaveCopy self, self.Application.AddIns.Item(iAddIn).FullName
+                    self.Application.AddIns.Item(iAddIn).Installed = True
+                    DebugBox ("Legacy overwritten")
                 Else
                     ' Not yet installed
                     DebugBox ("Called from:'" & sCurrentPath & "' Not installed")
@@ -85,7 +95,7 @@ Function SavePath()
     #If Mac Then
         If EXCEL_VERSION = "Mac2016" Then
             SavePath = MacScript("return POSIX path of (path to desktop folder) as string")
-            SavePath = Replace(SavePath, "/Desktop", "") & "/Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/Office/15.0/"
+            SavePath = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/AppData/Microsoft/Office/16.0/"
             SavePath = SavePath & "Add-Ins/"
         Else
             SavePath = Application.LibraryPath
@@ -137,14 +147,20 @@ Sub SaveCopyAsExcel2016(wb, name As String)
     Dim StrFileName As String
     Dim FileExtStr As String
 
-    'Create folder if it not exists in the Microsoft Office Folder
-    Folderstring = CreateFolderinMacOffice2016()
-
-    StrFilePath = Folderstring
-    StrFileName = name
-
-    With wb
-        .SaveCopyAs StrFilePath & StrFileName
-    End With
+    If VBA.InStr(name, Application.PathSeparator) Then
+        With wb
+            .SaveCopyAs name
+        End With
+    Else
+        'Create folder if it not exists in the Microsoft Office Folder
+        Folderstring = CreateFolderinMacOffice2016()
+    
+        StrFilePath = Folderstring
+        StrFileName = name
+    
+        With wb
+            .SaveCopyAs StrFilePath & StrFileName
+        End With
+    End If
 End Sub
 

@@ -10,9 +10,17 @@ Public Sub RefreshData()
         End If
     End If
     
-    FixAddinLinks
-    ClearCache
-    Application.CalculateFull
+    On Error GoTo EnableCache
+    
+    StartRecache
+    
+    Dim wks As Worksheet
+    For Each wks In ActiveWorkbook.Worksheets
+        wks.Calculate
+    Next
+    
+EnableCache:
+    StopRecache
 End Sub
 
 Public Sub DisplayDataLimit(Optional reset As Boolean = True)

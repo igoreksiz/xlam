@@ -8,39 +8,57 @@ Public CheckedForUpdates As Boolean
 
 Public Sub AddUDFCategoryDescription()
     #If Mac Then
-        'Excel for Mac does not support the property .MacroOptions
+        ' Excel for Mac does not support the property .MacroOptions
         Exit Sub
     #End If
     Application.MacroOptions Macro:="FNBX", Category:="finbox.io", _
         Description:="Returns a datapoint representing a selected company metric at a given point in time."
 End Sub
 
+' TODO: Value casting and language adjustment is duplicated a few times. Consolidate this into a function or module.
+' TODO: Move api request logic (including batch-splitting) into a separate module to make this function easier to follow.
 Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional ByRef period = "") As Variant
+    ' Must be marked volatile to enable recalculation on refresh
+    Application.Volatile
+    
     On Error GoTo Error_Handler
-
+    
+    ' Check for updates on first use
     If Not CheckedForUpdates Then
         CheckedForUpdates = True
         CheckUpdates
     End If
 
+    ' Dont try to calculate during a link replacement.
+    ' Link replacement converts FNBX references in
+    ' external workbooks to local references.
+    ' e.g. 'C:\...\finboxio.xlam'!FNBX => FNBX
     If IsReplacingLinks Then
+        ' TODO: is it possible to just reuse existing
+        ' value instead of putting error in cell?
         FNBX = CVErr(xlErrName)
         Exit Function
     End If
 
-    Dim val
+    Dim val As Variant
     Dim count As Integer
     Dim cell As String
+    Dim languageAdjusted As String
+    Dim pos As Long
+    Dim char As String
+    Dim numeric As String
+    
+    ' Get the address of the cell this was called from
     cell = CurrentCaller()
 
-    ' check for null arguments
+    ' Check for null arguments
     If IsEmpty(ticker) Or IsEmpty(metric) Then
-       FNBX = CVErr(xlErrNum) ' return #NUM!
+       FNBX = CVErr(xlErrNum)
        LogMessage "ticker.metric mal-formed.", ticker & "." & metric
        Exit Function
     End If
 
-    ' build key from arguments
+    ' Build finql key from arguments
     Dim key As String
     Dim index As Integer
 
@@ -63,7 +81,7 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         key = key & "[""" & period & """]"
     End If
 
-    ' check if (recent) key value is available in cache
+    ' Check if key value is available in cache
     If IsCached(key) Then
         If TypeName(GetCachedValue(key)) = "Collection" Then
             Set val = GetCachedValue(key)
@@ -78,8 +96,25 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
                 val = val(index)
                 If IsDate(val) Then
                     val = CDate(val)
-                ElseIf IsNumeric(val) Then
-                    val = CDbl(val)
+                ElseIf TypeName(val) = "String" Then
+                    numeric = "1234567890-.,"
+                    languageAdjusted = ""
+                    For pos = 1 To VBA.Len(val)
+                        char = VBA.Mid(val, pos, 1)
+                        If VBA.InStr(numeric, char) = 0 Then
+                            languageAdjusted = "x"
+                            Exit For
+                        ElseIf char = "," Then
+                            languageAdjusted = languageAdjusted & Application.International(xlThousandsSeparator)
+                        ElseIf char = "." Then
+                            languageAdjusted = languageAdjusted & Application.International(xlDecimalSeparator)
+                        Else
+                            languageAdjusted = languageAdjusted & char
+                        End If
+                    Next
+                    If IsNumeric(languageAdjusted) Then
+                        val = CDbl(languageAdjusted)
+                    End If
                 End If
             End If
         ElseIf TypeName(val) = "Collection" Then
@@ -89,12 +124,8 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         Exit Function
     End If
 
-    Dim loggedIn As Boolean
-    If Not IsLoggedIn() Then
-        ShowLoginForm
-    End If
-
-    ' check if user was recently notified of limit overage
+    ' Check if user recently hit limit overage
+    ' and refuse to request data if so
     If TypeName(RedisplayDataLimit) = "Date" Then
         If RedisplayDataLimit > Now() Then
             FNBX = CVErr(xlErrNA)
@@ -104,11 +135,14 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         End If
     End If
 
-    ' check for null API key
+    ' Check if user is logged in and prompt if not
     Dim APIkey As String
+    If Not IsLoggedIn() Then
+        ShowLoginForm
+    End If
     APIkey = GetAPIKey()
 
-    ' Add all uncached keys to request
+    ' Collect all uncached keys to request
     Dim i As Integer
     Dim k As String
     Dim escaped As String
@@ -116,8 +150,13 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
     Dim requestedKeys() As String
     Dim added As Boolean
 
+    Dim book As Workbook
+    Dim cellRange As range
+    Set cellRange = range(cell)
+    Set book = cellRange.Worksheet.Parent
+    
     ReDim requestedKeys(0)
-    allKeys = FindAllKeys()
+    allKeys = FindAllKeys(book)
     added = InsertElementIntoArray(allKeys, UBound(allKeys) + 1, key)
 
     For i = 1 To UBound(allKeys)
@@ -127,11 +166,15 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         End If
     Next
 
-    Debug.Print "Building batch request for " & NumElements(requestedKeys) & " keys"
-
+    If (NumElements(requestedKeys) - 1) = 1 Then
+        Debug.Print "Building batch request for " & requestedKeys(1) & " (" & cell & ")"
+    Else
+        Debug.Print "Building batch request for " & (NumElements(requestedKeys) - 1) & " keys (" & cell & ")"
+    End If
+    
+    ' Request all keys in batches smaller than MAX_BATCH_SIZE
     Dim batchStart As Long: batchStart = 1
     Do While batchStart < NumElements(requestedKeys)
-        ' build json request
         Dim jsonReqObj As Object
         Dim jsonDataObj As Object
         Dim batchKeys() As String
@@ -152,13 +195,13 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         Dim postData As String
         postData = ConvertToJson(jsonReqObj)
 
-        ' request json from web
         Dim webClient As New webClient
 
         webClient.BaseUrl = BATCH_URL
 
+        ' Setup Basic Auth with API key as username and empty password
         Dim Auth As New HttpBasicAuthenticator
-        Auth.Setup APIkey, "" ' api_key, password(not used)
+        Auth.Setup APIkey, ""
 
         Set webClient.Authenticator = Auth
 
@@ -181,33 +224,30 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
         If errStr <> "" Then LogMessage "errors: " & errStr
 
         If webResponse.statusCode = 429 Then
+            ' Notify user that they have hit their data limit and return #N/A error
             DisplayDataLimit
             LogMessage "Finbox.io Data Limit Reached"
             FNBX = CVErr(xlErrNA)
             GoTo Exit_Function
-        ' Return error if HTTP response code not 200
         ElseIf webResponse.statusCode >= 400 Or webResponse.Data Is Nothing Then
-            LogMessage "The finbox.io API returned http status code " & webResponse.statusCode & " = " & _
-                    VBA.Trim(webResponse.StatusDescription), key
-
-            FNBX = CVErr(xlErrNA) ' return #N/A
+            ' Log unspecified errors and return #N/A
+            LogMessage "The finbox.io API returned http status code " & webResponse.statusCode & " = " & VBA.Trim(webResponse.StatusDescription), key
+            FNBX = CVErr(xlErrNA)
             GoTo Exit_Function
         End If
 
+        ' Clear data-limit block on successful request
         RedisplayDataLimit = True
 
-        Dim resStr As String
-        resStr = ConvertToJson(webResponse.Data("data"), Whitespace:=2)
-
-        ' Extract data value from json response
-        Dim dataVal
-
+        Dim dataVal As Variant
+        
         For i = 1 To UBound(batchKeys)
             k = batchKeys(i)
-            escaped = EscapeQuotes(k)
             If IsNull(webResponse.Data("data")(k)) Then
+                ' Cache null value
                 Call SetCachedValue(k, CVErr(xlErrNull))
             Else
+                ' Cast value to appropriate type and cache
                 If TypeName(webResponse.Data("data")(k)) = "Collection" Then
                     Set dataVal = webResponse.Data("data")(k)
                 Else
@@ -215,98 +255,145 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
                 End If
                 
                 If IsDate(dataVal) Then
-                    dataVal = CDate(webResponse.Data("data")(k))
-                ElseIf IsNumeric(dataVal) Then
-                    dataVal = CDbl(webResponse.Data("data")(k))
+                    dataVal = CDate(dataVal)
+                ElseIf TypeName(dataVal) = "String" Then
+                    numeric = "1234567890-.,"
+                    languageAdjusted = ""
+                    For pos = 1 To VBA.Len(dataVal)
+                        char = VBA.Mid(dataVal, pos, 1)
+                        If VBA.InStr(numeric, char) = 0 Then
+                            languageAdjusted = "x"
+                            Exit For
+                        ElseIf char = "," Then
+                            languageAdjusted = languageAdjusted & Application.International(xlThousandsSeparator)
+                        ElseIf char = "." Then
+                            languageAdjusted = languageAdjusted & Application.International(xlDecimalSeparator)
+                        Else
+                            languageAdjusted = languageAdjusted & char
+                        End If
+                    Next
+                    If IsNumeric(languageAdjusted) Then
+                        dataVal = CDbl(languageAdjusted)
+                    End If
                 End If
                 Call SetCachedValue(k, dataVal)
             End If
         Next
     Loop
 
-    ' key should now be cached
+    ' Key should now be cached, so just lookup and return
     If IsCached(key) Then
-        If TypeName(val) = "Collection" Then
+        If TypeName(GetCachedValue(key)) = "Collection" Then
             Set val = GetCachedValue(key)
         Else
             val = GetCachedValue(key)
         End If
         
         If pType = "Double" And TypeName(val) = "Collection" Then
+            ' For formulas that request list item at specific index [=FNBX("AAPL","benchmarks",1)]
+            ' Lists are indexed starting at position 1! (Not 0)
             count = val.count
             If count < index Then
                 val = CVErr(xlErrNull)
             Else
+                ' Cast individual list items to proper type
                 val = val(index)
                 If IsDate(val) Then
                     val = CDate(val)
-                ElseIf IsNumeric(val) Then
-                    val = CDbl(val)
+                ElseIf TypeName(val) = "String" Then
+                    numeric = "1234567890-.,"
+                    languageAdjusted = ""
+                    For pos = 1 To VBA.Len(val)
+                        char = VBA.Mid(val, pos, 1)
+                        If VBA.InStr(numeric, char) = 0 Then
+                            languageAdjusted = "x"
+                            Exit For
+                        ElseIf char = "," Then
+                            languageAdjusted = languageAdjusted & Application.International(xlThousandsSeparator)
+                        ElseIf char = "." Then
+                            languageAdjusted = languageAdjusted & Application.International(xlDecimalSeparator)
+                        Else
+                            languageAdjusted = languageAdjusted & char
+                        End If
+                    Next
+                    If IsNumeric(languageAdjusted) Then
+                        val = CDbl(languageAdjusted)
+                    End If
                 End If
             End If
         ElseIf TypeName(val) = "Collection" Then
+            ' For formulas that request a list without specifying an index [=FNBX("AAPL","benchmarks")]
             val = CollectionToString(val)
         End If
         FNBX = val
     Else
+        ' For some reason this value was not found in the cache.
+        ' Generally, this indicates some problem since even
+        ' unsupported keys should get cached as null.
         FNBX = CVErr(xlErrNull)
     End If
 
     GoTo Exit_Function
 
 Error_Handler:
-    FNBX = CVErr(xlErrValue) ' return #VALUE!
-
-    LogMessage "VBA code error " & Err.Number & " [" & Err.Description & "]", key
+    ' Log unspecified errors and return #VALUE!
+    FNBX = CVErr(xlErrValue)
+    LogMessage "VBA error from cell " & cell & ": " & Err.Number & " [" & Err.Description & "]", key
 
 Exit_Function:
-    ' Clean up and exit
-    Set jsonReqObj = Nothing
-    Set jsonDataObj = Nothing
-    Set webClient = Nothing
-    Set webRequest = Nothing
-    Set Auth = Nothing
-    Set webResponse = Nothing
-
-    On Error GoTo 0
+    ' Do any cleanup here
 End Function
 
-Public Function FindAllKeys() As String()
-    Dim fnd As String, FirstFound As String
-    Dim FoundCell As Range, rng As Range
-    Dim myRange As Range, LastCell As Range
-    Dim formula As String
+' Return a list of all finql keys required by a workbook
+Public Function FindAllKeys(ByRef book As Workbook) As String()
+    Dim fnd As String, range As range, cell As range, formula As String
     Dim allKeys() As String
-    Dim book As Workbook
 
     ReDim allKeys(0)
 
     Dim sheet As Worksheet
-    Dim curSheet As String
-
-    curSheet = ActiveSheet.name
-
-    For Each book In Workbooks
+    If Not book Is Nothing Then
         For Each sheet In book.Worksheets
             fnd = "FNBX("
-            Set myRange = sheet.UsedRange
+            Set range = sheet.UsedRange
             #If Mac Then
-                Dim cell As Range
+                ' VBA on Mac does not allow us to use Find while running in the context
+                ' of a UDF. So we have to iterate all the cells and check for FNBX. A
+                ' couple of optimizations are important for making this usable with very
+                ' large sheets. First, load the 2D array of formulas from the entire range
+                ' instead of individual cells. Second, use SpecialCells to reduce the range
+                ' to only include cells with formulas.
+                Dim formulas As Variant
                 On Error Resume Next
-                For Each cell In myRange
-                    If cell.HasFormula Then
-                        ParseFormula cell.formula, cell, sheet, allKeys
-                    End If
-                Next cell
+                formulas = range.SpecialCells(xlCellTypeFormulas).formula
+                Dim i As Long, j As Long
+                For i = LBound(formulas, 1) To UBound(formulas, 1)
+                    For j = LBound(formulas, 2) To UBound(formulas, 2)
+                        If Not formulas(i, j) = "" Then
+                            If VBA.InStr(formulas(i, j), fnd) > 0 Then
+                                formula = formulas(i, j)
+                                Set cell = range.Cells(i, j)
+                                ParseFormula formula, cell, sheet, allKeys
+                            End If
+                        End If
+                    Next j
+                Next i
             #Else
-                Set LastCell = myRange.Cells(myRange.Cells.count)
-                Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell)
+                ' On Windows, we can do a search for all FNBX cells. Generally, this gives
+                ' better performance because we don't have to iterate through all cells in
+                ' the workbook. However, we are accessing each formula on individual cells
+                ' which could be more expensive than loading all formulas for a range in a
+                ' single call. So there may be a need to optimize this call for very large
+                ' workbooks with a high ratio of FNBXs-to-cells (TODO: test performance
+                ' trade-off for workbooks with increasing FNBX count)
+                Dim FirstFound As String, LastCell As range, FoundCell As range
+                Set LastCell = range.Cells(range.Cells.count)
+                Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell)
                 If Not FoundCell Is Nothing Then
                     FirstFound = FoundCell.address
-                    Set rng = FoundCell
                     On Error Resume Next
                     Do Until FoundCell Is Nothing
-                        Set FoundCell = myRange.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell)
+                        Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell)
                         If FoundCell.HasFormula Then
                             formula = FoundCell.formula
                             ParseFormula formula, FoundCell, sheet, allKeys
@@ -314,182 +401,12 @@ Public Function FindAllKeys() As String()
                         If FoundCell.address = FirstFound Then Exit Do
                     Loop
                 End If
+                
+                ' Reset the Find/Replace dialog after Find (not 100% sure this is necessary)
+                Application.Run "ResetFindReplace"
             #End If
         Next sheet
-    Next book
-    Sheets(curSheet).Select
-    Application.Run "ResetFindReplace"
+    End If
 
     FindAllKeys = allKeys()
 End Function
-
-Sub ParseFormula(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
-    Dim fn As String: fn = ""
-    Dim quotes As Boolean: quotes = False
-    Dim parens As Long: parens = 0
-    Dim i As Long
-    For i = 1 To VBA.Len(formula)
-        Dim char As String
-        char = VBA.Mid(formula, i, 1)
-        If char = """" Then
-            quotes = Not quotes
-            If VBA.Len(fn) > 0 Then
-                fn = fn & char
-            End If
-        ElseIf quotes Then
-            If VBA.Len(fn) > 0 Then
-                fn = fn & char
-            End If
-        ElseIf char = "(" Then
-            parens = parens + 1
-            fn = fn & char
-        ElseIf char = ")" Then
-            parens = parens - 1
-            fn = fn & char
-            If parens = 0 Then
-                ParseKeys fn, cell, sheet, keys
-                fn = ""
-            End If
-        ElseIf parens = 0 And char Like "[A-Za-z_]" Then
-            fn = fn & char
-        ElseIf parens = 0 Then
-            fn = ""
-        Else
-            fn = fn & char
-        End If
-    Next i
-End Sub
-
-Sub ParseKeys(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
-    Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
-    If argIndex = 0 Then Exit Sub
-
-    Dim name As String: name = VBA.Left(formula, argIndex - 1)
-    Dim args() As String: args = GetParameters(formula)
-    Dim argsCount As Long: argsCount = NumElements(args)
-
-    If name = "FNBX" Or name = "=FNBX" Or name = "=-FNBX" Then
-        Dim success As Boolean
-        Dim ticker As String
-        Dim metric As String
-        Dim activated As Boolean
-        Dim period
-        
-        ticker = EvalArgument(args(0), cell, sheet)
-        metric = EvalArgument(args(1), cell, sheet)
-        period = ""
-
-        If argsCount > 2 Then
-            period = EvalArgument(args(2), cell, sheet)
-            Dim pType As String: pType = TypeName(period)
-            If pType = "Double" Then
-                period = ""
-            ElseIf pType = "Date" Then
-                period = "Y" & Year(period) & ".M" & Month(period) & ".D" & Day(period)
-            End If
-        End If
-
-        Dim key As String
-        key = ticker & "." & metric
-        If period <> "" Then
-            key = key & "[""" & period & """]"
-        End If
-
-        success = InsertElementIntoArray(keys, UBound(keys) + 1, key)
-    End If
-End Sub
-
-Function EvalArgument(arg As String, cell As Range, sheet As Worksheet)
-    Dim value
-    Dim address As String
-    If ValidAddress(arg) Then
-        address = sheet.Range(arg).address(External:=True)
-        value = Range(address).value
-        EvalArgument = value
-    ElseIf IsTableAddress(arg) Then
-        value = EvalTableAddress(arg, cell)
-        EvalArgument = value
-    Else
-        value = Application.Evaluate(arg)
-        EvalArgument = value
-    End If
-End Function
-
-Function IsTableAddress(arg As String) As Boolean
-    Dim i As Long
-    Dim c As String
-    Dim result As Boolean
-    result = False
-    
-    For i = 1 To VBA.Len(arg)
-        c = VBA.Mid(arg, i, 1)
-        If c = """" Then
-            result = False
-            i = VBA.Len(arg)
-        ElseIf c = "[" Then
-            result = True
-            i = VBA.Len(arg)
-        End If
-    Next i
-    
-    IsTableAddress = result
-End Function
-
-Function EvalTableAddress(arg As String, cell As Range)
-    Dim i As Long
-    Dim j As Long
-    Dim c As String
-    Dim table As ListObject
-    
-    i = VBA.InStr(arg, "[")
-    If (i = 1) Then
-        Set table = cell.ListObject
-    Else
-        Dim name As String: name = VBA.Left(arg, i)
-        Set table = cell.Worksheet.ListObjects(name)
-    End If
-    
-    j = VBA.InStr(i, arg, "]")
-    Dim header As String
-    header = VBA.Mid(arg, i + 1, j - i - 1)
-    header = VBA.Replace(header, "@", "")
-    
-    Dim row As Long
-    Dim first As Range
-    Set first = table.DataBodyRange.Cells(1, 1)
-    row = first.row - 1
-    
-    Dim row2 As Long
-    row2 = cell.row
-    
-    Dim focus
-    EvalTableAddress = table.DataBodyRange(row2 - row, table.ListColumns(header).index)
-End Function
-
-Function GetParameters(func As String) As String()
-    Dim args() As String
-    Dim safeArgs As String
-    Dim c As String
-    Dim i As Long, pdepth As Long
-
-    func = VBA.Trim(func)
-    i = VBA.InStr(func, "(")
-    func = VBA.Mid(func, i + 1)
-    func = VBA.Mid(func, 1, VBA.Len(func) - 1)
-
-    For i = 1 To VBA.Len(func)
-        c = VBA.Mid(func, i, 1)
-        If c = "(" Then
-            pdepth = pdepth + 1
-        ElseIf c = ")" Then
-            pdepth = pdepth - 1
-        ElseIf c = "," And pdepth = 0 Then
-            c = "[[,]]"
-        End If
-        safeArgs = safeArgs & c
-    Next i
-    args = Split(safeArgs, "[[,]]")
-    GetParameters = args
-End Function
-
-

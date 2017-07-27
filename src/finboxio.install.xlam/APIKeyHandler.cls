@@ -7,55 +7,114 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-' It is impossible to write other cell values when executing code
-' triggered by a UDF call from another cell. So in order to support
-' a login prompt on first use of the FNBX formula (if not logged in)
-' this sets up a listener to save the collected API key in an independent
-' execution context once the UDF is completed
-
 Option Explicit
 
-Private WithEvents App As Application
-Attribute App.VB_VarHelpID = -1
-Private keyToStore As String
+Private activeKey As String
+Private hasReadKey As Boolean
 
 Private Sub Class_Initialize()
-    Set App = Application
-    keyToStore = ""
+    activeKey = ""
+    hasReadKey = False
 End Sub
 
 Public Sub StoreApiKey(key As String)
-    keyToStore = key
-    StoreKey
-End Sub
-
-Public Sub ClearAPIKey()
-    keyToStore = ""
-    StoreKey
+    activeKey = key
+    hasReadKey = True
+    WriteKey activeKey
+    InvalidateAppRibbon
 End Sub
 
 Public Function GetAPIKey()
-    If keyToStore <> "" Then
-        GetAPIKey = keyToStore
-    Else
-        GetAPIKey = VBA.Trim(ThisWorkbook.Sheets("API_Credentials").Range("APIkey").value)
+    If Not hasReadKey Then
+        activeKey = ReadKey
+        hasReadKey = True
     End If
+    GetAPIKey = activeKey
 End Function
 
-Private Sub App_SheetChange(ByVal Sh As Object, ByVal Source As Range)
-    StoreKey
+Public Sub ClearAPIKey()
+    activeKey = ""
+    hasReadKey = True
+    WriteKey activeKey
+    InvalidateAppRibbon
 End Sub
 
-Private Sub StoreKey()
-    On Error GoTo EnableEvents
-    App.EnableEvents = False
-    ThisWorkbook.Sheets("API_Credentials").Range("APIkey").value = keyToStore
-    Application.DisplayAlerts = False
-    ThisWorkbook.Save
-    Application.DisplayAlerts = True
-    keyToStore = ""
-    InvalidateAppRibbon
-    Exit Sub
-EnableEvents:
-    App.EnableEvents = True
+Private Sub WriteKey(key As String)
+    Dim keyfile As String
+    keyfile = ThisWorkbook.path & Application.PathSeparator & "finboxio.key"
+    Open keyfile For Output As #1
+    Write #1, key
+    Close #1
 End Sub
+
+Private Function ReadKey()
+    On Error GoTo Finish
+    Dim key As String, keyfile As String
+    key = ""
+    keyfile = ThisWorkbook.path & Application.PathSeparator & "finboxio.key"
+    Open keyfile For Input As #1
+    Line Input #1, key
+    key = VBA.Replace(key, """", "")
+    Close #1
+Finish:
+    ReadKey = key
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Old method of key storage is commented out below.
+' Didn't really work because it relied on saving the key
+' in the add-on workbook, which was unreliable because
+' saving sometimes fails without explanation, and in some
+' environments the workbook is read-only anyways.
+' Keeping the code here as reference because it shows how
+' to use application events, which will probably be useful
+' at some point in the future.
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+'Private WithEvents App As Application
+'Private keyToStore As String
+'Private isStoring As Boolean
+
+'Private Sub Class_Initialize()
+'    Set App = Application
+'    keyToStore = ""
+'    isStoring = False
+'End Sub
+
+'Public Sub StoreApiKey(key As String)
+    'keyToStore = key
+    'StoreKey
+'End Sub
+
+'Public Sub ClearAPIKey()
+    'keyToStore = ""
+    'StoreKey
+'End Sub
+
+'Public Function GetAPIKey()
+    'If keyToStore <> "" Then
+    '    GetAPIKey = keyToStore
+    'Else
+    '    GetAPIKey = VBA.Trim(ThisWorkbook.Sheets("API_Credentials").Range("APIkey").value)
+    'End If
+'End Function
+
+'Private Sub App_SheetChange(ByVal Sh As Object, ByVal Source As Range)
+'    If isStoring = False And Not keyToStore = "" Then
+'        StoreKey
+'    End If
+'End Sub
+
+'Private Sub StoreKey()
+'    On Error GoTo FinishStoring
+'    isStoring = True
+'    ThisWorkbook.Sheets("API_Credentials").Range("APIkey").value = keyToStore
+'    Application.DisplayAlerts = False
+'    ThisWorkbook.Save
+'    keyToStore = ""
+'FinishStoring:
+'    Application.DisplayAlerts = True
+'    isStoring = False
+'    InvalidateAppRibbon
+'End Sub
+
