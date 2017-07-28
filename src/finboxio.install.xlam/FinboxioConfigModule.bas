@@ -25,6 +25,12 @@ Public Const UPDATES_URL = "https://api.finbox.io/v2/add-ons/excel/latest"
 Public Const TIER_URL = "https://api.finbox.io/beta/usage"
 Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
 
+Public Const LIMIT_EXCEEDED_ERROR = 20400
+Public Const INVALID_AUTH_ERROR = 20401
+Public Const INVALID_ARGS_ERROR = 20402
+Public Const MISSING_VALUE_ERROR = 20403
+Public Const UNSPECIFIED_API_ERROR = 20500
+
 #If Mac Then
     #If MAC_OFFICE_VERSION < 15 Then
         Public Const EXCEL_VERSION = "Mac2011"

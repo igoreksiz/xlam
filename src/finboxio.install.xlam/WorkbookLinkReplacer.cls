@@ -15,7 +15,7 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub App_WorkbookOpen(ByVal wb As Workbook)
-    FinboxioUtilitiesModule.FixAddinLinks wb
+    FinboxioFixLinksModule.FixAddinLinks wb
 End Sub
 
 

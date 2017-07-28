@@ -62,8 +62,8 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             APItier = ""
             APIkey = ""
             On Error Resume Next
-            APItier = webResponse.Data("api_tier")
-            APIkey = webResponse.Data("api_key")
+            APItier = webResponse.data("api_tier")
+            APIkey = webResponse.data("api_key")
             On Error GoTo ErrorHandler
             
             ' Process api_tier and api_key
@@ -124,7 +124,7 @@ Public Function GetTier()
     Dim webResponse As webResponse
     Set webResponse = webClient.Execute(webRequest)
 
-    tier = webResponse.Data("data")("tier")
+    tier = webResponse.data("data")("tier")
 OnError:
     GetTier = tier
 End Function

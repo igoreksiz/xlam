@@ -21,7 +21,7 @@ Public Sub CheckUpdates(Optional explicit As Boolean = False, Optional wb As Wor
 
     Select Case webResponse.statusCode
     Case 200
-        latest = webResponse.Data("version")
+        latest = webResponse.data("version")
     End Select
     
 Confirmation:
@@ -60,7 +60,7 @@ Public Function latestVersion()
 
     Select Case webResponse.statusCode
     Case 200
-        latest = webResponse.Data("version")
+        latest = webResponse.data("version")
     End Select
 Finish:
     latestVersion = latest

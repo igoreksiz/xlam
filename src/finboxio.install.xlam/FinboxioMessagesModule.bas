@@ -43,8 +43,9 @@ Public Sub ShowMessages()
     Set LogWorksheet = Nothing
 End Sub
 
-Public Sub LogMessage(ByVal Msg As String, Optional ByVal key As String = "")
-    If key <> "" Then Msg = Msg & " (" & key & ")"
-    CachedMessages.Add Now() & "  " & Msg
+Public Sub LogMessage(ByVal msg As String, Optional ByVal key As String = "")
+    If key <> "" Then msg = msg & " (" & key & ")"
+    CachedMessages.Add Now() & "  " & msg
+    Debug.Print Now() & " " & msg
 End Sub
 

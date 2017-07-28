@@ -1,6 +1,8 @@
 Attribute VB_Name = "FinboxioParserModule"
+Option Explicit
+
 ' Locate all FNBX formulas in a string and evaluate required keys for each
-Sub ParseFormula(formula As String, cell As range, sheet As Worksheet, ByRef keys)
+Sub ParseFormula(formula As String, cell As range, Sheet As Worksheet, ByRef keys)
     Dim fn As String: fn = ""
     Dim quotes As Boolean: quotes = False
     Dim inFNBX As Long: inFNBX = 0
@@ -25,7 +27,7 @@ Sub ParseFormula(formula As String, cell As range, sheet As Worksheet, ByRef key
             parens = parens - 1
             fn = fn & char
             If parens = 0 Then
-                ParseKeys fn, cell, sheet, keys
+                ParseKeys fn, cell, Sheet, keys
                 fn = ""
                 inFNBX = 0
             End If
@@ -51,7 +53,7 @@ Sub ParseFormula(formula As String, cell As range, sheet As Worksheet, ByRef key
 End Sub
 
 ' Determine all finql keys required by a FNBX formula
-Sub ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef keys)
+Sub ParseKeys(formula As String, cell As range, Sheet As Worksheet, ByRef keys)
     Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
     If argIndex = 0 Then Exit Sub
 
@@ -75,46 +77,47 @@ Sub ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef keys)
         nested = False
         If argsCount > 0 Then
             If VBA.InStr(args(0), "FNBX(") > 0 Then
-                ParseFormula args(0), cell, sheet, keys
+                ParseFormula args(0), cell, Sheet, keys
                 nested = True
             End If
         End If
         
         If argsCount > 1 Then
             If VBA.InStr(args(1), "FNBX(") > 0 Then
-                ParseFormula args(1), cell, sheet, keys
+                ParseFormula args(1), cell, Sheet, keys
                 nested = True
             End If
         End If
         
         If argsCount > 2 Then
             If VBA.InStr(args(2), "FNBX(") > 0 Then
-                ParseFormula args(2), cell, sheet, keys
+                ParseFormula args(2), cell, Sheet, keys
                 nested = True
             End If
         End If
         
         If argsCount > 3 Then
             If VBA.InStr(args(3), "FNBX(") > 0 Then
-                ParseFormula args(3), cell, sheet, keys
+                ParseFormula args(3), cell, Sheet, keys
                 nested = True
             End If
         End If
         
         If nested Then Exit Sub
         
-        ' Build the finql key required by the formula
+        ' Build the finql key required by the formula.
+        ' This code is (sort of) duplicated in FNBX, so
+        ' if you change this, check that function as well
         
-        ticker = EvalArgument(args(0), cell, sheet)
-        metric = EvalArgument(args(1), cell, sheet)
+        ticker = EvalArgument(args(0), cell, Sheet)
+        metric = EvalArgument(args(1), cell, Sheet)
         period = ""
 
         If argsCount > 2 Then
-            period = EvalArgument(args(2), cell, sheet)
-            Dim pType As String: pType = TypeName(period)
-            If pType = "Double" Then
+            period = EvalArgument(args(2), cell, Sheet)
+            If TypeName(period) = "Double" And period < (Now() - (365 * 50)) Then
                 period = ""
-            ElseIf pType = "Date" Then
+            ElseIf TypeName(period) = "Double" Or TypeName(period) = "Date" Then
                 period = "Y" & Year(period) & ".M" & Month(period) & ".D" & Day(period)
             End If
         End If
@@ -164,7 +167,7 @@ End Function
 
 ' Evaluate the value of an argument that may include
 ' formulas or cell references
-Function EvalArgument(arg As String, cell As range, sheet As Worksheet)
+Function EvalArgument(arg As String, cell As range, Sheet As Worksheet)
     Dim value
     Dim address As String
     If IsCellAddress(arg) Then
@@ -178,11 +181,11 @@ Function EvalArgument(arg As String, cell As range, sheet As Worksheet)
             sheetName = parts(0)
             cellAddr = parts(1)
         Else
-            sheetName = sheet.name
+            sheetName = Sheet.name
             cellAddr = parts(0)
         End If
             
-        address = sheet.Parent.Sheets(sheetName).range(cellAddr).address(External:=True)
+        address = Sheet.Parent.Sheets(sheetName).range(cellAddr).address(External:=True)
         value = range(address).value
         EvalArgument = value
     ElseIf IsTableAddress(arg) Then
