@@ -145,7 +145,7 @@ Public Sub AddCustomMenu()
             .Caption = "&finbox.io"
             .Tag = "finbox.io"
             .enabled = True
-            .visible = True
+            .Visible = True
         End With
     
         ' Add buttons to top level menu "Add-Ins"
@@ -189,5 +189,7 @@ Public Sub DeleteCustomMenu()
         On Error GoTo 0
     Next bd
 End Sub
+
+
 
 

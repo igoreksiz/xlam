@@ -25,7 +25,7 @@ Public Function MSOffVer() As Integer
     Dim startPos As Integer
     MSOffVer = 0
         
-    verStr = Application.version
+    verStr = Application.Version
     startPos = VBA.InStr(verStr, ".")
         
         On Error Resume Next
@@ -70,7 +70,7 @@ Public Function EscapeQuotes(str As String) As String
 End Function
 
 Public Function DescapeQuotes(str As String) As String
-    EscapeQuotes = Replace(str, "\""", """")
+    DescapeQuotes = Replace(str, "\""", """")
 End Function
 
 Public Function CurrentCaller() As String
@@ -97,3 +97,5 @@ Public Function GetAPIHeader()
     
     GetAPIHeader = APIHeader
 End Function
+
+

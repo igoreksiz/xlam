@@ -6,7 +6,7 @@ Attribute VB_Name = "WebResponse"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 ''
 ' WebResponse v4.1.2
 ' (c) Tim Hall - https://github.com/VBA-tools/VBA-Web
@@ -384,25 +384,29 @@ End Function
 Private Function web_FindStatusLine_ORIGINAL(web_CurlResponseLines() As String) As Long
     ' Special case for cURL: 100 Continue is included before final status code
     ' -> ignore 100 and find final status code (next non-100 status code)
-    For web_FindStatusLine = LBound(web_CurlResponseLines) To UBound(web_CurlResponseLines)
-        If VBA.Trim$(web_CurlResponseLines(web_FindStatusLine)) <> "" Then
-            If VBA.Split(web_CurlResponseLines(web_FindStatusLine), " ")(1) <> "100" Then
+    Dim line As Long
+    For line = LBound(web_CurlResponseLines) To UBound(web_CurlResponseLines)
+        If VBA.Trim$(web_CurlResponseLines(line)) <> "" Then
+            If VBA.Split(web_CurlResponseLines(line), " ")(1) <> "100" Then
+                web_FindStatusLine_ORIGINAL = line
                 Exit Function
             End If
         End If
-    Next web_FindStatusLine
+    Next line
 End Function
 
 Private Function web_FindStatusLine(web_CurlResponseLines() As String) As Long
-
     ' find last HTTP status line; replacement function written by Michael Chambers March 2017
-    For web_FindStatusLine = UBound(web_CurlResponseLines) To LBound(web_CurlResponseLines) Step -1
-        If VBA.Len(web_CurlResponseLines(web_FindStatusLine)) >= 7 Then
-            If VBA.Left(web_CurlResponseLines(web_FindStatusLine), 7) = "HTTP/1." Or VBA.Left(web_CurlResponseLines(web_FindStatusLine), 6) = "HTTP/2" Then
+    Dim line As Long
+    For line = UBound(web_CurlResponseLines) To LBound(web_CurlResponseLines) Step -1
+        If VBA.Len(web_CurlResponseLines(line)) >= 7 Then
+            If VBA.Left(web_CurlResponseLines(line), 7) = "HTTP/1." Or VBA.Left(web_CurlResponseLines(line), 6) = "HTTP/2" Then
+                web_FindStatusLine = line
                 Exit Function
             End If
         End If
-    Next web_FindStatusLine
+    Next line
+    web_FindStatusLine = line
 End Function
 
 Private Function web_FindBlankLine(web_CurlResponseLines() As String) As Long
@@ -419,3 +423,5 @@ Private Sub Class_Initialize()
     Set Headers = New Collection
     Set Cookies = New Collection
 End Sub
+
+

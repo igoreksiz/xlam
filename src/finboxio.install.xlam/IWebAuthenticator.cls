@@ -6,7 +6,7 @@ Attribute VB_Name = "IWebAuthenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 ''
 ' IWebAuthenticator v4.1.2
 ' (c) Tim Hall - https://github.com/VBA-tools/VBA-Web
@@ -69,3 +69,4 @@ End Sub
 Public Sub PrepareCurl(ByVal Client As webClient, ByVal Request As webRequest, ByRef Curl As String)
     ' e.g. Add flags to cURL
 End Sub
+

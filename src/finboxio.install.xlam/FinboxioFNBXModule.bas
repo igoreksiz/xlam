@@ -135,6 +135,7 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
     Dim keys() As String, uncached() As String
     ReDim keys(0)
     ReDim uncached(0)
+    Dim i As Long, j As Long
     If Not book Is Nothing Then
         Dim fnd As String, range As range, cell As range, formula As String
         Dim Sheet As Worksheet
@@ -151,7 +152,6 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
                 Dim formulas As Variant
                 On Error Resume Next
                 formulas = range.SpecialCells(xlCellTypeFormulas).formula
-                Dim i As Long, j As Long
                 For i = LBound(formulas, 1) To UBound(formulas, 1)
                     For j = LBound(formulas, 2) To UBound(formulas, 2)
                         If Not formulas(i, j) = "" Then
@@ -193,7 +193,6 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
         Next Sheet
     End If
 
-    Dim i As Long
     For i = 1 To UBound(keys)
         If Not IsCached(keys(i)) Then
             Call InsertElementIntoArray(uncached, UBound(uncached) + 1, keys(i))
@@ -212,9 +211,13 @@ Public Function CachedToFNBX(key As String, Optional index As Integer)
         ElseIf list.count < index Then
             CachedToFNBX = CVErr(xlErrNull)
         Else
-            CachedToFNBX = val(index)
+            CachedToFNBX = Val(index)
         End If
     Else
         CachedToFNBX = GetCachedValue(key)
     End If
 End Function
+
+
+
+

@@ -40,3 +40,4 @@ Public Const UNSPECIFIED_API_ERROR = 20500
 #Else
     Public Const EXCEL_VERSION = "Win"
 #End If
+

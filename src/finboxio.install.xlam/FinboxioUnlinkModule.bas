@@ -40,7 +40,7 @@ Public Sub UnlinkFormulas()
                 Next i
                 Application.Calculation = calcType
                 
-                ActiveWorkbook.SaveAs FileName:=fileSaveName, FileFormat:=xlOpenXMLWorkbook
+                ActiveWorkbook.SaveAs Filename:=fileSaveName, FileFormat:=xlOpenXMLWorkbook
                 Application.DisplayAlerts = True
             End If
     End Select
@@ -49,3 +49,5 @@ Public Sub UnlinkFormulas()
 ShowWarning:
     MsgBox ("This workbook cannot be unlinked")
 End Sub
+
+

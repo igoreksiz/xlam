@@ -6,7 +6,7 @@ Attribute VB_Name = "HttpBasicAuthenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 ''
 ' Http Basic Authenticator v3.0.5
 ' (c) Tim Hall - https://github.com/VBA-tools/VBA-Web
@@ -93,4 +93,5 @@ Private Sub IWebAuthenticator_PrepareCurl(ByVal Client As webClient, ByVal Reque
     ' e.g. Add flags to cURL
     Curl = Curl & " --basic --user " & xHelpersWeb.PrepareTextForShell(Me.Username) & ":" & xHelpersWeb.PrepareTextForShell(Me.password)
 End Sub
+
 

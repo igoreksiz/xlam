@@ -260,3 +260,4 @@ Function EvalTableAddress(arg As String, cell As range)
     Dim focus
     EvalTableAddress = table.DataBodyRange(row2 - row, table.ListColumns(header).index)
 End Function
+

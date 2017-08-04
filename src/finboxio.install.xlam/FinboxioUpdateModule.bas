@@ -65,3 +65,4 @@ Public Function latestVersion()
 Finish:
     latestVersion = latest
 End Function
+

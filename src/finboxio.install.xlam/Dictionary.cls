@@ -6,8 +6,7 @@ Attribute VB_Name = "Dictionary"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
-Attribute VB_Description = "Drop-in replacement for Scripting.Dictionary on Mac\r\n\r\nDictionary v1.4.0\r\n(c) Tim Hall - https://github.com/timhall/VBA-Dictionary\r\nAuthor: tim.hall.engr@gmail.com\r\nLicense: MIT (http://www.opensource.org/licenses/mit-license.php)\r\n"
+Attribute VB_Exposed = False
 ''
 ' Dictionary v1.4.1
 ' (c) Tim Hall - https://github.com/timhall/VBA-Dictionary
@@ -56,7 +55,6 @@ End Enum
 ' --------------------------------------------- '
 
 Public Property Get CompareMode() As CompareMethod
-Attribute CompareMode.VB_Description = "Set or get the string comparison method."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     CompareMode = dict_pCompareMode
 #Else
@@ -78,7 +76,6 @@ Public Property Let CompareMode(value As CompareMethod)
 End Property
 
 Public Property Get count() As Long
-Attribute count.VB_Description = "Get the number of items in the dictionary.\n"
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     count = dict_pKeyValues.count
 #Else
@@ -87,8 +84,6 @@ Attribute count.VB_Description = "Get the number of items in the dictionary.\n"
 End Property
 
 Public Property Get Item(key As Variant) As Variant
-Attribute Item.VB_Description = "Set or get the item for a given key."
-Attribute Item.VB_UserMemId = 0
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     Dim dict_KeyValue As Variant
     dict_KeyValue = dict_GetKeyValue(key)
@@ -134,7 +129,6 @@ Public Property Set Item(key As Variant, value As Variant)
 End Property
 
 Public Property Let key(Previous As Variant, Updated As Variant)
-Attribute key.VB_Description = "Change a key to a different key."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     Dim dict_KeyValue As Variant
     dict_KeyValue = dict_GetKeyValue(Previous)
@@ -158,7 +152,6 @@ End Property
 ' @param {Variant} Item
 ' --------------------------------------------- '
 Public Sub Add(key As Variant, Item As Variant)
-Attribute Add.VB_Description = "Add a new key and item to the dictionary."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     If Not Me.Exists(key) Then
         dict_AddKeyValue key, Item
@@ -178,7 +171,6 @@ End Sub
 ' @return {Boolean}
 ' --------------------------------------------- '
 Public Function Exists(key As Variant) As Boolean
-Attribute Exists.VB_Description = "Determine if a given key is in the dictionary."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     Exists = Not IsEmpty(dict_GetKeyValue(key))
 #Else
@@ -192,7 +184,6 @@ End Function
 ' @return {Variant}
 ' --------------------------------------------- '
 Public Function Items() As Variant
-Attribute Items.VB_Description = "Get an array containing all items in the dictionary."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     If Me.count > 0 Then
         Items = dict_pItems
@@ -211,7 +202,6 @@ End Function
 ' @return {Variant}
 ' --------------------------------------------- '
 Public Function keys() As Variant
-Attribute keys.VB_Description = "Get an array containing all keys in the dictionary."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     If Me.count > 0 Then
         keys = dict_pKeys
@@ -230,7 +220,6 @@ End Function
 ' @param {Variant} Key
 ' --------------------------------------------- '
 Public Sub Remove(key As Variant)
-Attribute Remove.VB_Description = "Remove a given key from the dictionary."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     Dim dict_KeyValue As Variant
     dict_KeyValue = dict_GetKeyValue(key)
@@ -250,7 +239,6 @@ End Sub
 ' Remove all items
 ' --------------------------------------------- '
 Public Sub RemoveAll()
-Attribute RemoveAll.VB_Description = "Remove all information from the dictionary."
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     Set dict_pKeyValues = New Collection
 
@@ -472,3 +460,4 @@ Private Sub Class_Terminate()
     Set dict_pDictionary = Nothing
 #End If
 End Sub
+
