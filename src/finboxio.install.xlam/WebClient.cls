@@ -345,7 +345,7 @@ web_ErrorHandling:
     Case 12002, 12007, 12029
         ' Treat timeout-related errors as 408: timeout, name not resolved, cannot connect
         web_Response.statusCode = WebStatusCode.RequestTimeout
-        web_Response.StatusDescription = "Request Timeout: " & Err.Description
+        web_Response.StatusDescription = "Request Timeout: " & Err.description
 
         xHelpersWeb.LogResponse Me, Request, web_Response
         Set Execute = web_Response
@@ -353,7 +353,7 @@ web_ErrorHandling:
     Case Else
         ' Error
         web_ErrorDescription = "An error occurred during execute" & vbNewLine & _
-            Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+            Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
         xHelpersWeb.LogError web_ErrorDescription, "WebClient.Execute", 11011 + vbObjectError
         Err.Raise 11011 + vbObjectError, "WebClient.Execute", web_ErrorDescription
@@ -570,11 +570,11 @@ Public Function PrepareHttpRequest(Request As webRequest, Optional Async As Bool
 
     ' Set headers on http request (after open)
     For Each web_KeyValue In Request.Headers
-        web_Http.SetRequestHeader web_KeyValue("Key"), web_KeyValue("Value")
+        web_Http.SetRequestHeader web_KeyValue.Item("Key"), web_KeyValue.Item("Value")
     Next web_KeyValue
 
     For Each web_KeyValue In Request.Cookies
-        web_Http.SetRequestHeader "Cookie", web_KeyValue("Key") & "=" & web_KeyValue("Value")
+        web_Http.SetRequestHeader "Cookie", web_KeyValue.Item("Key") & "=" & web_KeyValue.Item("Value")
     Next web_KeyValue
 
     ' Give authenticator opportunity to update Http
@@ -592,7 +592,7 @@ web_ErrorHandling:
     Set web_Http = Nothing
     Err.Raise 11012 + vbObjectError, "WebClient.PrepareHttpRequest", _
         "An error occurred while preparing http request" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 End Function
 
 ''
@@ -645,11 +645,11 @@ Public Function PrepareCurlRequest(Request As webRequest) As String
 
     ' Set headers and cookies
     For Each web_KeyValue In Request.Headers
-        web_Curl = web_Curl & " -H '" & web_KeyValue("Key") & ": " & web_KeyValue("Value") & "'"
+        web_Curl = web_Curl & " -H '" & web_KeyValue.Item("Key") & ": " & web_KeyValue.Item("Value") & "'"
     Next web_KeyValue
 
     For Each web_KeyValue In Request.Cookies
-        web_CookieString = web_CookieString & web_KeyValue("Key") & "=" & web_KeyValue("Value") & ";"
+        web_CookieString = web_CookieString & web_KeyValue.Item("Key") & "=" & web_KeyValue.Item("Value") & ";"
     Next web_KeyValue
     If web_CookieString <> "" Then
         web_Curl = web_Curl & " --cookie '" & web_CookieString & "'"
@@ -674,7 +674,7 @@ web_ErrorHandling:
 
     Err.Raise 11013 + vbObjectError, "WebClient.PrepareCURLRequest", _
         "An error occurred while preparing cURL request" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 End Function
 
 ''
@@ -745,7 +745,7 @@ Private Sub web_LoadAutoProxy(web_Request As webRequest)
 web_ErrorHandling:
 
     xHelpersWeb.LogError "An error occurred while loading auto-proxy" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description, _
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description, _
         "WebClient.LoadAutoProxy", Err.Number
 #End If
 End Sub

@@ -1,5 +1,6 @@
 Attribute VB_Name = "FinboxioLimitModule"
 Option Explicit
+Option Private Module
 
 Private RedisplayWarning As Date
 
@@ -17,6 +18,10 @@ Public Function IsRateLimited()
         IsRateLimited = False
     End If
 End Function
+
+Public Sub ClearRateLimit()
+    RedisplayWarning = Now() - 1
+End Sub
 
 Private Sub SetRateLimitTimer()
     RedisplayWarning = Now() + (5 / (60 * 24))

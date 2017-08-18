@@ -1,8 +1,14 @@
 Attribute VB_Name = "FinboxioUnlinkModule"
 Option Explicit
+Option Private Module
 
 Public Sub UnlinkFormulas()
     On Error GoTo ShowWarning
+    
+    If Not ActiveWorkbook.Saved Then
+        MsgBox ("This workbook contains unsaved changes. You must save before it can be unlinked.")
+        Exit Sub
+    End If
     
     Dim wbName As String
     wbName = ActiveWorkbook.name
@@ -11,8 +17,8 @@ Public Sub UnlinkFormulas()
     wbName = Replace(wbName, ".xls", "")
 
     Dim msg As String, choice As Variant
-    msg = "This will save any changes you have made to the current workbook and create a copy with all finbox.io formulas replaced by their current values. Do you wish to continue?"
-    choice = MsgBox(msg, vbYesNo, "Save and unlink?")
+    msg = "This will save a copy of the current workbook with all finbox.io formulas replaced by their current values. Do you wish to continue?"
+    choice = MsgBox(msg, vbYesNo)
     Select Case choice
         Case vbYes
             Dim fileSaveName As Variant
@@ -27,8 +33,7 @@ Public Sub UnlinkFormulas()
     
             If TypeName(fileSaveName) <> "Boolean" Then
                 Application.DisplayAlerts = False
-                ActiveWorkbook.Save
-                
+            
                 Dim calcType: calcType = Application.Calculation
                 Application.Calculation = xlCalculationManual
                 Dim r As range, i As Long

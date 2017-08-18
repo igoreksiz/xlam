@@ -1,7 +1,6 @@
 Attribute VB_Name = "FinboxioMessagesModule"
-' finbox.io API Integration
-
 Option Explicit
+Option Private Module
 
 Private CachedMessages As New Collection
 

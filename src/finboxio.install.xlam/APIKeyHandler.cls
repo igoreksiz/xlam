@@ -20,6 +20,7 @@ End Sub
 Public Sub StoreApiKey(key As String)
     activeKey = key
     hasReadKey = True
+    LogMessage "Using API key " & activeKey
     WriteKey activeKey
     InvalidateAppRibbon
 End Sub
@@ -28,6 +29,7 @@ Public Function GetAPIKey()
     If Not hasReadKey Then
         activeKey = ReadKey
         hasReadKey = True
+        If activeKey <> "" Then LogMessage "Using API key " & activeKey
     End If
     GetAPIKey = activeKey
 End Function
@@ -35,6 +37,7 @@ End Function
 Public Sub ClearAPIKey()
     activeKey = ""
     hasReadKey = True
+    LogMessage "Logging out"
     WriteKey activeKey
     InvalidateAppRibbon
 End Sub

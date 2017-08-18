@@ -1,9 +1,8 @@
 Attribute VB_Name = "FinboxioFNBXModule"
-' finbox.io API Integration
-
 Option Explicit
 
 Public CheckedForUpdates As Boolean
+Public RequestedLogin As Boolean
 
 Public Sub AddUDFCategoryDescription()
     #If Mac Then
@@ -11,7 +10,7 @@ Public Sub AddUDFCategoryDescription()
         Exit Sub
     #End If
     Application.MacroOptions Macro:="FNBX", Category:="finbox.io", _
-        Description:="Returns a datapoint representing a selected company metric at a given point in time."
+        description:="Returns a datapoint representing a selected company metric at a given point in time."
 End Sub
 
 Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional ByRef period = "") As Variant
@@ -30,20 +29,13 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
     ' external workbooks to local references.
     ' e.g. 'C:\...\finboxio.xlam'!FNBX => FNBX
     If IsReplacingLinks Then
-        FNBX = cell.value
+        FNBX = CVErr(xlErrName)
         GoTo Finish
     End If
 
     ' Check for updates on first use
     If Not CheckedForUpdates Then CheckUpdates
     CheckedForUpdates = True
-
-    ' Check if user recently hit limit overage
-    ' and refuse to request data if so
-    If IsRateLimited Then
-        FNBX = cell.value
-        GoTo Finish
-    End If
 
     ' Check for null arguments
     If IsEmpty(ticker) Or IsEmpty(metric) Then
@@ -68,19 +60,21 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
     
     Dim index As Integer
     If TypeName(period) = "Range" Then
-        period = Application.Evaluate(period.address)
+        period = Application.Evaluate(period.address(External:=True))
     End If
     If TypeName(period) = "Double" And period < (Now() - (365 * 50)) Then
         index = CInt(period)
         period = ""
     ElseIf TypeName(period) = "Double" Or TypeName(period) = "Date" Then
         period = "Y" & Year(period) & ".M" & Month(period) & ".D" & Day(period)
+    ElseIf TypeName(period) = "String" And IsDateString(CStr(period)) Then
+        period = DateStringToPeriod(CStr(period))
     End If
 
     ' Build finql key from arguments
     Dim key As String
-    key = ticker & "." & metric
-    If period <> "" Then key = key & "[""" & period & """]"
+    key = VBA.UCase(ticker) & "." & VBA.LCase(metric)
+    If period <> "" Then key = key & "[""" & VBA.UCase(period) & """]"
     
     ' If key is already cached, just return it
     If IsCached(key) Then
@@ -89,11 +83,21 @@ Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional By
     End If
 
     ' Check if user is logged in and prompt if not
-    If Not IsLoggedIn() Then ShowLoginForm
+    If Not IsLoggedIn() And Not RequestedLogin Then ShowLoginForm
+    RequestedLogin = True
+
+    ' Check if user recently hit limit overage
+    ' and refuse to request data if so
+    If IsRateLimited Then
+        FNBX = CVErr(xlErrNA)
+        GoTo Finish
+    End If
 
     ' Collect all uncached keys to request
     Dim book As Workbook: Set book = cell.Worksheet.Parent
+    ' LogMessage "Parsing Keys"
     Dim uncached() As String: uncached = FindUncachedKeys(book)
+    ' LogMessage "Parsed Keys"
     Call InsertElementIntoArray(uncached, UBound(uncached) + 1, key)
 
     ' Request and cache keys
@@ -115,33 +119,45 @@ HandleErrors:
     If Err.Number = LIMIT_EXCEEDED_ERROR Then
         ShowRateLimitWarning
     End If
-    
-    If Err.Number = INVALID_ARGS_ERROR Then
-        FNBX = CVErr(xlErrNum)
-    ElseIf Err.Number = MISSING_VALUE_ERROR Then
+
+    If Err.Number = MISSING_VALUE_ERROR Then
         FNBX = CVErr(xlErrNull)
-    Else
+    ElseIf Err.Number = INVALID_ARGS_ERROR Then
         FNBX = CVErr(xlErrValue)
+    ElseIf Err.Number = INVALID_KEY_ERROR Then
+        FNBX = CVErr(xlErrValue)
+    ElseIf Err.Number = INVALID_PERIOD_ERROR Then
+        FNBX = CVErr(xlErrValue)
+    ElseIf Err.Number = UNSUPPORTED_METRIC_ERROR Then
+        FNBX = CVErr(xlErrValue)
+    ElseIf Err.Number = UNSUPPORTED_COMPANY_ERROR Then
+        FNBX = CVErr(xlErrValue)
+    ElseIf Err.Number = RESTRICTED_COMPANY_ERROR Then
+        FNBX = CVErr(xlErrNA)
+    ElseIf Err.Number = RESTRICTED_METRIC_ERROR Then
+        FNBX = CVErr(xlErrNA)
+    Else
+        FNBX = CVErr(xlErrNA)
     End If
     
-    LogMessage "VBA error code " & Err.Number & " [" & Err.Description & "]", address
+    LogMessage "VBA error code " & Err.Number & " [" & Err.description & "]", address
     
 Finish:
-    
+
 End Function
 
 ' Return a list of all uncached finql keys required by a workbook
-Public Function FindUncachedKeys(ByRef book As Workbook) As String()
+Private Function FindUncachedKeys(ByRef book As Workbook) As String()
     Dim keys() As String, uncached() As String
     ReDim keys(0)
     ReDim uncached(0)
     Dim i As Long, j As Long
     If Not book Is Nothing Then
         Dim fnd As String, range As range, cell As range, formula As String
-        Dim Sheet As Worksheet
-        For Each Sheet In book.Worksheets
+        Dim sheet As Worksheet
+        For Each sheet In book.Worksheets
             fnd = "FNBX("
-            Set range = Sheet.UsedRange
+            Set range = sheet.UsedRange
             #If Mac Then
                 ' VBA on Mac does not allow us to use Find while running in the context
                 ' of a UDF. So we have to iterate all the cells and check for FNBX. A
@@ -155,10 +171,10 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
                 For i = LBound(formulas, 1) To UBound(formulas, 1)
                     For j = LBound(formulas, 2) To UBound(formulas, 2)
                         If Not formulas(i, j) = "" Then
-                            If VBA.InStr(formulas(i, j), fnd) > 0 Then
+                            If VBA.InStr(VBA.UCase(formulas(i, j)), fnd) > 0 Then
                                 formula = formulas(i, j)
                                 Set cell = range.Cells(i, j)
-                                ParseFormula formula, cell, Sheet, keys
+                                Call ParseFormula(formula, cell, sheet, keys)
                             End If
                         End If
                     Next j
@@ -173,15 +189,15 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
                 ' trade-off for workbooks with increasing FNBX count)
                 Dim FirstFound As String, LastCell As range, FoundCell As range
                 Set LastCell = range.Cells(range.Cells.count)
-                Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell)
+                Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell, MatchCase:=False)
                 If Not FoundCell Is Nothing Then
                     FirstFound = FoundCell.address
                     On Error Resume Next
                     Do Until FoundCell Is Nothing
-                        Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell)
+                        Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell, MatchCase:=False)
                         If FoundCell.HasFormula Then
                             formula = FoundCell.formula
-                            ParseFormula formula, FoundCell, Sheet, keys
+                            Call ParseFormula(formula, FoundCell, sheet, keys)
                         End If
                         If FoundCell.address = FirstFound Then Exit Do
                     Loop
@@ -190,7 +206,7 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
                 ' Reset the Find/Replace dialog after Find (not 100% sure this is necessary)
                 ResetFindReplace
             #End If
-        Next Sheet
+        Next sheet
     End If
 
     For i = 1 To UBound(keys)
@@ -201,23 +217,4 @@ Public Function FindUncachedKeys(ByRef book As Workbook) As String()
 
     FindUncachedKeys = uncached()
 End Function
-
-Public Function CachedToFNBX(key As String, Optional index As Integer)
-    If TypeName(GetCachedValue(key)) = "Collection" Then
-        Dim list As Collection
-        Set list = GetCachedValue(key)
-        If TypeName(index) = "Empty" Then
-            CachedToFNBX = CollectionToString(list)
-        ElseIf list.count < index Then
-            CachedToFNBX = CVErr(xlErrNull)
-        Else
-            CachedToFNBX = Val(index)
-        End If
-    Else
-        CachedToFNBX = GetCachedValue(key)
-    End If
-End Function
-
-
-
 

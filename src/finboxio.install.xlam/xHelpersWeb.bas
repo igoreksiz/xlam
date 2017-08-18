@@ -1,4 +1,6 @@
 Attribute VB_Name = "xHelpersWeb"
+Option Private Module
+
 ''
 ' xHelpersWeb v4.1.2
 ' (c) Tim Hall - https://github.com/VBA-tools/VBA-Web
@@ -541,11 +543,11 @@ Public Sub LogRequest(Client As webClient, Request As webRequest)
 
         Dim web_KeyValue As Dictionary
         For Each web_KeyValue In Request.Headers
-            Debug.Print web_KeyValue("Key") & ": " & web_KeyValue("Value")
+            Debug.Print web_KeyValue.Item("Key") & ": " & web_KeyValue.Item("Value")
         Next web_KeyValue
 
         For Each web_KeyValue In Request.Cookies
-            Debug.Print "Cookie: " & web_KeyValue("Key") & "=" & web_KeyValue("Value")
+            Debug.Print "Cookie: " & web_KeyValue.Item("Key") & "=" & web_KeyValue.Item("Value")
         Next web_KeyValue
 
         If Not IsEmpty(Request.Body) Then
@@ -572,11 +574,11 @@ Public Sub LogResponse(Client As webClient, Request As webRequest, Response As w
         Debug.Print Response.statusCode & " " & Response.StatusDescription
 
         For Each web_KeyValue In Response.Headers
-            Debug.Print web_KeyValue("Key") & ": " & web_KeyValue("Value")
+            Debug.Print web_KeyValue.Item("Key") & ": " & web_KeyValue.Item("Value")
         Next web_KeyValue
 
         For Each web_KeyValue In Response.Cookies
-            Debug.Print "Cookie: " & web_KeyValue("Key") & "=" & web_KeyValue("Value")
+            Debug.Print "Cookie: " & web_KeyValue.Item("Key") & "=" & web_KeyValue.Item("Value")
         Next web_KeyValue
 
         Debug.Print vbNewLine & Response.Content & vbNewLine
@@ -671,7 +673,7 @@ Public Function ConvertToUrlEncoded(Obj As Variant, Optional EncodingMode As Url
 
         For Each web_KeyValue In Obj
             If VBA.Len(web_Encoded) > 0 Then: web_Encoded = web_Encoded & "&"
-            web_Encoded = web_Encoded & web_GetUrlEncodedKeyValue(web_KeyValue("Key"), web_KeyValue("Value"), EncodingMode)
+            web_Encoded = web_Encoded & web_GetUrlEncodedKeyValue(web_KeyValue.Item("Key"), web_KeyValue.Item("Value"), EncodingMode)
         Next web_KeyValue
     Else
         Dim web_Key As Variant
@@ -798,7 +800,7 @@ web_ErrorHandling:
 
     Dim web_ErrorDescription As String
     web_ErrorDescription = "An error occurred during parsing" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
     LogError web_ErrorDescription, "xHelpersWeb.ParseByFormat", 11000
     Err.Raise 11000, "xHelpersWeb.ParseByFormat", web_ErrorDescription
@@ -856,7 +858,7 @@ web_ErrorHandling:
 
     Dim web_ErrorDescription As String
     web_ErrorDescription = "An error occurred during conversion" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
     LogError web_ErrorDescription, "xHelpersWeb.ConvertToFormat", 11001
     Err.Raise 11001, "xHelpersWeb.ConvertToFormat", web_ErrorDescription
@@ -885,7 +887,7 @@ End Function
 ' @param {UrlEncodingMode} [EncodingMode = StrictUrlEncoding]
 ' @return {String} Encoded string
 ''
-Public Function UrlEncode(Text As Variant, _
+Public Function UrlEncode(text As Variant, _
     Optional SpaceAsPlus As Boolean = False, Optional EncodeUnsafe As Boolean = True, _
     Optional EncodingMode As UrlEncodingMode = UrlEncodingMode.StrictUrlEncoding) As String
 
@@ -901,7 +903,7 @@ Public Function UrlEncode(Text As Variant, _
     Dim web_UrlVal As String
     Dim web_StringLen As Long
 
-    web_UrlVal = VBA.CStr(Text)
+    web_UrlVal = VBA.CStr(text)
     web_StringLen = VBA.Len(web_UrlVal)
 
     If web_StringLen > 0 Then
@@ -1077,15 +1079,15 @@ End Function
 ' @param {Variant} Text Text to encode
 ' @return {String} Encoded string
 ''
-Public Function Base64Encode(Text As String) As String
+Public Function Base64Encode(text As String) As String
 #If Mac Then
     Dim web_Command As String
-    web_Command = "printf " & PrepareTextForShell(Text) & " | openssl base64"
+    web_Command = "printf " & PrepareTextForShell(text) & " | openssl base64"
     Base64Encode = ExecuteInShell(web_Command).Output
 #Else
     Dim web_Bytes() As Byte
 
-    web_Bytes = VBA.StrConv(Text, vbFromUnicode)
+    web_Bytes = VBA.StrConv(text, vbFromUnicode)
     Base64Encode = web_AnsiBytesToBase64(web_Bytes)
 #End If
 
@@ -1116,7 +1118,7 @@ Public Function Base64Decode(Encoded As Variant) As String
     Set web_Node = web_XmlObj.createElement("b64")
 
     web_Node.DataType = "bin.base64"
-    web_Node.Text = Encoded
+    web_Node.text = Encoded
     Base64Decode = VBA.StrConv(web_Node.nodeTypedValue, vbUnicode)
 
     Set web_Node = Nothing
@@ -1379,7 +1381,7 @@ web_ErrorHandling:
 
     Dim web_ErrorDescription As String
     web_ErrorDescription = "An error occurred while getting url parts" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
     LogError web_ErrorDescription, "xHelpersWeb.GetUrlParts", 11003
     Err.Raise 11003, "xHelpersWeb.GetUrlParts", web_ErrorDescription
@@ -1443,8 +1445,8 @@ End Function
 Public Function CreateKeyValue(key As String, value As Variant) As Dictionary
     Dim web_KeyValue As New Dictionary
 
-    web_KeyValue("Key") = key
-    web_KeyValue("Value") = value
+    web_KeyValue.Item("Key") = key
+    web_KeyValue.Item("Value") = value
     Set CreateKeyValue = web_KeyValue
 End Function
 
@@ -1472,8 +1474,8 @@ Public Function FindInKeyValues(KeyValues As Collection, key As Variant) As Vari
     Dim web_KeyValue As Dictionary
 
     For Each web_KeyValue In KeyValues
-        If web_KeyValue("Key") = key Then
-            FindInKeyValues = web_KeyValue("Value")
+        If web_KeyValue.Item("Key") = key Then
+            FindInKeyValues = web_KeyValue.Item("Value")
             Exit Function
         End If
     Next web_KeyValue
@@ -1517,7 +1519,7 @@ Public Sub AddOrReplaceInKeyValues(KeyValues As Collection, key As Variant, valu
 
     web_Index = 1
     For Each web_KeyValue In KeyValues
-        If web_KeyValue("Key") = key Then
+        If web_KeyValue.Item("Key") = key Then
             ' Replace existing
             KeyValues.Remove web_Index
 
@@ -1735,10 +1737,10 @@ End Function
 ' @param {String} [Format="Hex"] "Hex" or "Base64" encoding for result
 ' @return {String} HMAC-SHA1
 ''
-Public Function HMACSHA1(Text As String, Secret As String, Optional Format As String = "Hex") As String
+Public Function HMACSHA1(text As String, Secret As String, Optional Format As String = "Hex") As String
 #If Mac Then
     Dim web_Command As String
-    web_Command = "printf " & PrepareTextForShell(Text) & " | openssl dgst -sha1 -hmac " & PrepareTextForShell(Secret)
+    web_Command = "printf " & PrepareTextForShell(text) & " | openssl dgst -sha1 -hmac " & PrepareTextForShell(Secret)
 
     If Format = "Base64" Then
         web_Command = web_Command & " -binary | openssl enc -base64"
@@ -1751,7 +1753,7 @@ Public Function HMACSHA1(Text As String, Secret As String, Optional Format As St
     Dim web_SecretBytes() As Byte
     Dim web_Bytes() As Byte
 
-    web_TextBytes = VBA.StrConv(Text, vbFromUnicode)
+    web_TextBytes = VBA.StrConv(text, vbFromUnicode)
     web_SecretBytes = VBA.StrConv(Secret, vbFromUnicode)
 
     Set web_Crypto = CreateObject("System.Security.Cryptography.HMACSHA1")
@@ -1782,10 +1784,10 @@ End Function
 ' @param {String} [Format="Hex"] "Hex" or "Base64" encoding for result
 ' @return {String} HMAC-SHA256
 ''
-Public Function HMACSHA256(Text As String, Secret As String, Optional Format As String = "Hex") As String
+Public Function HMACSHA256(text As String, Secret As String, Optional Format As String = "Hex") As String
 #If Mac Then
     Dim web_Command As String
-    web_Command = "printf " & PrepareTextForShell(Text) & " | openssl dgst -sha256 -hmac " & PrepareTextForShell(Secret)
+    web_Command = "printf " & PrepareTextForShell(text) & " | openssl dgst -sha256 -hmac " & PrepareTextForShell(Secret)
 
     If Format = "Base64" Then
         web_Command = web_Command & " -binary | openssl enc -base64"
@@ -1798,7 +1800,7 @@ Public Function HMACSHA256(Text As String, Secret As String, Optional Format As 
     Dim web_SecretBytes() As Byte
     Dim web_Bytes() As Byte
 
-    web_TextBytes = VBA.StrConv(Text, vbFromUnicode)
+    web_TextBytes = VBA.StrConv(text, vbFromUnicode)
     web_SecretBytes = VBA.StrConv(Secret, vbFromUnicode)
 
     Set web_Crypto = CreateObject("System.Security.Cryptography.HMACSHA256")
@@ -1831,10 +1833,10 @@ End Function
 ' @param {String} [Format="Hex"] "Hex" or "Base64" encoding for result
 ' @return {String} MD5 Hash
 ''
-Public Function MD5(Text As String, Optional Format As String = "Hex") As String
+Public Function MD5(text As String, Optional Format As String = "Hex") As String
 #If Mac Then
     Dim web_Command As String
-    web_Command = "printf " & PrepareTextForShell(Text) & " | openssl dgst -md5"
+    web_Command = "printf " & PrepareTextForShell(text) & " | openssl dgst -md5"
 
     If Format = "Base64" Then
         web_Command = web_Command & " -binary | openssl enc -base64"
@@ -1846,7 +1848,7 @@ Public Function MD5(Text As String, Optional Format As String = "Hex") As String
     Dim web_TextBytes() As Byte
     Dim web_Bytes() As Byte
 
-    web_TextBytes = VBA.StrConv(Text, vbFromUnicode)
+    web_TextBytes = VBA.StrConv(text, vbFromUnicode)
 
     Set web_Crypto = CreateObject("System.Security.Cryptography.MD5CryptoServiceProvider")
     web_Bytes = web_Crypto.ComputeHash_2(web_TextBytes)
@@ -1926,7 +1928,7 @@ Private Function web_AnsiBytesToBase64(web_Bytes() As Byte)
 
     web_Node.DataType = "bin.base64"
     web_Node.nodeTypedValue = web_Bytes
-    web_AnsiBytesToBase64 = web_Node.Text
+    web_AnsiBytesToBase64 = web_Node.text
 
     Set web_Node = Nothing
     Set web_XmlObj = Nothing
@@ -2221,7 +2223,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
             json_BufferAppend json_buffer, "{", json_BufferPosition, json_BufferLength
             For Each json_Key In JsonValue.keys
                 ' For Objects, undefined (Empty/Nothing) is not added to object
-                json_Converted = ConvertToJson(JsonValue(json_Key), Whitespace, json_CurrentIndentation + 1)
+                json_Converted = ConvertToJson(JsonValue.Item(json_Key), Whitespace, json_CurrentIndentation + 1)
                 If json_Converted = "" Then
                     json_SkipItem = json_IsUndefined(JsonValue(json_Key))
                 Else
@@ -2799,7 +2801,7 @@ Public Function ParseUtc(utc_UtcDate As Date) As Date
     Exit Function
 
 utc_ErrorHandling:
-    Err.Raise 10011, "UtcConverter.ParseUtc", "UTC parsing error: " & Err.Number & " - " & Err.Description
+    Err.Raise 10011, "UtcConverter.ParseUtc", "UTC parsing error: " & Err.Number & " - " & Err.description
 End Function
 
 ''
@@ -2828,7 +2830,7 @@ Public Function ConvertToUtc(utc_LocalDate As Date) As Date
     Exit Function
 
 utc_ErrorHandling:
-    Err.Raise 10012, "UtcConverter.ConvertToUtc", "UTC conversion error: " & Err.Number & " - " & Err.Description
+    Err.Raise 10012, "UtcConverter.ConvertToUtc", "UTC conversion error: " & Err.Number & " - " & Err.description
 End Function
 
 ''
@@ -2906,7 +2908,7 @@ Public Function ParseIso(utc_IsoString As String) As Date
     Exit Function
 
 utc_ErrorHandling:
-    Err.Raise 10013, "UtcConverter.ParseIso", "ISO 8601 parsing error for " & utc_IsoString & ": " & Err.Number & " - " & Err.Description
+    Err.Raise 10013, "UtcConverter.ParseIso", "ISO 8601 parsing error for " & utc_IsoString & ": " & Err.Number & " - " & Err.description
 End Function
 
 ''
@@ -2925,7 +2927,7 @@ Public Function ConvertToIso(utc_LocalDate As Date) As String
     Exit Function
 
 utc_ErrorHandling:
-    Err.Raise 10014, "UtcConverter.ConvertToIso", "ISO 8601 conversion error: " & Err.Number & " - " & Err.Description
+    Err.Raise 10014, "UtcConverter.ConvertToIso", "ISO 8601 conversion error: " & Err.Number & " - " & Err.description
 End Function
 
 ' ============================================= '
@@ -3194,7 +3196,7 @@ AutoProxy_Cleanup:
     ' Error handling
     If Err.Number <> 0 Then
         ' Unmanaged error
-        Err.Raise Err.Number, "AutoProxy:" & Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
+        Err.Raise Err.Number, "AutoProxy:" & Err.Source, Err.description, Err.HelpFile, Err.HelpContext
     ElseIf AutoProxy_Error <> 0 Then
         Err.Raise AutoProxy_Error, "AutoProxy", AutoProxy_ErrorMsg
     End If

@@ -1,5 +1,6 @@
 Attribute VB_Name = "FinboxioMenuModule"
 Option Explicit
+Option Private Module
 
 #If Mac Then
     Public AppRibbon
@@ -50,6 +51,23 @@ Public Sub FinboxioIsFree(control, ByRef free)
     End If
 End Sub
 
+Public Sub FinboxioQuotaLabel(control, ByRef label)
+    label = QuotaLabel
+End Sub
+
+Public Sub FinboxioQuotaImage(control, ByRef image)
+    image = QuotaImage
+End Sub
+
+Public Sub FinboxioCheckQuota(Optional control)
+    CheckQuota
+    If QuotaTotal < 1 Then
+        MsgBox "Quota usage is unavailable at this time."
+    Else
+        MsgBox "You have used " & QuotaUsed & " datapoints of your " & QuotaTotal & " quota limit."
+    End If
+End Sub
+
 Public Sub FinboxioShowLogin(Optional control)
     ShowLoginForm
 End Sub
@@ -90,9 +108,7 @@ Public Sub FinboxioScreener(Optional control)
 End Sub
 
 Public Sub FinboxioTemplates(Optional control)
-    MsgBox "Coming Soon!"
-    Exit Sub
-    ' ThisWorkbook.FollowHyperlink TEMPLATES_URL
+    ThisWorkbook.FollowHyperlink TEMPLATES_URL
 End Sub
 
 Public Sub FinboxioRefresh(Optional control)
