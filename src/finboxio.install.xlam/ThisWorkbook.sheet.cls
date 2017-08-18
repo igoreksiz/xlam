@@ -13,6 +13,8 @@ Private Sub Workbook_Open()
     Call AddCustomMenu
 
     LogMessage "Welcome to " & AppTitle
+    
+    CheckQuota
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)

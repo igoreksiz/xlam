@@ -1,7 +1,6 @@
 Attribute VB_Name = "FinboxioAuthenticationModule"
-' finbox.io API Integration
-
 Option Explicit
+Option Private Module
 
 Private APIKeyStore As APIKeyHandler
 Private tier As String
@@ -12,11 +11,11 @@ End Sub
 
 Public Function ShowLoginForm()
     If EXCEL_VERSION = "Mac2011" Then
-        MacCredentialsForm.Show
+        Mac2011CredentialsForm.Show
     ElseIf EXCEL_VERSION = "Mac2016" Then
         Mac2016CredentialsForm.Show
     Else
-        CredentialsForm.Show
+        DefaultCredentialsForm.Show
     End If
 End Function
 
@@ -31,8 +30,8 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     Dim jsonReqObj As Object
     Set jsonReqObj = ParseJson("{}")
     
-    jsonReqObj("email") = email
-    jsonReqObj("password") = password
+    jsonReqObj.Item("email") = email
+    jsonReqObj.Item("password") = password
     
     Dim postData As String
     postData = ConvertToJson(jsonReqObj)
@@ -52,7 +51,7 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     
     ' Process according to HTTP response code
     Dim APItier As String
-    Dim APIkey As String
+    Dim APIKey As String
     
     Select Case webResponse.statusCode
         Case 401
@@ -60,11 +59,14 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
         Case 200
             ' Extract api_tier and api_key from json response
             APItier = ""
-            APIkey = ""
+            APIKey = ""
             On Error Resume Next
-            APItier = webResponse.data("api_tier")
-            APIkey = webResponse.data("api_key")
+            APItier = webResponse.data.Item("api_tier")
+            APIKey = webResponse.data.Item("api_key")
             On Error GoTo ErrorHandler
+            
+            If APItier = "default" Then APItier = "premium"
+            LogMessage "Logged in as " & APItier & " user " & email
             
             ' Process api_tier and api_key
             If APItier = "inactive" Then
@@ -72,7 +74,7 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
                     "To resend the verification email, visit https://finbox.io/profile.", _
                     vbCritical, AppTitle
             Else
-                APIKeyStore.StoreApiKey (APIkey)
+                APIKeyStore.StoreApiKey (APIKey)
                 Login = True
             End If
         Case Else
@@ -87,34 +89,35 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     Set webRequest = Nothing
     Set webResponse = Nothing
     
+    CheckQuota
     InvalidateAppRibbon
     Exit Function
+
 ErrorHandler:
     tier = ""
+    CheckQuota
     InvalidateAppRibbon
     Dim answer As Integer
     answer = MsgBox("Failed to authenticate with finbox.io. Contact support@finbox.io if this problem persists.", vbCritical, "finbox.io Addin")
 End Function
 
 Public Function GetTier()
-    If Not tier = "" Then
-        GoTo OnError
-    End If
+    ' Only load tier once
+    If Not tier = "" Then GoTo OnError
     
     On Error GoTo OnError
-    
-    Dim APIkey As String
-    
     tier = "anonymous"
-    APIkey = GetAPIKey()
     
     Dim webClient As New webClient
-    
     webClient.BaseUrl = TIER_URL
     
-    Dim Auth As New HttpBasicAuthenticator
-    Auth.Setup APIkey, ""
-    Set webClient.Authenticator = Auth
+    ' Setup Basic Auth with API key as username and empty password
+    Dim APIKey As String: APIKey = GetAPIKey()
+    If APIKey <> "" Then
+        Dim Auth As New HttpBasicAuthenticator
+        Auth.Setup APIKey, ""
+        Set webClient.Authenticator = Auth
+    End If
     
     Dim webRequest As New webRequest
     webRequest.Method = WebMethod.HttpGet
@@ -124,7 +127,7 @@ Public Function GetTier()
     Dim webResponse As webResponse
     Set webResponse = webClient.Execute(webRequest)
 
-    tier = webResponse.data("data")("tier")
+    tier = webResponse.data.Item("data").Item("tier")
 OnError:
     GetTier = tier
 End Function
@@ -143,6 +146,7 @@ Public Sub Logout()
     End If
     APIKeyStore.ClearAPIKey
     tier = ""
+    CheckQuota
 End Sub
 
 Public Function IsLoggedIn()

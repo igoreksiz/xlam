@@ -149,7 +149,7 @@ web_ErrorHandling:
 
     Dim web_ErrorDescription As String
     web_ErrorDescription = "An error occurred while creating response from http" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
     xHelpersWeb.LogError web_ErrorDescription, "WebResponse.CreateFromHttp", 11030 + vbObjectError
     Err.Raise 11030 + vbObjectError, "WebResponse.CreateFromHttp", web_ErrorDescription
@@ -185,7 +185,7 @@ web_ErrorHandling:
 
     Dim web_ErrorDescription As String
     web_ErrorDescription = "An error occurred while creating response from cURL" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
     xHelpersWeb.LogError web_ErrorDescription, "WebResponse.CreateFromCurl", 11031 + vbObjectError
     Err.Raise 11031 + vbObjectError, "WebResponse.CreateFromCurl", web_ErrorDescription
@@ -247,7 +247,7 @@ web_ErrorHandling:
 
     Dim web_ErrorDescription As String
     web_ErrorDescription = "An error occurred while extracting headers" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
 
     xHelpersWeb.LogError web_ErrorDescription, "WebResponse.CreateFromCurl", 11032 + vbObjectError
     Err.Raise 11032 + vbObjectError, "WebResponse.CreateFromCurl", web_ErrorDescription
@@ -269,8 +269,8 @@ Public Function ExtractCookies(Headers As Collection) As Collection
     Dim web_Cookies As New Collection
 
     For Each web_Header In Headers
-        If web_Header("Key") = "Set-Cookie" Then
-            web_Cookie = web_Header("Value")
+        If web_Header.Item("Key") = "Set-Cookie" Then
+            web_Cookie = web_Header.Item("Value")
             If VBA.InStr(1, web_Cookie, "=") > 0 Then
                 web_Key = VBA.Mid$(web_Cookie, 1, VBA.InStr(1, web_Cookie, "=") - 1)
                 web_Value = VBA.Mid$(web_Cookie, VBA.InStr(1, web_Cookie, "=") + 1, VBA.Len(web_Cookie))
@@ -308,7 +308,7 @@ Private Sub web_LoadValues(web_Headers As String, web_Content As String, web_Bod
             xHelpersWeb.ParseByFormat(web_Content, web_Request.ResponseFormat, web_Request.CustomResponseFormat, web_Body)
 
         If Err.Number <> 0 Then
-            xHelpersWeb.LogError Err.Description, Err.Source, Err.Number
+            xHelpersWeb.LogError Err.description, Err.Source, Err.Number
             Err.Clear
         End If
         On Error GoTo 0

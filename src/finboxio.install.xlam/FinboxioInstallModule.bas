@@ -1,12 +1,6 @@
 Attribute VB_Name = "FinboxioInstallModule"
-' (c) Willy Roche (willy.roche(at)centraliens.net)
-' Install procedure of XLAM (library of functions)
-' This procedure will install a file name .install.xlam in the proper excel directory
-' The install package will be name
-' During install you may be prompt to enable macros (accept it)
-' You can accept to install or refuse (which let you modify the XLAM file macros or install procedure
-
 Option Explicit
+Option Private Module
 
 ' Taken from https://stackoverflow.com/questions/9745469/automatically-install-excel-vba-add-in
 
@@ -29,7 +23,8 @@ Public Sub InstallAddin(self)
         
         ' Avoid the re-entry of script after activating the addin
         If Not (bAlreadyRun) Then
-            bAlreadyRun = True ' Ensure we wont install it multiple times (because Excel reopen files after an XLAM installation)
+            ' Ensure we wont install it multiple times (because Excel reopen files after an XLAM installation)
+            bAlreadyRun = True
             If MsgBox("Do you want to install the finbox.io excel add-in? This will overwrite any previously installed versions.", vbYesNo) = vbYes Then
                 ' Create a workbook otherwise, we get into troubles as Application.AddIns may not exist
                 Set oXLApp = Application
@@ -48,15 +43,11 @@ Public Sub InstallAddin(self)
                 If bAlreadyInstalled Then
                     ' Already installed
                     DebugBox ("Called from:'" & sCurrentPath & "' Already installed")
-                    If self.Application.AddIns.Item(iAddIn).Installed Then
-                        ' Deactivate the add-in to be able to overwrite the file
-                        self.Application.AddIns.Item(iAddIn).Installed = False
-                        SaveCopy self, sAddInFileName
-                        self.Application.AddIns.Item(iAddIn).Installed = True
-                    Else
-                        SaveCopy self, sAddInFileName
-                        self.Application.AddIns.Item(iAddIn).Installed = True
-                    End If
+                    ' Deactivate the add-in to be able to overwrite the file
+                    self.Application.AddIns.Item(iAddIn).Installed = False
+                    SaveCopy self, sAddInFileName
+                    self.Application.AddIns.Item(iAddIn).Installed = True
+                    DebugBox ("Add-In overwritten")
                 ElseIf bLegacyInstalled Then
                     ' Installed in an old location
                     DebugBox ("Called from:'" & sCurrentPath & "' Legacy installed")
@@ -74,10 +65,8 @@ Public Sub InstallAddin(self)
                 Dim restart As Integer
                 restart = MsgBox("The finbox.io add-in was successfully installed! You must quit and restart Excel to activate it. Would you like to quit Excel now?", vbYesNo)
                 If restart = vbYes Then
-                    oWorkbook.Close (False) ' Close the workbook opened by the install script
-                    oXLApp.Quit ' Close the app opened by the install script
-                    Set oWorkbook = Nothing ' Free memory
-                    Set oXLApp = Nothing ' Free memory
+                    oWorkbook.Close (False)
+                    oXLApp.Quit
                     self.Close (False)
                 End If
             End If
@@ -121,7 +110,6 @@ End Sub
 
 Function CreateFolderinMacOffice2016() As String
     'Function to create folder if it not exists in the Microsoft Office Folder
-    'Ron de Bruin : 8-Jan-2016
     Dim PathToFolder As String
     Dim TestStr As String
 

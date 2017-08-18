@@ -1,5 +1,6 @@
 Attribute VB_Name = "FinboxioUpdateModule"
 Option Explicit
+Option Private Module
 
 Public Sub CheckUpdates(Optional explicit As Boolean = False, Optional wb As Workbook)
     Dim latest As String
@@ -21,7 +22,7 @@ Public Sub CheckUpdates(Optional explicit As Boolean = False, Optional wb As Wor
 
     Select Case webResponse.statusCode
     Case 200
-        latest = webResponse.data("version")
+        latest = webResponse.data.Item("version")
     End Select
     
 Confirmation:
@@ -60,7 +61,7 @@ Public Function latestVersion()
 
     Select Case webResponse.statusCode
     Case 200
-        latest = webResponse.data("version")
+        latest = webResponse.data.Item("version")
     End Select
 Finish:
     latestVersion = latest

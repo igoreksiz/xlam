@@ -1,4 +1,6 @@
 Attribute VB_Name = "xHelpersRightClick"
+Option Private Module
+
 Public Sub RightClickMenu()
 ' Subroutine to generate right-click menu for
 ' cut / copy / paste / select all / delete

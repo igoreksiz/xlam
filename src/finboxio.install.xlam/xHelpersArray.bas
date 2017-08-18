@@ -1,6 +1,8 @@
 Attribute VB_Name = "xHelpersArray"
 Option Explicit
 Option Compare Text
+Option Private Module
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' modArraySupport
 ' By Chip Pearson, chip@cpearson.com, www.cpearson.com
@@ -1465,7 +1467,7 @@ Public Function IsArrayAllocated(Arr As Variant) As Boolean
 ' This function is just the reverse of IsArrayEmpty.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-Dim N As Long
+Dim n As Long
 On Error Resume Next
 
 ' if Arr is not an array, return FALSE and get out.
@@ -1476,7 +1478,7 @@ End If
 
 ' Attempt to get the UBound of the array. If the array has not been allocated,
 ' an error will occur. Test Err.Number to see if an error occurred.
-N = UBound(Arr, 1)
+n = UBound(Arr, 1)
 If (Err.Number = 0) Then
     ''''''''''''''''''''''''''''''''''''''
     ' Under some circumstances, if an array
@@ -2351,7 +2353,7 @@ Public Function SetObjectArrayToNothing(InputArray As Variant) As Boolean
 ' The function returns True if successful, False otherwise.
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-Dim N As Long
+Dim n As Long
 
 ''''''''''''''''''''''''''''''''''''''
 ' Ensure InputArray is an array.
@@ -2381,12 +2383,12 @@ End If
 ' get set to Nothing.
 ''''''''''''''''''''''''''''''''''''''''''''''''
 If IsArrayAllocated(Arr:=InputArray) = True Then
-    For N = LBound(InputArray) To UBound(InputArray)
-        If IsObject(InputArray(N)) = False Then
+    For n = LBound(InputArray) To UBound(InputArray)
+        If IsObject(InputArray(n)) = False Then
             SetObjectArrayToNothing = False
             Exit Function
         End If
-    Next N
+    Next n
 Else
     SetObjectArrayToNothing = True
     Exit Function
@@ -2396,9 +2398,9 @@ End If
 '''''''''''''''''''''''''''''''''''''''''''''
 ' Set each element of InputArray to Nothing.
 '''''''''''''''''''''''''''''''''''''''''''''
-For N = LBound(InputArray) To UBound(InputArray)
-    Set InputArray(N) = Nothing
-Next N
+For n = LBound(InputArray) To UBound(InputArray)
+    Set InputArray(n) = Nothing
+Next n
 
 SetObjectArrayToNothing = True
 

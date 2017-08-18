@@ -1,7 +1,6 @@
 Attribute VB_Name = "FinboxioCacheModule"
-' finbox.io API Integration
-
 Option Explicit
+Option Private Module
 
 Private CachedValues As New Dictionary
 Private CachedTimestamp As New Dictionary
@@ -25,12 +24,12 @@ Public Function StopRecache()
     Recaching = False
     Dim key As Variant
     For Each key In RecachedValues.keys
-        If TypeName(RecachedValues(key)) = "Collection" Then
-            Set CachedValues(key) = RecachedValues(key)
+        If TypeName(RecachedValues.Item(key)) = "Collection" Or TypeName(RecachedValues.Item(key)) = "ErrorPoint" Then
+            Set CachedValues.Item(key) = RecachedValues.Item(key)
         Else
-            CachedValues(key) = RecachedValues(key)
+            CachedValues.Item(key) = RecachedValues.Item(key)
         End If
-        CachedTimestamp(key) = RecachedTimestamp(key)
+        CachedTimestamp.Item(key) = RecachedTimestamp.Item(key)
     Next
     RecachedValues.RemoveAll
     RecachedTimestamp.RemoveAll
@@ -46,11 +45,11 @@ Public Function IsCached(ByVal key As String, Optional skip As Boolean = False) 
     
     If Not Recaching Then
         If CachedTimestamp.Exists(key) Then
-            If CachedTimestamp(key) + (CACHE_TIMEOUT_MINUTES / 60 / 24) >= Now() Then IsCached = True
+            If CachedTimestamp.Item(key) + (CACHE_TIMEOUT_MINUTES / 60 / 24) >= Now() Then IsCached = True
         End If
     Else
         If RecachedTimestamp.Exists(key) Then
-            If RecachedTimestamp(key) + (CACHE_TIMEOUT_MINUTES / 60 / 24) >= Now() Then IsCached = True
+            If RecachedTimestamp.Item(key) + (CACHE_TIMEOUT_MINUTES / 60 / 24) >= Now() Then IsCached = True
         End If
     End If
 End Function
@@ -58,19 +57,19 @@ End Function
 Public Sub SetCachedValue(ByVal key As String, ByVal dataValue As Variant)
     ' Set cached value and timestamp for key
     If Not Recaching Then
-        If TypeName(dataValue) = "Collection" Then
-            Set CachedValues(key) = dataValue
+        If TypeName(dataValue) = "Collection" Or TypeName(dataValue) = "ErrorPoint" Then
+            Set CachedValues.Item(key) = dataValue
         Else
-            CachedValues(key) = dataValue
+            CachedValues.Item(key) = dataValue
         End If
-        CachedTimestamp(key) = Now()
+        CachedTimestamp.Item(key) = Now()
     Else
-        If TypeName(dataValue) = "Collection" Then
-            Set RecachedValues(key) = dataValue
+        If TypeName(dataValue) = "Collection" Or TypeName(dataValue) = "ErrorPoint" Then
+            Set RecachedValues.Item(key) = dataValue
         Else
-            RecachedValues(key) = dataValue
+            RecachedValues.Item(key) = dataValue
         End If
-        RecachedTimestamp(key) = Now()
+        RecachedTimestamp.Item(key) = Now()
     End If
 End Sub
 
@@ -78,20 +77,20 @@ Public Function GetCachedValue(ByVal key As String) As Variant
     ' Retrieve cached value for key
     If Not Recaching Then
         If CachedValues.Exists(key) Then
-            If TypeName(CachedValues(key)) = "Collection" Then
-                Set GetCachedValue = CachedValues(key)
+            If TypeName(CachedValues.Item(key)) = "Collection" Or TypeName(CachedValues.Item(key)) = "ErrorPoint" Then
+                Set GetCachedValue = CachedValues.Item(key)
             Else
-                GetCachedValue = CachedValues(key)
+                GetCachedValue = CachedValues.Item(key)
             End If
         Else
             GetCachedValue = CVErr(xlErrNA) ' return #NA
         End If
     Else
         If RecachedValues.Exists(key) Then
-            If TypeName(RecachedValues(key)) = "Collection" Then
-                Set GetCachedValue = RecachedValues(key)
+            If TypeName(RecachedValues.Item(key)) = "Collection" Or TypeName(RecachedValues.Item(key)) = "ErrorPoint" Then
+                Set GetCachedValue = RecachedValues.Item(key)
             Else
-                GetCachedValue = RecachedValues(key)
+                GetCachedValue = RecachedValues.Item(key)
             End If
         Else
             GetCachedValue = CVErr(xlErrNA) ' return #NA
@@ -99,4 +98,26 @@ Public Function GetCachedValue(ByVal key As String) As Variant
     End If
 End Function
 
+Public Function IsCachedError(key As String) As Boolean
+    IsCachedError = (TypeName(GetCachedValue(key)) = "ErrorPoint")
+End Function
 
+Public Function CachedToFNBX(key As String, Optional index As Integer)
+    If TypeName(GetCachedValue(key)) = "Collection" Then
+        Dim list As Collection
+        Set list = GetCachedValue(key)
+        If TypeName(index) = "Empty" Or index = 0 Then
+            CachedToFNBX = CollectionToString(list)
+        ElseIf list.count < index Then
+            CachedToFNBX = CVErr(xlErrNull)
+        Else
+            CachedToFNBX = list(index)
+        End If
+    ElseIf IsCachedError(key) Then
+        Dim ep As errorPoint
+        Set ep = GetCachedValue(key)
+        Err.Raise ep.code, ep.name, ep.description
+    Else
+        CachedToFNBX = GetCachedValue(key)
+    End If
+End Function

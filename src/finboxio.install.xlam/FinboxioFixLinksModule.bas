@@ -1,5 +1,6 @@
 Attribute VB_Name = "FinboxioFixLinksModule"
 Option Explicit
+Option Private Module
 
 Public IsReplacingLinks As Boolean
 
@@ -9,8 +10,15 @@ Public Function FixAddinLinks(Optional wb As Workbook)
     IsReplacingLinks = True
     
     Dim calc As Long
-    Dim Sheet As Worksheet
+    Dim prefix As String
+    Dim sheet As Worksheet
     Dim replaced As Boolean
+    
+    #If Mac Then
+        prefix = "file:///*"
+    #Else
+        prefix = "?:\*"
+    #End If
     
     replaced = False
     
@@ -21,11 +29,10 @@ Public Function FixAddinLinks(Optional wb As Workbook)
         Set ws = wb.Worksheets
     End If
     
-    Application.ScreenUpdating = False
-    For Each Sheet In ws
-        If Not Sheet.Cells.Find("'*finboxio.install.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not Sheet.ProtectionMode Then
-            Sheet.Cells.Replace _
-                What:="'*finboxio.install.xlam'!", _
+    For Each sheet In ws
+        If Not sheet.Cells.Find("'" & prefix & "finboxio.install.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
+            sheet.Cells.Replace _
+                What:="'" & prefix & "finboxio.install.xlam'!", _
                 Replacement:="", _
                 LookAt:=xlPart, _
                 SearchOrder:=xlByRows, _
@@ -33,21 +40,21 @@ Public Function FixAddinLinks(Optional wb As Workbook)
             replaced = True
         End If
         
-        If Not Sheet.Cells.Find("'*finboxio.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not Sheet.ProtectionMode Then
-            Sheet.Cells.Replace _
-                What:="'*finboxio.xlam'!", _
+        If Not sheet.Cells.Find("'" & prefix & "finboxio.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
+            sheet.Cells.Replace _
+                What:="'" & prefix & "finboxio.xlam'!", _
                 Replacement:="", _
                 LookAt:=xlPart, _
                 SearchOrder:=xlByRows, _
                 MatchCase:=False
             replaced = True
         End If
-    Next Sheet
+    Next sheet
 
 CleanExit:
     ResetFindReplace
-    Application.ScreenUpdating = True
     IsReplacingLinks = False
+    If replaced Then Application.CalculateFull
     If replaced Then Application.CalculateFull
 End Function
 

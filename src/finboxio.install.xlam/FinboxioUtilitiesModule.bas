@@ -1,13 +1,11 @@
 Attribute VB_Name = "FinboxioUtilitiesModule"
-' finbox.io API Integration
-
 Option Explicit
-
+Option Private Module
 
 Public Function CollectionToString(ByVal dataCol As Variant) As String
     Dim i As Integer
     For i = 1 To dataCol.count
-        If CollectionToString <> "" Then CollectionToString = CollectionToString & ", "
+        If CollectionToString <> "" Then CollectionToString = CollectionToString & ","
         CollectionToString = CollectionToString & dataCol(i)
     Next i
 End Function
@@ -82,6 +80,15 @@ Public Function CurrentCaller() As String
     Else
         CurrentCaller = CStr(Application.Caller)
     End If
+End Function
+
+Public Function IsDateString(period As String)
+    IsDateString = VBA.IsDate(period)
+End Function
+
+Public Function DateStringToPeriod(period As String)
+    Dim d As Date: d = CDate(period)
+    DateStringToPeriod = "Y" & VBA.Year(d) & ".M" & VBA.Month(d) & ".D" & VBA.Day(d)
 End Function
 
 Public Function GetAPIHeader()

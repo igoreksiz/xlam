@@ -268,7 +268,7 @@ End Property
 ' Response.Content = "{""message"":""Howdy!""}"
 '
 ' ' -> Parse Content to JSON Dictionary
-' Debug.Print Response.Data("message") ' -> "Howdy!"
+' Debug.Print Response.Data.Item("message") ' -> "Howdy!"
 ' ```
 '
 ' @property ResponseFormat
