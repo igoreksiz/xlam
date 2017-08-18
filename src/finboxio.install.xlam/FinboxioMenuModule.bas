@@ -77,7 +77,7 @@ Public Sub FinboxioLogout(Optional control)
 End Sub
 
 Public Sub FinboxioAbout(Optional control)
-    MsgBox "You are using " & AppTitle & " (" & EXCEL_VERSION & " edition)." & vbCrLf & _
+    MsgBox "You are using the " & AppTitle & vbCrLf & _
         "This add-on is installed as " & ThisWorkbook.path & Application.PathSeparator & ThisWorkbook.name & "." & vbCrLf & _
         "You can contact support@finbox.io with any questions or concerns." & vbCrLf & vbCrLf & _
         "Happy investing!"

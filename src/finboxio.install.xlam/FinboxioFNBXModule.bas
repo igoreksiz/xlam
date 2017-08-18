@@ -14,6 +14,8 @@ Public Sub AddUDFCategoryDescription()
 End Sub
 
 Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional ByRef period = "") As Variant
+Attribute FNBX.VB_Description = "Returns a datapoint representing a selected company metric at a given point in time."
+Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
     ' Must be marked volatile to enable recalculation on refresh
     Application.Volatile
     

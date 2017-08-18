@@ -2,8 +2,9 @@ Attribute VB_Name = "FinboxioConfigModule"
 Option Explicit
 Option Private Module
 
-Public Const AppVersion = "v0.16"
-Public Const AppTitle = "finbox.io Add-In " & AppVersion
+Public AppVersion As String
+Public AppTitle As String
+Public ReleaseDate As Date
 
 Public Const CACHE_TIMEOUT_MINUTES = 60
 Public Const MAX_BATCH_SIZE = 99

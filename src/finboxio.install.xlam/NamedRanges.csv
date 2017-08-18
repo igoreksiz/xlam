@@ -1,2 +1,4 @@
-APIkey,=API_Credentials!$B$1,
-APIReferer,=API_Credentials!$B$2,
+AppVersion,=finboxio!$B$1,
+AppVersionLabel,=finboxio!$A$1,
+ReleaseDate,=finboxio!$B$3,
+ReleaseDateLabel,=finboxio!$A$3,

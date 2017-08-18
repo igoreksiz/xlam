@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Get the new package version
+VERSION=$(node -pe "require('./package.json').version")
+
+# Update the add-in with the latest version
+scripts/update-addin-version
+git add finboxio.install.xlam
+
+# Update changelog
+git changelog -t $VERSION
+git add History.md

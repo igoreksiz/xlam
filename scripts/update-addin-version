@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+
+const fs = require('fs')
+const zip = require('jszip')
+const xml = require('xml2js')
+const formula = require('formulajs')
+
+const version = require('../package.json').version
+const date = formula.DATEVALUE(new Date().toString())
+
+const run = async () => {
+  const xlam = fs.readFileSync('finboxio.install.xlam')
+  const addin = await zip.loadAsync(xlam)
+
+  let parser = promised(new xml.Parser())
+  let book = await addin
+    .file('xl/workbook.xml')
+    .async('string')
+  book = await parser.parseAsync(book)
+
+  const versionRange = getAddress(book, 'AppVersion')
+  const dateRange = getAddress(book, 'ReleaseDate')
+  book.workbook.sheets.forEach((s) => s.sheet.forEach((s) => {
+    if (s.$.name === versionRange.sheet) versionRange.sheet = s.$['r:id']
+    if (s.$.name === dateRange.sheet) dateRange.sheet = s.$['r:id']
+  }))
+
+  parser.reset()
+  let rels = await addin
+    .file('xl/_rels/workbook.xml.rels')
+    .async('string')
+  rels = await parser.parseAsync(rels)
+
+  const sheets = [ versionRange.sheet, dateRange.sheet ]
+  const sheetFiles = rels.Relationships.Relationship
+    .filter((r) => sheets.includes(r.$.Id))
+    .map((r) => r.$.Target)
+
+  if (sheetFiles.length > 1) {
+    throw new Error('Expected version and date in same sheet')
+  }
+
+  parser.reset()
+  let sheet = await addin
+    .file(`xl/${sheetFiles[0]}`)
+    .async('string')
+  const sheetJson = await parser.parseAsync(sheet)
+  const sheetCells = sheetJson.worksheet.sheetData[0].row.reduce((c, r) => c.concat(r.c), [])
+
+  const versionCell = sheetCells.filter((c) => c.$.r === versionRange.cell)
+
+  if (versionCell.length !== 1) {
+    throw new Error('Could not find version cell')
+  }
+
+  if (versionCell[0].$.t !== 's') {
+    throw new Error('Version is not specified in shared string')
+  }
+
+  parser.reset()
+  let strings = await addin
+    .file('xl/sharedStrings.xml')
+    .async('string')
+  const stringsJson = await parser.parseAsync(strings)
+  const sst = stringsJson.sst.si.map((s) => s.t.pop())
+
+  const versionIndex = +(versionCell[0].v[0])
+  const versionString = sst[versionIndex]
+
+  const versionFind = `<si><t>${versionString}</t></si>`
+  const versionReplace = `<si><t>${version}</t></si>`
+  strings = strings.replace(versionFind, versionReplace)
+  addin.file('xl/sharedStrings.xml', strings)
+
+  const dateExp = new RegExp(`(<c[^>]*r="${dateRange.cell}"[^>]*><v>)([0-9.]+)(</v></c>)`)
+  const dateTag = dateExp.exec(sheet)
+
+  if (!dateTag || !dateTag[2]) {
+    throw new Error('Could not find date cell')
+  }
+
+  const dateFind = `${dateTag[0]}`
+  const dateReplace = `${dateTag[1]}${date}${dateTag[3]}`
+  sheet = sheet.replace(dateFind, dateReplace)
+  addin.file(`xl/${sheetFiles[0]}`, sheet)
+
+  await new Promise((resolve, reject) => {
+    addin.generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+      .pipe(fs.createWriteStream('finboxio.install.xlam'))
+      .on('error', (err) => reject(err))
+      .on('finish', () => resolve())
+  })
+}
+
+run().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})
+
+const promised = (parser) => {
+  parser.parseAsync = (xml) => new Promise((resolve, reject) => {
+    parser.parseString(xml, (err, res) => err ? reject(err) : resolve(res))
+  })
+  return parser
+}
+
+const getAddress = (book, name) => {
+  return book.workbook.definedNames[0].definedName
+    .filter((n) => n.$.name === name)
+    .map((n) => ({
+      sheet: n._.split('!')[0],
+      cell: n._.split('!')[1].replace(/\$/g, '')
+    }))
+    .pop()
+}

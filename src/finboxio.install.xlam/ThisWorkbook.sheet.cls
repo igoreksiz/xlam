@@ -12,13 +12,13 @@ Private Sub Workbook_Open()
     
     Call AddCustomMenu
 
-    LogMessage "Welcome to " & AppTitle
+    AppVersion = ThisWorkbook.Sheets("finboxio").range("AppVersion")
+    ReleaseDate = ThisWorkbook.Sheets("finboxio").range("ReleaseDate")
+    AppTitle = "finbox.io excel add-in v" & AppVersion & " (" & EXCEL_VERSION & " edition), released " & ReleaseDate
+
+    LogMessage "Welcome to the " & AppTitle
     
     CheckQuota
-End Sub
-
-Private Sub Workbook_BeforeClose(Cancel As Boolean)
-    ' Call DeleteCustomMenu
 End Sub
 
 Private Sub SetWorkbookLinkReplacer(wlr As WorkbookLinkReplacer)
