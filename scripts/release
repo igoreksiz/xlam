@@ -10,4 +10,4 @@ git add finboxio.install.xlam
 # Update changelog
 git changelog -t $VERSION
 sleep 0.5
-git add History.md package.json package-lock.json
+git add History.md
