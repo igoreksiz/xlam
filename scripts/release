@@ -10,5 +10,3 @@ git add finboxio.install.xlam
 # Update changelog
 git changelog -t $VERSION
 git add History.md
-
-echo "done"
