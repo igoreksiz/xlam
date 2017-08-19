@@ -85,7 +85,7 @@ const run = async () => {
   addin.file(`xl/${sheetFiles[0]}`, sheet)
 
   await new Promise((resolve, reject) => {
-    addin.generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+    addin.generateNodeStream({ type: 'nodebuffer', streamFiles: true, compression: 'DEFLATE' })
       .pipe(fs.createWriteStream('finboxio.install.xlam'))
       .on('error', (err) => reject(err))
       .on('finish', () => resolve())
