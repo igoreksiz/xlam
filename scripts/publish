@@ -21,7 +21,7 @@ else
   RELEASE_NOTES=$(
     echo "Release ${PUBLISH_VERSION}"
     echo
-    ./scripts/changelog
+    ./scripts/release-notes
   )
 
   RELEASE_URL=$(echo "$RELEASE_NOTES" | hub release create -F - --draft ${PRERELEASE:+--prerelease} -a finboxio.install.xlam "v$PUBLISH_VERSION")
