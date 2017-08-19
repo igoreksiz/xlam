@@ -10,7 +10,8 @@
   "scripts": {
     "preversion": "scripts/prerelease",
     "version": "scripts/release",
-    "postversion": "scripts/postrelease"
+    "postversion": "scripts/postrelease",
+    "publish": "scripts/publish"
   },
   "repository": {
     "type": "git",

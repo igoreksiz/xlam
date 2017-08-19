@@ -25,7 +25,7 @@ else
   )
 
   RELEASE_URL=$(echo "$RELEASE_NOTES" | hub release create -F - --draft ${PRERELEASE:+--prerelease} -a finboxio.install.xlam "v$PUBLISH_VERSION")
-  echo $RELEASE_URL
+
   open $RELEASE_URL
 
   git checkout $CURRENT_BRANCH &> /dev/null
