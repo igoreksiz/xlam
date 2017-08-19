@@ -10,6 +10,5 @@ cat .git/index.lock
 
 # Update changelog
 git changelog -t $VERSION
-cat .git/index.lock
-git add History.md
-cat .git/index.lock
+sleep 0.5
+git add History.md package.json package-lock.json

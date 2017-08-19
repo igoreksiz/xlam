@@ -1,4 +1,13 @@
 
+0.17.3 / 2017-08-18
+===================
+
+  * more release script debugging
+  * Removes debugging in release script
+  * debug git lock issue
+  * Adds workbook compression after updating release version
+  * Adds publish script to package.json
+
 0.17.2 / 2017-08-18
 ===================
 
