@@ -6,7 +6,6 @@ VERSION=$(node -pe "require('./package.json').version")
 # Update the add-in with the latest version
 scripts/update-addin-version
 git add finboxio.install.xlam
-cat .git/index.lock
 
 # Update changelog
 git changelog -t $VERSION
