@@ -1,4 +1,9 @@
 
+0.18.4 / 2017-08-18
+===================
+
+  * Updates release notes to include all commits since last release
+
 0.18.3 / 2017-08-18
 ===================
 
