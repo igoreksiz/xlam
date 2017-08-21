@@ -12,8 +12,8 @@ Private Sub Workbook_Open()
     
     Call AddCustomMenu
 
-    AppVersion = ThisWorkbook.Sheets("finboxio").range("AppVersion")
-    ReleaseDate = ThisWorkbook.Sheets("finboxio").range("ReleaseDate")
+    AppVersion = ThisWorkbook.Sheets("finboxio").range("AppVersion").value
+    ReleaseDate = ThisWorkbook.Sheets("finboxio").range("ReleaseDate").value
     AppTitle = "finbox.io excel add-in v" & AppVersion & " (" & EXCEL_VERSION & " edition), released " & ReleaseDate
 
     LogMessage "Welcome to the " & AppTitle

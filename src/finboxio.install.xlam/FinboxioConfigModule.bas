@@ -20,10 +20,11 @@ Public Const UPGRADE_URL = "https://finbox.io/premium"
 Public Const UPDATE_URL = "https://finbox.io/integrations/excel?dl=1"
 
 Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
-Public Const UPDATES_URL = "https://api.finbox.io/v2/add-ons/excel/latest"
+Public Const RELEASES_URL = "https://api.github.com/repos/finboxio/xlam/releases"
 
 Public Const TIER_URL = "https://api.finbox.io/beta/usage"
 Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
+Public Const DOWNLOAD_URL = "https://api.finbox.io/v2/add-ons/excel"
 
 Public Const LIMIT_EXCEEDED_ERROR = 20400
 Public Const INVALID_AUTH_ERROR = 20401
