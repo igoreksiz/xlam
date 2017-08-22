@@ -1,4 +1,16 @@
 
+0.18.9 / 2017-08-21
+===================
+
+  * Drops upgrade tests for unsupported auto-download feature
+
+0.18.8 / 2017-08-21
+===================
+
+  * Fixes upgrade check when using outdated version
+  * Fixes user pro status logged on authentication
+  * add test templates for v1.0
+
 0.18.7 / 2017-08-21
 ===================
 
