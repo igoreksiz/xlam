@@ -21,9 +21,9 @@ else
   RELEASE_NOTES=$(
     echo "Release ${PUBLISH_VERSION}"
     echo
-    echo "To install/upgrade, download finboxio.install.xlam and open with Excel."
-    echo "If you are using Windows, ensure that the file is unblocked."
-    echo "Instructions on how to do this are included in our [Getting Started Guide](https://finbox.io/blog/using-the-excel-add-in/)"
+    echo "> To install/upgrade the add-in, download finboxio.install.xlam and open with Excel. If you are using Windows, ensure that the file is unblocked before opening. Instructions on how to do this are included in our [Getting Started Guide](https://finbox.io/blog/using-the-excel-add-in/)"
+    echo
+    echo "## Changes"
     echo
 
     ./scripts/release-notes
