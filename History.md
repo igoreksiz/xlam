@@ -1,4 +1,9 @@
 
+0.18.11 / 2017-08-22
+====================
+
+  * Fixes extraneous (and erroneous) check for updates during upgrade process
+
 0.18.10 / 2017-08-22
 ====================
 
