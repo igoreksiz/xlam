@@ -84,6 +84,27 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
         GoTo Finish
     End If
 
+    ' In some versions of excel, formulas may be called with incomplete
+    ' arguments when the workbook is first loading. For example, =FNBX(A1,A2,A3)
+    ' may be called with an empty period if A3 is a formula that hasn't
+    ' been calculated yet. This causes unnecessary API requests and can
+    ' significantly hurt load performance. So if we get a key that doesn't
+    ' have a period, we check here to see if the formula in this cell
+    ' actually does include a period. If so, we simply return an error since
+    ' this cell will be recalculated once all arguments are resolved.
+    If period = "" Then
+        Dim cellKeys() As String, ik As Integer, sameKey As Boolean
+        ReDim cellKeys(0)
+        Call ParseFormula(cell.formula, cell, cell.Worksheet, cellKeys)
+        For ik = 1 To UBound(cellKeys)
+            If key = cellKeys(ik) Then sameKey = True
+        Next ik
+        If Not sameKey Then
+            FNBX = CVErr(xlErrValue)
+            GoTo Finish
+        End If
+    End If
+
     ' Check if user is logged in and prompt if not
     If Not IsLoggedIn() And Not RequestedLogin Then ShowLoginForm
     RequestedLogin = True

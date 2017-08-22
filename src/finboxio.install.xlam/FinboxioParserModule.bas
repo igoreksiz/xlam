@@ -180,7 +180,17 @@ Function ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef k
         ' its period to the batch prevents potentially unnecessary API
         ' requests when this happens, even though it may cost one
         ' extra datapoint.
-        Call InsertElementIntoArray(keys, UBound(keys) + 1, withoutPeriod)
+        '
+        ' NOTE:
+        ' This scenario should now be resolved with an update to the
+        ' FNBX function that checks to make sure arguments match
+        ' what is in the formula text. Thus, this is less-ideal solution
+        ' is unused but left for reference in case more edge cases
+        ' are discovered that are not covered by the FNBX trick and
+        ' we need to reactivate this optimization
+        '
+        ' Call InsertElementIntoArray(keys, UBound(keys) + 1, withoutPeriod)
+        
     End If
 End Function
 
