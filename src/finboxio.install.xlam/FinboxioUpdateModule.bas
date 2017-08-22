@@ -15,6 +15,9 @@ Public Sub CheckUpdates(Optional explicit As Boolean = False, Optional wb As Wor
         webRequest As New webRequest, _
         webResponse As webResponse
     
+    ' Skip implicit update check if AppVersion is not set
+    If AppVersion = "" And Not explicit Then GoTo Finish
+    
 GetCurrent:
     On Error GoTo GetLatest
     webClient.BaseUrl = RELEASES_URL & "/tags/v" & AppVersion
@@ -50,7 +53,7 @@ GetLatest:
 Confirmation:
     On Error GoTo Finish
     
-    If lReleased = "" Or releaseUrl = "" Then
+    If AppVersion = "" Or lReleased = "" Or releaseUrl = "" Then
         answer = MsgBox("Unable to check for updates to the finbox.io add-on at this time. Please contact support@finbox.io if this problem persists.", vbCritical)
         LogMessage "Failed to check for updates."
     ElseIf lReleased = cReleased And explicit Then
@@ -64,7 +67,7 @@ Confirmation:
         LogMessage "Unreleased add-on version detected."
     ElseIf cReleased < lReleased Then
         answer = MsgBox("A newer version of the finbox.io add-on is available! Would you like to download the latest release?", vbYesNo + vbQuestion)
-        LogMessage "Add-on update " & lReleased & " is available."
+        LogMessage "Add-on update " & latest & " - " & lReleased & " is available. (Upgrading from " & current & " - " & cReleased & ")"
     ElseIf cReleased = lReleased Then
         LogMessage "No updates available."
     End If

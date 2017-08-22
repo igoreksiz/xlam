@@ -114,7 +114,7 @@ Public Function CachedToFNBX(key As String, Optional index As Integer)
             CachedToFNBX = list(index)
         End If
     ElseIf IsCachedError(key) Then
-        Dim ep As errorPoint
+        Dim ep As ErrorPoint
         Set ep = GetCachedValue(key)
         Err.Raise ep.code, ep.name, ep.description
     Else

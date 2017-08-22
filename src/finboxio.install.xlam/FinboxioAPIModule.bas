@@ -21,7 +21,7 @@ Public Function GetErrorCode(name As String)
 End Function
 
 Public Function RequestAndCacheKeys(ByRef keys() As String)
-    Dim i As Integer, mock As String, k As String, ep As errorPoint, escaped As String, errs
+    Dim i As Integer, mock As String, k As String, ep As ErrorPoint, escaped As String, errs
 
     ' Remove duplicate keys
     Dim unique As New Dictionary
@@ -121,7 +121,7 @@ Public Function RequestAndCacheKeys(ByRef keys() As String)
         If TypeName(webResponse.data.Item("errors")) = "Collection" Then
             Set errs = webResponse.data.Item("errors")
             For i = 1 To errs.count
-                Set ep = New errorPoint
+                Set ep = New ErrorPoint
                 ep.name = errs(i).Item("error")
                 ep.code = GetErrorCode(ep.name)
                 ep.description = errs(i).Item("description")
