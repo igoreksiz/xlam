@@ -52,14 +52,21 @@ Confirmation:
     
     If lReleased = "" Or releaseUrl = "" Then
         answer = MsgBox("Unable to check for updates to the finbox.io add-on at this time. Please contact support@finbox.io if this problem persists.", vbCritical)
+        LogMessage "Failed to check for updates."
     ElseIf lReleased = cReleased And explicit Then
         answer = MsgBox("You are already using the latest version of the finbox.io add-on. Congratulations!")
+        LogMessage "No updates available."
     ElseIf cReleased = "" And explicit Then
         answer = MsgBox("You are using an unreleased version of the finbox.io add-on. Would you like to download the latest release?", vbYesNo + vbQuestion)
-    ElseIf cReleased < lReleased Then
+        LogMessage "Unreleased add-on version detected."
+    ElseIf cReleased > lReleased Then
         answer = MsgBox("You are using an unreleased version of the finbox.io add-on. Would you like to download the latest release?", vbYesNo + vbQuestion)
-    ElseIf lReleased > cReleased Then
+        LogMessage "Unreleased add-on version detected."
+    ElseIf cReleased < lReleased Then
         answer = MsgBox("A newer version of the finbox.io add-on is available! Would you like to download the latest release?", vbYesNo + vbQuestion)
+        LogMessage "Add-on update " & lReleased & " is available."
+    ElseIf cReleased = lReleased Then
+        LogMessage "No updates available."
     End If
     
     If answer = vbYes Then
