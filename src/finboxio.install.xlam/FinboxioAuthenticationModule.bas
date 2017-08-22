@@ -61,25 +61,24 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             APItier = ""
             APIKey = ""
             On Error Resume Next
-            APItier = webResponse.data.Item("api_tier")
+            APItier = webResponse.data.Item("pro_status")
             APIKey = webResponse.data.Item("api_key")
             On Error GoTo ErrorHandler
             
-            If APItier = "default" Then APItier = "premium"
             LogMessage "Logged in as " & APItier & " user " & email
             
             ' Process api_tier and api_key
             If APItier = "inactive" Then
                 MsgBox "You have not verified your email address yet." & vbCrLf & _
                     "To resend the verification email, visit https://finbox.io/profile.", _
-                    vbCritical, AppTitle
+                    vbCritical
             Else
                 APIKeyStore.StoreApiKey (APIKey)
                 Login = True
             End If
         Case Else
             MsgBox "The finbox.io API returned http status code " & webResponse.statusCode & " = " & vbCr & _
-                VBA.Trim(webResponse.StatusDescription), vbCritical, AppTitle
+                VBA.Trim(webResponse.StatusDescription), vbCritical
     End Select
     
     tier = ""
