@@ -1,4 +1,9 @@
 
+0.18.10 / 2017-08-22
+====================
+
+  * Implements better solution for missing FNBX arguments that does not require requesting unnecessary keys
+
 0.18.9 / 2017-08-21
 ===================
 
