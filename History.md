@@ -1,4 +1,9 @@
 
+0.18.9 / 2017-08-21
+===================
+
+  * Drops upgrade tests for unsupported auto-download feature
+
 0.18.8 / 2017-08-21
 ===================
 
