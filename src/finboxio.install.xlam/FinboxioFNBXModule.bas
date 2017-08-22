@@ -40,7 +40,7 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
     CheckedForUpdates = True
 
     ' Check for null arguments
-    If IsEmpty(ticker) Or IsEmpty(metric) Then
+    If IsEmpty(ticker) Or ticker = "" Or IsEmpty(metric) Or metric = "" Then
        Err.Raise INVALID_ARGS_ERROR, "Invalid Arguments Error", "The FNBX function requires a ticker and a metric"
     End If
 

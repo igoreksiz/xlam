@@ -161,8 +161,9 @@ Function ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef k
             End If
         End If
         
-        Dim key As String
+        Dim key As String, withoutPeriod As String
         key = VBA.UCase(ticker) & "." & VBA.LCase(metric)
+        withoutPeriod = key
         If period <> "" Then key = key & "[""" & VBA.UCase(period) & """]"
 
         ' If key is already cached, we can resolve this formula
@@ -172,6 +173,14 @@ Function ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef k
 
         ' Add resolved key to list of keys to request
         Call InsertElementIntoArray(keys, UBound(keys) + 1, key)
+        
+        ' Add the key without a period to the batch request because
+        ' sometimes excel triggers the formula with a missing period
+        ' argument (particularly on sheet load). Adding the key without
+        ' its period to the batch prevents potentially unnecessary API
+        ' requests when this happens, even though it may cost one
+        ' extra datapoint.
+        Call InsertElementIntoArray(keys, UBound(keys) + 1, withoutPeriod)
     End If
 End Function
 
@@ -213,6 +222,7 @@ End Function
 Function EvalArgument(arg As String, cell As range, sheet As Worksheet)
     Dim value
     Dim address As String
+    Dim resolvedCell As range
     If IsCellAddress(arg) Then
         ' Evaluate reference to another sheet/cell
         Dim parts
@@ -230,7 +240,12 @@ Function EvalArgument(arg As String, cell As range, sheet As Worksheet)
         End If
             
         address = sheet.Parent.Sheets(sheetName).range(cellAddr).address(External:=True)
-        value = range(address).value
+        Set resolvedCell = range(address)
+        value = resolvedCell.value
+        If IsEmpty(value) And resolvedCell.HasFormula Then
+            value = resolvedCell.Worksheet.Evaluate(resolvedCell.formula)
+        End If
+
         EvalArgument = value
     ElseIf HasTableAddress(arg) Then
         ' Resolve table references
