@@ -16,7 +16,7 @@ Private Sub Workbook_Open()
     Call SetAPIKeyHandler(New APIKeyHandler)
     Call SetWorkbookLinkReplacer(New WorkbookLinkReplacer)
     
-    Call AddCustomMenu
+    Call UpdateCustomMenu
     
     CheckQuota
 End Sub

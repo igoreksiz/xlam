@@ -8,7 +8,7 @@ Option Private Module
     Public AppRibbon As IRibbonUI
 #End If
 
-Private ButtonDefs(1 To 12) As String
+Private ButtonDefs(1 To 13) As String
 
 Public Sub InvalidateAppRibbon()
     If Not TypeName(AppRibbon) = "Empty" Then
@@ -16,6 +16,7 @@ Public Sub InvalidateAppRibbon()
             AppRibbon.Invalidate
         End If
     End If
+    UpdateCustomMenu
 End Sub
 
 #If Mac Then
@@ -123,89 +124,82 @@ Public Sub FinboxioUpdate(Optional control)
     Call CheckUpdates(True)
 End Sub
 
-Public Sub AddCustomMenu()
-    ' Add macro into menu bar (Mac Excel 2011)
-
-    ' Button definitions:  Cap&tion,MacroName,ToolTip,IconId,BeginGroupBool
-    '      (IconId 39 is blue right arrow, and is a good default option)
-    
-    ButtonDefs(1) = "Log&in,FinboxioShowLogin,Login to finbox.io API,39,True"
-    ButtonDefs(2) = "Log&out,FinboxioLogout,Logout from finbox.io API,39,False"
-    ButtonDefs(3) = "&Pro,FinboxioUpgrade,Upgrade to premium access,39,False"
-    
-    ButtonDefs(4) = "&Watchlist,FinboxioWatchlist,Go to your watchlist,39,True"
-    ButtonDefs(5) = "&Screener,FinboxioScreener,Go to the online screener,39,False"
-    ButtonDefs(6) = "&Templates,FinboxioTemplates,Download pre-built templates,39,False"
-    
-    ButtonDefs(7) = "&Refresh data,FinboxioRefresh,Recalculate open Excel Workbooks,39,True"
-    ButtonDefs(8) = "Un&link Formulas,FinboxioUnlink,Unlink finbox.io formulas,39,False"
-    
-    ButtonDefs(9) = "&Message Log,FinboxioMessages,Display message log,39,True"
-    ButtonDefs(10) = "Check For &Updates,FinboxioUpdate,Check for updates,39,False"
-    ButtonDefs(11) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,39,False"
-    ButtonDefs(12) = "&About,FinboxioAbout,Information about the add-on,39,False"
-
-    Dim bd As Integer
-    Dim butdefs() As String
-    
+Public Sub UpdateCustomMenu()
     If EXCEL_VERSION = "Mac2011" Then
-     
-        ' Office 2003 and earlier or Mac 2011
-        ' Add (or retrieve) top level menu "Add-Ins"
         Dim CustomMenu As CommandBarPopup
+        Dim Controls, i As Integer
+        Set Controls = Application.CommandBars("Worksheet Menu Bar").Controls
+        For i = 1 To Controls.count
+            Dim control
+            Set control = Controls.Item(i)
+            If control.Tag = "finbox.io" Then Set CustomMenu = control
+        Next i
         
         On Error GoTo 0
-        Set CustomMenu = Application.CommandBars("Worksheet Menu Bar").Controls.Add(msoControlPopup, _
-                temporary:=True)  ' before "Data"
-        With CustomMenu
-            .Caption = "&finbox.io"
-            .Tag = "finbox.io"
-            .enabled = True
-            .Visible = True
-        End With
-    
-        ' Add buttons to top level menu "Add-Ins"
-        With CustomMenu.Controls
-            For bd = LBound(ButtonDefs) To UBound(ButtonDefs)
-                butdefs = Split(ButtonDefs(bd), ",")
-                With .Add(msoControlButton, temporary:=True)
-                    .Caption = butdefs(0)
-                    .Tag = Replace(butdefs(0), "&", "")
-                    .OnAction = butdefs(1)
-                    .TooltipText = butdefs(2)
-                    .Style = 3
-                    .FaceId = CInt(butdefs(3))
-                    
-                    If VBA.LCase(butdefs(4)) = "true" Then
-                        .BeginGroup = True
-                    Else
-                        .BeginGroup = False
-                    End If
-                End With
-            Next
-         End With
-    End If
-End Sub
+        If IsEmpty(CustomMenu) Or CustomMenu Is Nothing Then
+            ' Add macro into menu bar (Mac Excel 2011)
 
-Public Sub DeleteCustomMenu()
-    Dim bd As Integer
-    Dim butdefs() As String
-    
-    For bd = UBound(ButtonDefs) To LBound(ButtonDefs) Step -1
-        On Error Resume Next
-        butdefs = Split(ButtonDefs(bd), ",")
-          
-        If EXCEL_VERSION = "Mac2011" Then
-            ' Delete buttons and top level menu "Custom"
-            With Application.CommandBars("Worksheet Menu Bar").Controls("Add-Ins")
-                .Controls(Replace(butdefs(0), "&", "")).Delete
-                If .Controls.count = 0 Then .Delete
+            ' Button definitions:  Cap&tion,MacroName,ToolTip,IconId,BeginGroupBool
+            '      (IconId 39 is blue right arrow, and is a good default option)
+            
+            ButtonDefs(1) = "Log&in,FinboxioShowLogin,Login to finbox.io API,2882,True"
+            ButtonDefs(2) = "Log&out,FinboxioLogout,Logout from finbox.io API,1019,False"
+            ButtonDefs(3) = "&Pro,FinboxioUpgrade,Upgrade to premium access,225,False"
+            ButtonDefs(4) = "Check &Quota,FinboxioCheckQuota,Check quota usage,52,False"
+            
+            ButtonDefs(5) = "&Watchlist,FinboxioWatchlist,Go to your watchlist,183,True"
+            ButtonDefs(6) = "&Screener,FinboxioScreener,Go to the online screener,601,False"
+            ButtonDefs(7) = "&Templates,FinboxioTemplates,Download pre-built templates,357,False"
+            ButtonDefs(8) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,49,False"
+            
+            ButtonDefs(9) = "&Refresh Data,FinboxioRefresh,Recalculate open Excel Workbooks,37,True"
+            ButtonDefs(10) = "Un&link Formulas,FinboxioUnlink,Unlink finbox.io formulas,2309,False"
+            
+            ButtonDefs(11) = "&Message Log,FinboxioMessages,Display message log,588,True"
+            ButtonDefs(12) = "Check For &Updates,FinboxioUpdate,Check for updates,273,False"
+            ButtonDefs(13) = "&About,FinboxioAbout,Information about the add-on,487,False"
+        
+            Dim bd As Integer
+            Dim butdefs() As String
+        
+            Set CustomMenu = Application.CommandBars("Worksheet Menu Bar").Controls.Add(msoControlPopup, temporary:=True)
+            With CustomMenu
+                .Caption = "&finbox.io"
+                .Tag = "finbox.io"
+                .enabled = True
+                .Visible = True
+            End With
+            
+            ' Add buttons to top level menu "Add-Ins"
+            With CustomMenu.Controls
+               For bd = LBound(ButtonDefs) To UBound(ButtonDefs)
+                   butdefs = Split(ButtonDefs(bd), ",")
+                   With .Add(msoControlButton, temporary:=True)
+                       .Caption = butdefs(0)
+                       .Tag = Replace(butdefs(0), "&", "")
+                       .OnAction = butdefs(1)
+                       .TooltipText = butdefs(2)
+                       .Style = 3
+                       .FaceId = CInt(butdefs(3))
+                       
+                       If VBA.LCase(butdefs(4)) = "true" Then
+                           .BeginGroup = True
+                       Else
+                           .BeginGroup = False
+                       End If
+                   End With
+                Next
             End With
         End If
-        On Error GoTo 0
-    Next bd
+        
+        CustomMenu.Controls.Item(1).Visible = Not IsLoggedIn()
+        CustomMenu.Controls.Item(2).Visible = IsLoggedIn()
+        CustomMenu.Controls.Item(3).Visible = (GetTier() = "free")
+        CustomMenu.Controls.Item(4).Caption = QuotaLabel
+        CustomMenu.Controls.Item(4).Tag = QuotaLabel
+        If QuotaImage = "Piggy" Then CustomMenu.Controls.Item(4).FaceId = 52
+        If QuotaImage = "HappyFace" Then CustomMenu.Controls.Item(4).FaceId = 59
+        If QuotaImage = "TraceError" Then CustomMenu.Controls.Item(4).FaceId = 463
+        If QuotaImage = "HighImportance" Then CustomMenu.Controls.Item(4).FaceId = 459
+    End If
 End Sub
-
-
-
-
