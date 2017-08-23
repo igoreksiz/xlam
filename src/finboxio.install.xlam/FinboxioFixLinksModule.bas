@@ -8,6 +8,7 @@ Public Function FixAddinLinks(Optional wb As Workbook)
     On Error GoTo CleanExit
     
     IsReplacingLinks = True
+    Application.ScreenUpdating = False
     
     Dim calc As Long
     Dim prefix As String
@@ -15,7 +16,16 @@ Public Function FixAddinLinks(Optional wb As Workbook)
     Dim replaced As Boolean
     
     #If Mac Then
-        prefix = "file:///*"
+        If EXCEL_VERSION = "Mac2011" Then
+            ' TODO:
+            ' This is not robust enough to handle references
+            ' to add-ins saved on a network drive. Should replace
+            ' this to find and iterate range of cells, replacing
+            ' add-in paths manually
+            prefix = "Mac HD:*"
+        Else
+            prefix = "file:///*"
+        End If
     #Else
         prefix = "?:\*"
     #End If
@@ -53,6 +63,7 @@ Public Function FixAddinLinks(Optional wb As Workbook)
 
 CleanExit:
     ResetFindReplace
+    Application.ScreenUpdating = True
     IsReplacingLinks = False
     If replaced Then Application.CalculateFull
     If replaced Then Application.CalculateFull
