@@ -1,4 +1,12 @@
 
+0.19.0 / 2017-08-23
+===================
+
+  * Updates fnbx test workbook
+  * Adds dynamic menu items on Mac 2011
+  * Fixes link replacement on Mac 2011
+  * Completed Mac 2011 tests for v1.0
+
 0.18.11 / 2017-08-22
 ====================
 
