@@ -55,7 +55,7 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     
     Select Case webResponse.statusCode
         Case 401
-            MsgBox "The provided credentials are invalid.", vbCritical, AppTitle
+            MsgBox "The provided credentials are invalid.", vbCritical
         Case 200
             ' Extract api_tier and api_key from json response
             APItier = ""

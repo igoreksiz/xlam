@@ -16,7 +16,7 @@ Public Sub ShowMessages()
     msgs = CachedMessages.count
     
     If msgs = 0 Then
-        MsgBox "No finbox.io messages to display.", vbInformation, AppTitle
+        MsgBox "No finbox.io messages to display.", vbInformation
         Exit Sub
     End If
 
