@@ -45,10 +45,12 @@ Function ParseFormula(formula As String, cell As range, sheet As Worksheet, ByRe
             parens = parens - 1
             fn = fn & char
             If parens = 0 Then
-                Dim fnResolved As String
+                Dim fnResolved
                 fnResolved = ParseKeys(fn, cell, sheet, keys)
                 If Not resolvable Or fnResolved = "" Then
                     resolvable = False
+                ElseIf TypeName(fnResolved) = "Date" Then
+                    fnResolved = CDbl(fnResolved)
                 ElseIf TypeName(fnResolved) = "String" Then
                     fnResolved = """" & fnResolved & """"
                 ElseIf TypeName(fnResolved) = "Boolean" And fnResolved Then
@@ -85,7 +87,7 @@ End Function
 ' Determine all finql keys required by a FNBX formula
 ' Assumes that formula is a FNBX formula (may have nested arguments)
 ' If formula can be resolved to a static value, this value is returned
-Function ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef keys) As String
+Function ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef keys)
     ParseKeys = ""
     Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
     If argIndex = 0 Then Exit Function
@@ -218,7 +220,7 @@ Function ParseArguments(formula As String) As String()
             pdepth = pdepth - 1
         ElseIf c = """" Then
             quoted = Not quoted
-        ElseIf c = Application.International(xlListSeparator) And pdepth = 0 And Not quoted Then
+        ElseIf (c = "," Or c = Application.International(xlListSeparator)) And pdepth = 0 And Not quoted Then
             c = "[[,]]"
         End If
         safeArgs = safeArgs & c
@@ -379,7 +381,7 @@ Function ResolveTableAddresses(arg As String, cell As range)
             If inTable = "col" Then
                 For j = i + 1 To VBA.Len(arg)
                     c = VBA.Mid(arg, j, 1)
-                    If c = " " Or c = Application.International(xlListSeparator) Then
+                    If c = " " Or c = "," Or c = Application.International(xlListSeparator) Then
                         tableSpec = tableSpec & c
                     Else
                         Dim endPos As Integer, colName As String
@@ -463,4 +465,6 @@ Function ResolveTableAddresses(arg As String, cell As range)
     ResolveTableAddresses = resolved
     ' LogMessage "Resolved to " & resolved
 End Function
+
+
 
