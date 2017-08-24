@@ -528,8 +528,12 @@ system after changing the language and before beginning these tests.
 
   - [ ] Open the 'tests/batch.xlsx' workbook.
   - [ ] Click the 'Message Log' button in the finbox.io ribbon.
-  - [ ] VERIFY that only one message exists indicating that any keys were requested.
-  - [ ] VERIFY that this message indicates that 4 keys were requested.
+  - [ ] VERIFY that 3 requests were made, for 126, 30, and 3 keys respectively.
+  - [ ] Close the message log.
+  - [ ] Select a different sheet in the workbook.
+  - [ ] Click the 'Refresh' button in the finbox.io ribbon.
+  - [ ] Click the 'Message Log' button in the finbox.io ribbon.
+  - [ ] VERIFY that 3 additional requests were made, for 126, 30, and 3 keys respectively.
 
 
 #### Quota Usage
