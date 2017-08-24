@@ -334,6 +334,8 @@ Function ResolveTableAddresses(arg As String, cell As range)
     '  - Extra space not allowed within row/col brackets
     '  - Escape characters are not recognized
     
+    ' LogMessage "Resolving " & arg
+    
     Dim validTableStart As String, validTableChar As String
     validTableStart = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\._"
     validTableChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz._0123456789"
@@ -383,7 +385,7 @@ Function ResolveTableAddresses(arg As String, cell As range)
                         Dim endPos As Integer, colName As String
                         endPos = VBA.InStr(j, arg, "]")
                         If endPos > 0 Then
-                            colName = VBA.Mid(arg, j, endPos - i - 1)
+                            colName = VBA.Mid(arg, j, endPos - j)
                             j = endPos
                             tableSpec = tableSpec & colName
                             ' If col name was bracketed, keep all space
@@ -391,7 +393,7 @@ Function ResolveTableAddresses(arg As String, cell As range)
                             If VBA.Left(colName, 1) = "[" Then
                                 colName = VBA.Mid(colName, 2)
                                 Dim k As Integer
-                                For k = j + 1 To VBA.Len(arg)
+                                For k = j To VBA.Len(arg)
                                     c = VBA.Mid(arg, k, 1)
                                     If c = " " Then
                                         tableSpec = tableSpec & c
@@ -407,8 +409,22 @@ Function ResolveTableAddresses(arg As String, cell As range)
                                 ' Otherwise, trim extra space because it's
                                 ' not part of column name
                                 colName = VBA.Trim(colName)
+                                j = j - 1
                             End If
-                            tableSpec = tableSpec & "]"
+                            
+                            ' Parse to the end of the table spec
+                            For k = j + 1 To VBA.Len(arg)
+                                c = VBA.Mid(arg, k, 1)
+                                If c = " " Then
+                                    tableSpec = tableSpec & c
+                                ElseIf c = "]" Then
+                                    tableSpec = tableSpec & c
+                                    Exit For
+                                Else
+                                    Exit For
+                                End If
+                            Next k
+                            j = k
                         Else
                             inTable = ""
                             tableSpec = tableSpec & c
@@ -445,4 +461,6 @@ Function ResolveTableAddresses(arg As String, cell As range)
         End If
     Next i
     ResolveTableAddresses = resolved
+    ' LogMessage "Resolved to " & resolved
 End Function
+

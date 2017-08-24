@@ -52,7 +52,7 @@ Public Function RequestAndCacheKeys(ByRef keys() As String)
                 jsonDataObj.Item(escaped) = k
                 Call InsertElementIntoArray(batchKeys, UBound(batchKeys) + 1, k)
             End If
-             ' LogMessage "Requesting " & k
+            ' LogMessage "Requesting " & k
         Next
         batchStart = batchStart + MAX_BATCH_SIZE
 
