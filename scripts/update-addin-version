@@ -16,11 +16,11 @@ const run = async () => {
   let book = await addin
     .file('xl/workbook.xml')
     .async('string')
-  book = await parser.parseAsync(book)
+  let bookJson = await parser.parseAsync(book)
 
-  const versionRange = getAddress(book, 'AppVersion')
-  const dateRange = getAddress(book, 'ReleaseDate')
-  book.workbook.sheets.forEach((s) => s.sheet.forEach((s) => {
+  const versionRange = getAddress(bookJson, 'AppVersion')
+  const dateRange = getAddress(bookJson, 'ReleaseDate')
+  bookJson.workbook.sheets.forEach((s) => s.sheet.forEach((s) => {
     if (s.$.name === versionRange.sheet) versionRange.sheet = s.$['r:id']
     if (s.$.name === dateRange.sheet) dateRange.sheet = s.$['r:id']
   }))
@@ -63,6 +63,11 @@ const run = async () => {
     .async('string')
   const stringsJson = await parser.parseAsync(strings)
   const sst = stringsJson.sst.si.map((s) => s.t.pop())
+
+  const calcFind = new RegExp('calcMode=".*?"')
+  const calcReplace = ""
+  book = book.replace(calcFind, calcReplace)
+  addin.file('xl/workbook.xml', book)
 
   const versionIndex = +(versionCell[0].v[0])
   const versionString = sst[versionIndex]
