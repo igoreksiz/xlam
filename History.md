@@ -1,4 +1,22 @@
 
+0.20.0 / 2017-08-24
+===================
+
+  * Completed international tests on Mac v1.0
+  * Improves fnbx.xlsm test workbook and macros
+  * Improves matching algorithm for replacing remote FNBX links
+  * Removes manual calculation property from workbook binary
+  * Updates international tests in test template
+  * Adds completed international tests for v1.0 windows versions
+  * Adds check to make sure workbook is not in use before preparing release
+  * Adds check to ensure workbook calculation property is set to auto before release
+  * Commits updated workbook binary
+  * Updates batch/fnbx tests for international environment and fixes some issues with test macros
+  * Updates string conversion of list values to use the system list separator character
+  * Fixes batch parsing in international environments
+  * Fixes Unlink image icon selection in international environments
+  * Namespaces use of VBA.IsDate function for consistency
+
 0.19.1 / 2017-08-24
 ===================
 
