@@ -144,7 +144,7 @@ Private Function ConvertValue(ByRef data As Variant)
         Next
         Set ConvertValue = data
         Exit Function
-    ElseIf IsDate(data) Then
+    ElseIf VBA.IsDate(data) Then
         data = CDate(data)
     ElseIf TypeName(data) = "String" Then
         Dim numeric As String, char As String, pos As Long, languageAdjusted As String
