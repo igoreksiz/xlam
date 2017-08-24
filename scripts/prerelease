@@ -25,3 +25,7 @@ else
   exit 1
 fi
 
+if [[ -e '~$finboxio.install.xlam' ]]; then
+  echo "The add-in finboxio.install.xlam is in use by another application! Aborting."
+  exit 1
+fi
