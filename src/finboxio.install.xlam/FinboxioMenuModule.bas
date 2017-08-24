@@ -122,7 +122,7 @@ End Sub
 
 Public Sub FinboxioUnlinkImage(control, ByRef image)
     image = "HyperlinkRemove"
-    If EXCEL_VERSION = "Win" And Application.Version <= 14 Then
+    If EXCEL_VERSION = "Win" And CInt(VBA.Left(Application.Version, VBA.InStr(Application.Version, ".") - 1)) <= 14 Then
         image = "SkipOccurrence"
     End If
 End Sub
