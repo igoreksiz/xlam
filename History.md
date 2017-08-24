@@ -1,4 +1,15 @@
 
+0.19.1 / 2017-08-24
+===================
+
+  * Adds dynamic button icon for Unlink action
+  * Completed Mac 2016 tests for v1.0
+  * Fixes batching problem with table references that include [#This Row], and fixes Excel 2007/2010 ribbon.
+  * Removes extended add-in name from dialog box titles
+  * Completed tests for Win 2007, v1.0
+  * Update Win-2010.md
+  * Completed tests for Win 2013 - v1.0
+
 0.19.0 / 2017-08-23
 ===================
 
