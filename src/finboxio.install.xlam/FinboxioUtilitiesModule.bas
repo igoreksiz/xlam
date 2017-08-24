@@ -3,10 +3,15 @@ Option Explicit
 Option Private Module
 
 Public Function CollectionToString(ByVal dataCol As Variant) As String
-    Dim i As Integer
+    Dim i As Integer, val As String, sep As String
+    sep = Application.International(xlListSeparator)
     For i = 1 To dataCol.count
-        If CollectionToString <> "" Then CollectionToString = CollectionToString & ","
-        CollectionToString = CollectionToString & dataCol(i)
+        If CollectionToString <> "" Then
+            CollectionToString = CollectionToString & sep
+        End If
+        val = CStr(dataCol(i))
+        If VBA.InStr(val, sep) > 0 Then val = """" & EscapeQuotes(val) & """"
+        CollectionToString = CollectionToString & val
     Next i
 End Function
 
