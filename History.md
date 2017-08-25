@@ -1,4 +1,9 @@
 
+0.21.0-2 / 2017-08-25
+=====================
+
+  * Adds safety checks and finboxio.functions.xlam asset to publish script
+
 0.21.0-1 / 2017-08-25
 =====================
 
