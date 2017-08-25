@@ -8,7 +8,16 @@ PUBLISH_VERSION=${1:-$CURRENT_VERSION}
 
 [[ $PUBLISH_VERSION == *-* ]] && PRERELEASE=1 || PRERELEASE=
 
-git checkout tags/v$PUBLISH_VERSION &> /dev/null
+git checkout tags/v$PUBLISH_VERSION &> /dev/null || {
+  echo "Failed to checkout version tag!"
+  exit 1
+}
+
+git status | grep "nothing to commit, working directory clean" || {
+  echo "Working directory is not clean!"
+  git checkout $CURRENT_BRANCH &> /dev/null
+  exit 1
+}
 
 if hub release --include-drafts | grep -q "^v${PUBLISH_VERSION}\$"; then
   echo "Release already exists!"
@@ -29,7 +38,7 @@ else
     ./scripts/release-notes
   )
 
-  RELEASE_URL=$(echo "$RELEASE_NOTES" | hub release create -F - --draft ${PRERELEASE:+--prerelease} -a finboxio.install.xlam "v$PUBLISH_VERSION")
+  RELEASE_URL=$(echo "$RELEASE_NOTES" | hub release create -F - --draft ${PRERELEASE:+--prerelease} -a finboxio.install.xlam -a finboxio.functions.xlam "v$PUBLISH_VERSION")
 
   open $RELEASE_URL
 
