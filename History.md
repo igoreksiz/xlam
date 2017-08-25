@@ -1,4 +1,9 @@
 
+0.21.0-1 / 2017-08-25
+=====================
+
+  * Updates release script to check in finboxio.functions.xlam
+
 0.21.0-0 / 2017-08-25
 =====================
 
