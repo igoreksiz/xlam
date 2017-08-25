@@ -8,8 +8,22 @@ const formula = require('formulajs')
 const version = require('../package.json').version
 const date = formula.DATEVALUE(new Date().toString())
 
+const dryRun = false
+
 const run = async () => {
-  const xlam = fs.readFileSync('finboxio.install.xlam')
+  await Promise.all([
+    update('finboxio.functions.xlam', { dryRun }),
+    update('finboxio.install.xlam', { dryRun })
+  ])
+}
+
+const update = async (filename, { dryRun } = {}) => {
+  const isOpen = fs.existsSync(`~$${filename}`)
+  if (isOpen) {
+    throw new Error(`[${filename}] File is in use`)
+  }
+
+  const xlam = fs.readFileSync(filename)
   const addin = await zip.loadAsync(xlam)
 
   let parser = promised(new xml.Parser())
@@ -37,7 +51,7 @@ const run = async () => {
     .map((r) => r.$.Target)
 
   if (sheetFiles.length > 1) {
-    throw new Error('Expected version and date in same sheet')
+    throw new Error(`[${filename}] Expected version and date in same sheet`)
   }
 
   parser.reset()
@@ -50,11 +64,11 @@ const run = async () => {
   const versionCell = sheetCells.filter((c) => c.$.r === versionRange.cell)
 
   if (versionCell.length !== 1) {
-    throw new Error('Could not find version cell')
+    throw new Error(`[${filename}] Could not find version cell`)
   }
 
   if (versionCell[0].$.t !== 's') {
-    throw new Error('Version is not specified in shared string')
+    throw new Error(`[${filename}] Version is not specified in shared string`)
   }
 
   parser.reset()
@@ -81,7 +95,7 @@ const run = async () => {
   const dateTag = dateExp.exec(sheet)
 
   if (!dateTag || !dateTag[2]) {
-    throw new Error('Could not find date cell')
+    throw new Error(`[${filename}] Could not find date cell`)
   }
 
   const dateFind = `${dateTag[0]}`
@@ -89,9 +103,10 @@ const run = async () => {
   sheet = sheet.replace(dateFind, dateReplace)
   addin.file(`xl/${sheetFiles[0]}`, sheet)
 
-  await new Promise((resolve, reject) => {
+  console.log(`[${filename}] Updating from ${versionString} to ${version}`)
+  !dryRun && await new Promise((resolve, reject) => {
     addin.generateNodeStream({ type: 'nodebuffer', streamFiles: true, compression: 'DEFLATE' })
-      .pipe(fs.createWriteStream('finboxio.install.xlam'))
+      .pipe(fs.createWriteStream(filename))
       .on('error', (err) => reject(err))
       .on('finish', () => resolve())
   })
