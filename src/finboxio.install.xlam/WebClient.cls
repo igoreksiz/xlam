@@ -249,9 +249,9 @@ End Property
 ' @throws 11010 / 80042b02 / -2147210494 - cURL error in Execute
 ' @throws 11011 / 80042b03 / -2147210493 - Error in Execute
 ''
-Public Function Execute(Request As webRequest) As webResponse
+Public Function Execute(Request As WebRequest) As WebResponse
     Dim web_Http As Object
-    Dim web_Response As New webResponse
+    Dim web_Response As New WebResponse
 
     On Error GoTo web_ErrorHandling
 
@@ -355,7 +355,7 @@ web_ErrorHandling:
     Case 12002, 12007, 12029
         ' Treat timeout-related errors as 408: timeout, name not resolved, cannot connect
         web_Response.statusCode = WebStatusCode.RequestTimeout
-        web_Response.StatusDescription = "Request Timeout: " & Err.description
+        web_Response.StatusDescription = "Request Timeout: " & Err.Description
 
         xHelpersWeb.LogResponse Me, Request, web_Response
         Set Execute = web_Response
@@ -363,7 +363,7 @@ web_ErrorHandling:
     Case Else
         ' Error
         web_ErrorDescription = "An error occurred during execute" & vbNewLine & _
-            Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
+            Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
 
         xHelpersWeb.LogError web_ErrorDescription, "WebClient.Execute", 11011 + vbObjectError
         Err.Raise 11011 + vbObjectError, "WebClient.Execute", web_ErrorDescription
@@ -401,8 +401,8 @@ End Function
 ' @param {Dictionary} [Options.UrlSegments]
 ' @return {WebResponse} Response
 ''
-Public Function GetJson(url As String, Optional Options As Dictionary) As webResponse
-    Dim web_Request As New webRequest
+Public Function GetJson(url As String, Optional Options As Dictionary) As WebResponse
+    Dim web_Request As New WebRequest
     web_Request.CreateFromOptions Options
     web_Request.Resource = url
     web_Request.Format = WebFormat.Json
@@ -448,8 +448,8 @@ End Function
 ' @param {Dictionary} [Options.UrlSegments]
 ' @return {WebResponse} Response
 ''
-Public Function PostJson(url As String, Body As Variant, Optional Options As Dictionary) As webResponse
-    Dim web_Request As New webRequest
+Public Function PostJson(url As String, Body As Variant, Optional Options As Dictionary) As WebResponse
+    Dim web_Request As New WebRequest
     web_Request.CreateFromOptions Options
     web_Request.Resource = url
     web_Request.Format = WebFormat.Json
@@ -502,7 +502,7 @@ End Sub
 ' @param {WebRequest} Request
 ' @return {String}
 ''
-Public Function GetFullUrl(Request As webRequest) As String
+Public Function GetFullUrl(Request As WebRequest) As String
     GetFullUrl = xHelpersWeb.JoinUrl(Me.BaseUrl, Request.FormattedResource)
 End Function
 
@@ -515,7 +515,7 @@ End Function
 ' @return {WinHttpRequest}
 ' @throws 11012 / 80042b04 / -2147210492 - Error preparing http request
 ''
-Public Function PrepareHttpRequest(Request As webRequest, Optional Async As Boolean = True) As Object
+Public Function PrepareHttpRequest(Request As WebRequest, Optional Async As Boolean = True) As Object
     Dim web_Http As Object
     Dim web_KeyValue As Dictionary
 
@@ -602,7 +602,7 @@ web_ErrorHandling:
     Set web_Http = Nothing
     Err.Raise 11012 + vbObjectError, "WebClient.PrepareHttpRequest", _
         "An error occurred while preparing http request" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
 End Function
 
 ''
@@ -614,7 +614,7 @@ End Function
 ' @return {String}
 ' @throws 11013 / 80042b05 / -2147210491 - Error preparing cURL request
 ''
-Public Function PrepareCurlRequest(Request As webRequest) As String
+Public Function PrepareCurlRequest(Request As WebRequest) As String
     Dim web_Curl As String
     Dim web_KeyValue As Dictionary
     Dim web_CookieString As String
@@ -684,7 +684,7 @@ web_ErrorHandling:
 
     Err.Raise 11013 + vbObjectError, "WebClient.PrepareCURLRequest", _
         "An error occurred while preparing cURL request" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description
 End Function
 
 ''
@@ -694,8 +694,8 @@ End Function
 ' @method Clone
 ' @return {WebClient}
 ''
-Public Function Clone() As webClient
-    Set Clone = New webClient
+Public Function Clone() As WebClient
+    Set Clone = New WebClient
     Clone.BaseUrl = Me.BaseUrl
     Clone.ProxyServer = Me.ProxyServer
     Clone.ProxyBypassList = Me.ProxyBypassList
@@ -711,7 +711,7 @@ End Function
 ' Private Methods
 ' ============================================= '
 
-Private Sub web_BeforeExecute(web_Request As webRequest)
+Private Sub web_BeforeExecute(web_Request As WebRequest)
     If Not Me.Authenticator Is Nothing Then
         Me.Authenticator.BeforeExecute Me, web_Request
     End If
@@ -721,7 +721,7 @@ Private Sub web_BeforeExecute(web_Request As webRequest)
     web_Request.Prepare
 End Sub
 
-Private Sub web_LoadAutoProxy(web_Request As webRequest)
+Private Sub web_LoadAutoProxy(web_Request As WebRequest)
 #If Win32 Or Win64 Then
     On Error GoTo web_ErrorHandling
 
@@ -755,7 +755,7 @@ Private Sub web_LoadAutoProxy(web_Request As webRequest)
 web_ErrorHandling:
 
     xHelpersWeb.LogError "An error occurred while loading auto-proxy" & vbNewLine & _
-        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.description, _
+        Err.Number & VBA.IIf(Err.Number < 0, " (" & VBA.LCase$(VBA.Hex$(Err.Number)) & ")", "") & ": " & Err.Description, _
         "WebClient.LoadAutoProxy", Err.Number
 #End If
 End Sub
@@ -767,7 +767,5 @@ Private Sub Class_Initialize()
     Me.Insecure = False
     Me.FollowRedirects = True
 End Sub
-
-
 
 

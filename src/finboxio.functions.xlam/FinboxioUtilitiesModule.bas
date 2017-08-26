@@ -110,4 +110,16 @@ Public Function GetAPIHeader()
     GetAPIHeader = APIHeader
 End Function
 
+Public Function StagedXlamPath(file As String) As String
+    StagedXlamPath = XlamPath(file & ".staged")
+End Function
 
+Public Function XlamPath(file As String) As String
+    XlamPath = ThisWorkbook.path & Application.PathSeparator & file & ".xlam"
+End Function
+
+Public Sub PromoteStagedFile(file As String)
+    SetAttr XlamPath(file), vbNormal
+    Kill XlamPath(file)
+    Name StagedXlamPath(file) As XlamPath(file)
+End Sub

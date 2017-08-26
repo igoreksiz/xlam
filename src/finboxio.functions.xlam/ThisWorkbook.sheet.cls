@@ -11,14 +11,12 @@ Private Sub Workbook_Open()
 
     LogMessage "Welcome to the " & AppTitle
     
-    Call InstallAddin(Me)
-    
     Call SetAPIKeyHandler(New APIKeyHandler)
     Call SetWorkbookLinkReplacer(New WorkbookLinkReplacer)
     
     Call UpdateCustomMenu
     
-    CheckQuota
+    CheckQuota blockEvents:=True
 End Sub
 
 Private Sub SetWorkbookLinkReplacer(wlr As WorkbookLinkReplacer)

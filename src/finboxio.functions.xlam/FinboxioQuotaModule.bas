@@ -39,11 +39,12 @@ Public Function QuotaImage() As String
     End If
 End Function
 
-Public Sub CheckQuota()
+Public Sub CheckQuota(Optional blockEvents As Boolean)
     On Error GoTo ClearQuota
     
     Dim webClient As New webClient
 
+    webClient.BlockEventLoop = blockEvents
     webClient.BaseUrl = TIER_URL
     webClient.TimeoutMs = 5000
 
