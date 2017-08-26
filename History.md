@@ -1,4 +1,10 @@
 
+0.21.0-3 / 2017-08-26
+=====================
+
+  * Adds support for blocking quota check on load
+  * Renames src files to finboxio.functions.xlam
+
 0.21.0-2 / 2017-08-25
 =====================
 
