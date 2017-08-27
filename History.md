@@ -1,4 +1,9 @@
 
+0.21.0-7 / 2017-08-27
+=====================
+
+  * Renames WorkbookLinkReplacer to generic AppEventHandler
+
 0.21.0-6 / 2017-08-27
 =====================
 
