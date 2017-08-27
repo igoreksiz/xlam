@@ -35,9 +35,8 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
         GoTo Finish
     End If
 
-    ' Check for updates on first use
-    ' If Not CheckedForUpdates Then CheckUpdates
-    ' CheckedForUpdates = True
+    ' Promote any staged manager update
+    PromoteStagedUpdate
 
     ' Check for null arguments
     If IsEmpty(ticker) Or ticker = "" Or IsEmpty(metric) Or metric = "" Then

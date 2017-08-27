@@ -58,7 +58,12 @@ End Function
 ' Does nothing if the add-in is not loaded.
 Public Sub UnloadAddInFunctions()
     On Error Resume Next
-    Workbooks(AddInFunctionsFile).Close
+    
+    ' If the functions module is in the process of
+    ' updating this add-in, we shouldn't unload it
+    Dim midUpdate As Boolean
+    midUpdate = Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
+    If Not midUpdate Then Workbooks(AddInFunctionsFile).Close
 End Sub
 
 ' Check if staged functions add-in is available

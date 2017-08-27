@@ -165,7 +165,7 @@ Public Sub FinboxioUnlinkImage(control, ByRef image)
 End Sub
 
 Public Sub FinboxioUpdate(Optional control)
-    ' Call CheckUpdates(True)
+    Call PromoteStagedUpdate
 End Sub
 
 Public Sub UpdateCustomMenu()

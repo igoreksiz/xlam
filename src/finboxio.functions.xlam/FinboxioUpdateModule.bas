@@ -2,33 +2,51 @@ Attribute VB_Name = "FinboxioUpdateModule"
 Option Explicit
 Option Private Module
 
-Public Const AddInLoaderFile = "finboxio"
+Private updatingManager As Boolean
 
-Public Sub CheckUpdates(Optional explicit As Boolean = False, Optional wb As Workbook)
-    If Dir(StagedXlamPath(AddInLoaderFile)) <> "" Then
-        Dim i As Integer
-        For i = 1 To Application.AddIns.count
-            On Error Resume Next
-            If Application.AddIns.Item(i).FullName = XlamPath(AddInLoaderFile) Then Exit For
-        Next i
-        If i <= Application.AddIns.count Then Application.AddIns.Item(i).Installed = False
-        PromoteStagedFile AddInLoaderFile
-        If i <= Application.AddIns.count Then Application.AddIns.Item(i).Installed = True
+Public Function IsUpdatingManager() As Boolean
+    IsUpdatingManager = updatingManager
+End Function
+
+Public Function HasInstalledAddInManager() As Boolean
+    HasInstalledAddInManager = _
+        Dir(LocalPath(AddInInstalledFile)) <> "" Or _
+        Dir(LocalPath(AddInInstalledFile), vbHidden) <> ""
+End Function
+
+Public Function HasStagedUpdate() As Boolean
+    HasStagedUpdate = _
+        Dir(StagingPath(AddInInstalledFile)) <> "" Or _
+        Dir(StagingPath(AddInInstalledFile), vbHidden) <> ""
+End Function
+
+' Promotes the staged add-in manager to active
+Public Sub PromoteStagedUpdate()
+    If Not HasStagedUpdate Then Exit Sub
+    
+    On Error GoTo Finish
+    
+    updatingManager = True
+    
+    ' Uninstall the active manager
+    Dim addIn As addIn
+    For Each addIn In Application.AddIns
+        If addIn.name = AddInInstalledFile And addIn.Installed Then
+            addIn.Installed = False
+            Exit For
+        End If
+    Next addIn
+    
+    ' Promote staged manager
+    If HasInstalledAddInManager Then
+        SetAttr LocalPath(AddInInstalledFile), vbNormal
+        Kill LocalPath(AddInInstalledFile)
     End If
+    Name StagingPath(AddInInstalledFile) As LocalPath(AddInInstalledFile)
+    VBA.SetAttr LocalPath(AddInInstalledFile), vbNormal
+    
+    ' Reinstall the manager
+    If Not addIn Is Nothing Then addIn.Installed = True
+Finish:
+    updatingManager = False
 End Sub
-
-Public Function StagedXlamPath(file As String) As String
-    StagedXlamPath = XlamPath(file & ".staged")
-End Function
-
-Public Function XlamPath(file As String) As String
-    XlamPath = ThisWorkbook.path & Application.PathSeparator & file & ".xlam"
-End Function
-
-Public Sub PromoteStagedFile(file As String)
-    SetAttr XlamPath(file), vbNormal
-    Kill XlamPath(file)
-    Name StagedXlamPath(file) As XlamPath(file)
-End Sub
-
-
