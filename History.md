@@ -1,4 +1,9 @@
 
+0.21.0-6 / 2017-08-27
+=====================
+
+  * Adds app event handler to automatically promote staged manager
+
 0.21.0-5 / 2017-08-27
 =====================
 
