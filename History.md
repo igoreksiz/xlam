@@ -1,4 +1,9 @@
 
+0.21.0-4 / 2017-08-27
+=====================
+
+  * Fixes installation for multi-component add-in module
+
 0.21.0-3 / 2017-08-26
 =====================
 
