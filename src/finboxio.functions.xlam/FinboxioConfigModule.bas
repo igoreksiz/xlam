@@ -2,10 +2,6 @@ Attribute VB_Name = "FinboxioConfigModule"
 Option Explicit
 Option Private Module
 
-Public AppVersion As String
-Public AppTitle As String
-Public ReleaseDate As Date
-
 Public Const CACHE_TIMEOUT_MINUTES = 60
 Public Const MAX_BATCH_SIZE = 99
 
@@ -21,6 +17,7 @@ Public Const UPDATE_URL = "https://finbox.io/integrations/excel?dl=1"
 
 Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
 Public Const RELEASES_URL = "https://api.github.com/repos/finboxio/xlam/releases"
+Public Const INSTALLER_URL = "https://github.com/finboxio/xlam/releases/download/v"
 
 Public Const TIER_URL = "https://api.finbox.io/beta/usage"
 Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
@@ -38,13 +35,37 @@ Public Const RESTRICTED_METRIC_ERROR = 20408
 Public Const MISSING_VALUE_ERROR = 20409
 Public Const UNSPECIFIED_API_ERROR = 20500
 
-#If Mac Then
-    #If MAC_OFFICE_VERSION < 15 Then
-        Public Const EXCEL_VERSION = "Mac2011"
-    #Else
-        Public Const EXCEL_VERSION = "Mac2016"
-    #End If
-#Else
-    Public Const EXCEL_VERSION = "Win"
-#End If
+Public Const AddInInstalledFile = "finboxio.xlam"
+Public Const AddInInstallerFile = "finboxio.install.xlam"
+Public Const AddInFunctionsFile = "finboxio.functions.xlam"
+
+Public Function AddInManagerFile() As String
+    On Error Resume Next
+    AddInManagerFile = Workbooks(AddInInstalledFile).name
+    AddInManagerFile = Workbooks(AddInInstallerFile).name
+End Function
+
+Public Function StagingPath(file As String) As String
+    StagingPath = LocalPath(VBA.Left(file, VBA.InStrRev(file, ".")) & "staged" & VBA.Mid(file, InStrRev(file, ".")))
+End Function
+
+Public Function LocalPath(file As String) As String
+    LocalPath = ThisWorkbook.path & Application.PathSeparator & file
+End Function
+
+Public Function AddInVersion(file As String) As String
+    On Error Resume Next
+    AddInVersion = Workbooks(file).Sheets("finboxio").range("AppVersion").value
+End Function
+
+Public Function AddInReleaseDate(file As String) As Date
+    AddInReleaseDate = VBA.Now()
+    On Error Resume Next
+    AddInReleaseDate = Workbooks(file).Sheets("finboxio").range("ReleaseDate").value
+End Function
+
+Public Function AddInLocation(file As String) As String
+    On Error Resume Next
+    AddInLocation = Workbooks(file).FullName
+End Function
 

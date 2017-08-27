@@ -2,7 +2,10 @@ Attribute VB_Name = "UpdaterModule"
 Option Explicit
 Option Private Module
 
-Public Sub DownloadUpdates(Optional explicit As Boolean = False, Optional wb As Workbook)
+' Downloads and stages the latest release from github
+' if not already up-to-date. Returns True if there are
+' staged updates to be applied.
+Public Function DownloadUpdates(Optional blockEvents As Boolean) As Boolean
     Dim allowPrereleases As Boolean: allowPrereleases = True
     
     Dim latest As String, _
@@ -12,18 +15,20 @@ Public Sub DownloadUpdates(Optional explicit As Boolean = False, Optional wb As 
         loaderUrl As String, _
         functionsUrl As String, _
         releaseUrl As String, _
-        answer As Integer
+        download As Integer
         
     Dim WebClient As New WebClient, _
         WebRequest As New WebRequest, _
         WebResponse As WebResponse, _
         asset As Object
     
-    WebClient.BlockEventLoop = Not explicit
+    WebClient.BlockEventLoop = blockEvents
     
     ' Skip update check if AppVersion is not set
+    ' This probably indicates something is wrong
+    ' with the current Excel session and it should
+    ' be restarted.
     If AddInVersion = "" Then
-        If explicit Then GoTo Confirmation
         GoTo Finish
     End If
     
@@ -77,54 +82,52 @@ GetLatest:
 Confirmation:
     On Error GoTo Finish
 
-    If AddInVersion = "" Or lReleased = "" Or releaseUrl = "" Then
-        answer = MsgBox("Unable to check for updates to the finbox.io add-on at this time. Please contact support@finbox.io if this problem persists.", vbCritical)
-        ' LogMessage "Failed to check for updates."
+    If Not HasAddInFunctions Then
+        ' The functions add-in isn't available. This can
+        ' happen on first-time installations.
+        download = vbYes
+    ' TODO: make sure installed versions are consistent
+    ' ElseIf Not AddInVersionsMatch Then
+    '    download = vbYes
+    ElseIf lReleased = "" Then
+        ' We were unable to get the latest release from github.
+        ' TODO: Error handling here
     ElseIf cReleased = "" Then
-        answer = MsgBox("You are using an unreleased version of the finbox.io add-on. Would you like to download the latest release?", vbYesNo + vbQuestion)
-        ' LogMessage "Unreleased add-on version detected."
+        ' User is running an unreleased version of the add-in.
+        ' This may happen if we delete a release from github or
+        ' if we send a hotfixed/beta version.
+        '
+        ' If the release was deleted from github, we probably
+        ' want to downgrade to the current latest
+        '
+        ' If we sent this as a hotfix, we probably don't want
+        ' to update unless the latest release was created after
+        ' the hotfix version.
+        '
+        ' TODO: How can we check this?
     ElseIf cReleased < lReleased Then
-        answer = MsgBox("A newer version of the finbox.io add-on is available! Would you like to download the latest release?", vbYesNo + vbQuestion)
-        ' LogMessage "Add-on update " & latest & " - " & lReleased & " is available. (Upgrading from " & current & " - " & cReleased & ")"
-    ElseIf lReleased = cReleased Then
-        If explicit Then answer = MsgBox("You are already using the latest version of the finbox.io add-on. Congratulations!")
-        ' LogMessage "No updates available."
+        ' There is a newer version available
+        download = vbYes
     End If
 
-    If answer = vbYes Or Not HasAddInFunctions Then
-        DownloadFile loaderUrl, StagedXlamPath(AddInLoaderFile)
-        DownloadFile functionsUrl, StagedXlamPath(AddInFunctionsFile)
-
-        MsgBox "The update is ready and will take effect after you restart Excel."
-
-        ' If wb Is Nothing Or VBA.IsEmpty(wb) Then Set wb = ThisWorkbook
-        ' If Not (wb Is Nothing Or VBA.IsEmpty(wb)) Then wb.FollowHyperlink releaseUrl
+    If download = vbYes Then
+        DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
+        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
+        
+        VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
+        VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
     End If
-
-Finish:
     
-End Sub
-
-Public Function HasStagedUpdates(file As String) As Boolean
-    HasStagedUpdates = Dir(StagedXlamPath(AddInFunctionsFile)) <> ""
+Finish:
+    DownloadUpdates = HasUpdates
 End Function
 
-Public Function XlamFile(file As String) As String
-    XlamFile = file & ".xlam"
+Public Function HasUpdates() As Boolean
+    HasUpdates = IsStaged(AddInInstalledFile) Or IsStaged(AddInFunctionsFile)
 End Function
 
-Public Function StagedXlamFile(file As String) As String
-    StagedXlamFile = XlamFile(file & ".staged")
+Private Function IsStaged(file As String) As Boolean
+    IsStaged = _
+        Dir(StagingPath(file)) <> "" Or _
+        Dir(StagingPath(file), vbHidden) <> ""
 End Function
-
-Public Function XlamPath(file As String) As String
-    XlamPath = ThisWorkbook.path & Application.PathSeparator & XlamFile(file)
-End Function
-
-Public Function StagedXlamPath(file As String) As String
-    StagedXlamPath = ThisWorkbook.path & Application.PathSeparator & StagedXlamFile(file)
-End Function
-
-Public Sub PromoteStagedUpdate(file As String)
-    FileCopy StagedXlamPath(file), XlamPath(file)
-End Sub

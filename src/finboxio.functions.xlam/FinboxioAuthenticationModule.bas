@@ -10,9 +10,9 @@ Public Sub SetAPIKeyHandler(handler As APIKeyHandler)
 End Sub
 
 Public Function ShowLoginForm()
-    If EXCEL_VERSION = "Mac2011" Then
+    If ExcelVersion = "Mac2011" Then
         Mac2011CredentialsForm.Show
-    ElseIf EXCEL_VERSION = "Mac2016" Then
+    ElseIf ExcelVersion = "Mac2016" Then
         Mac2016CredentialsForm.Show
     Else
         DefaultCredentialsForm.Show

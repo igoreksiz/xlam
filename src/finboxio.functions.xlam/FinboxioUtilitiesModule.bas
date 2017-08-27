@@ -15,32 +15,6 @@ Public Function CollectionToString(ByVal dataCol As Variant) As String
     Next i
 End Function
 
-Public Function MSOffVer() As Integer
-' Function returns version of MS Office being run
-'    9 = Office 2000
-'   10 = Office XP / 2002
-'   11 = Office 2003 & LibreOffice 3.5.2
-'   12 = Office 2007
-'   14 = Office 2010 or Office 2011 for Mac
-'   15 = Office 2013 or Office 2016 for Mac
-    
-    Dim verStr As String
-    Dim startPos As Integer
-    MSOffVer = 0
-        
-    verStr = Application.Version
-    startPos = VBA.InStr(verStr, ".")
-        
-        On Error Resume Next
-    If startPos > 0 Then
-        MSOffVer = CInt(VBA.Left(verStr, startPos - 1))
-    Else
-        MSOffVer = CInt(verStr)
-    End If
-        On Error GoTo 0
-
-End Function
-
 Public Sub ResetFindReplace()
    'Resets the find/replace dialog box options
    Dim r As range
@@ -96,30 +70,53 @@ Public Function DateStringToPeriod(period As String)
     DateStringToPeriod = "Y" & VBA.Year(d) & ".M" & VBA.Month(d) & ".D" & VBA.Day(d)
 End Function
 
-Public Function GetAPIHeader()
-    Dim APIHeader As String
-    
+Public Function GetAPIHeader() As String
+    GetAPIHeader = "Excel - " & ExcelVersion & " - v" & AddInVersion(AddInFunctionsFile)
+End Function
+
+Public Function ExcelVersion() As String
     #If Mac Then
-        APIHeader = "Excel_Mac_"
+        #If MAC_OFFICE_VERSION = 14 Then
+            ExcelVersion = "Mac2011"
+        #ElseIf MAC_OFFICE_VERSION = 15 Then
+            ExcelVersion = "Mac2016"
+        #Else
+            ExcelVersion = "Unsupported"
+        #End If
     #Else
-        APIHeader = "Excel_Win_"
+        Dim version As Integer
+        version = MSOfficeVersion
+        If version = 12 Then
+            ExcelVersion = "Win2007"
+        ElseIf version = 14 Then
+            ExcelVersion = "Win2010"
+        ElseIf version = 15 Then
+            ExcelVersion = "Win2013"
+        ElseIf version = 16 Then
+            ExcelVersion = "Win2016"
+        Else
+            ExcelVersion = "Unsupported"
+        End If
     #End If
-    
-    APIHeader = APIHeader & MSOffVer() & "-" & AppVersion
-    
-    GetAPIHeader = APIHeader
 End Function
 
-Public Function StagedXlamPath(file As String) As String
-    StagedXlamPath = XlamPath(file & ".staged")
+' Returns the version of MS Office being run
+'    9 = Office 2000
+'   10 = Office XP / 2002
+'   11 = Office 2003 & LibreOffice 3.5.2
+'   12 = Office 2007
+'   14 = Office 2010 or Office 2011 for Mac
+'   15 = Office 2013 or Office 2016 for Mac
+Public Function MSOfficeVersion() As Integer
+    Dim verStr As String
+    Dim startPos As Integer
+    MSOfficeVersion = 0
+    verStr = Application.version
+    startPos = VBA.InStr(verStr, ".")
+    On Error Resume Next
+    If startPos > 0 Then
+        MSOfficeVersion = CInt(VBA.Left(verStr, startPos - 1))
+    Else
+        MSOfficeVersion = CInt(verStr)
+    End If
 End Function
-
-Public Function XlamPath(file As String) As String
-    XlamPath = ThisWorkbook.path & Application.PathSeparator & file & ".xlam"
-End Function
-
-Public Sub PromoteStagedFile(file As String)
-    SetAttr XlamPath(file), vbNormal
-    Kill XlamPath(file)
-    Name StagedXlamPath(file) As XlamPath(file)
-End Sub

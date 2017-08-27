@@ -103,6 +103,20 @@ const update = async (filename, { dryRun } = {}) => {
   sheet = sheet.replace(dateFind, dateReplace)
   addin.file(`xl/${sheetFiles[0]}`, sheet)
 
+  parser.reset()
+  let props = await addin
+    .file('docProps/core.xml')
+    .async('string')
+
+  const titleExp = new RegExp('<dc:title>(.*)</dc:title>')
+  const titleTag = titleExp.exec(props)
+
+  const titleFind = `<dc:title>${titleTag[1]}</dc:title>`
+  const titleReplace = `<dc:title>${titleTag[1].replace(/v[0-9.A-Za-z_-]+$/, "").trim() + ` v${version}`}</dc:title>`
+
+  props = props.replace(titleFind, titleReplace)
+  addin.file('docProps/core.xml', props)
+
   console.log(`[${filename}] Updating from ${versionString} to ${version}`)
   !dryRun && await new Promise((resolve, reject) => {
     addin.generateNodeStream({ type: 'nodebuffer', streamFiles: true, compression: 'DEFLATE' })

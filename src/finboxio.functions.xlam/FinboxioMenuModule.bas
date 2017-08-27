@@ -78,10 +78,47 @@ Public Sub FinboxioLogout(Optional control)
 End Sub
 
 Public Sub FinboxioAbout(Optional control)
-    MsgBox "You are using the " & AppTitle & vbCrLf & _
-        "This add-on is installed as " & ThisWorkbook.path & Application.PathSeparator & ThisWorkbook.name & "." & vbCrLf & _
-        "You can contact support@finbox.io with any questions or concerns." & vbCrLf & vbCrLf & _
-        "Happy investing!"
+    Dim ManagerVersion As String, ManagerDate As Date, ManagerLocation As String
+    Dim FunctionsVersion As String, FunctionsDate As Date, FunctionsLocation As String
+    Dim APIKey As String
+    
+    ManagerVersion = AddInVersion(AddInManagerFile)
+    ManagerDate = AddInReleaseDate(AddInManagerFile)
+    ManagerLocation = AddInLocation(AddInManagerFile)
+    
+    FunctionsVersion = AddInVersion(AddInFunctionsFile)
+    FunctionsDate = AddInReleaseDate(AddInFunctionsFile)
+    FunctionsLocation = AddInLocation(AddInFunctionsFile)
+    
+    APIKey = GetAPIKey()
+    
+    Dim msg As String
+    msg = _
+        "Installation Details" & vbCrLf & _
+        "--------------------" & vbCrLf & _
+        vbCrLf & _
+        "  Add-In Components:" & vbCrLf & _
+        vbCrLf & _
+        "    * Add-In Manager (v" & ManagerVersion & ", " & VBA.Round(ManagerDate) & ")" & vbCrLf & _
+        "      " & ManagerLocation & vbCrLf & _
+        vbCrLf & _
+        "    * Add-In Functions (v" & FunctionsVersion & ", " & VBA.Round(FunctionsDate) & ")" & vbCrLf & _
+        "      " & FunctionsLocation & vbCrLf & _
+        vbCrLf & _
+        "  Current User:" & vbCrLf & _
+        vbCrLf & _
+        "    API Key " & APIKey & vbCrLf & _
+        vbCrLf & _
+        "  Contact Information: " & vbCrLf & _
+        vbCrLf & _
+        "    Please help us improve your experience by reporting " & vbCrLf & _
+        "    any issues and sending suggestions to support@finbox.io, " & vbCrLf & _
+        "    or visit https://finbox.io to chat with us live." & vbCrLf & _
+        vbCrLf & _
+        vbCrLf & _
+        "  Thank you for using finbox.io!"
+        
+    MsgBox msg, Title:="[finbox.io] Add-in Information"
 End Sub
 
 Public Sub FinboxioMessages(Optional control)
@@ -122,17 +159,17 @@ End Sub
 
 Public Sub FinboxioUnlinkImage(control, ByRef image)
     image = "HyperlinkRemove"
-    If EXCEL_VERSION = "Win" And CInt(VBA.Left(Application.Version, VBA.InStr(Application.Version, ".") - 1)) <= 14 Then
+    If ExcelVersion = "Win2010" Then
         image = "SkipOccurrence"
     End If
 End Sub
 
 Public Sub FinboxioUpdate(Optional control)
-    Call CheckUpdates(True)
+    ' Call CheckUpdates(True)
 End Sub
 
 Public Sub UpdateCustomMenu()
-    If EXCEL_VERSION = "Mac2011" Then
+    If ExcelVersion = "Mac2011" Then
         Dim CustomMenu As CommandBarPopup
         Dim Controls, i As Integer
         Set Controls = Application.CommandBars("Worksheet Menu Bar").Controls

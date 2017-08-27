@@ -58,6 +58,24 @@ Public Function FixAddinLinks(Optional wb As Workbook)
             replaced = True
         End If
         
+        If Not sheet.Cells.Find("'" & prefix & "finboxio.functions.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
+            sheet.Cells.Replace _
+                What:="'" & prefix & "finboxio.functions.xlam'!", _
+                Replacement:="", _
+                LookAt:=xlPart, _
+                SearchOrder:=xlByRows, _
+                MatchCase:=False
+            replaced = True
+        ElseIf Not sheet.Cells.Find("finboxio.functions.xlam!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
+            sheet.Cells.Replace _
+                What:="finboxio.functions.xlam!", _
+                Replacement:="", _
+                LookAt:=xlPart, _
+                SearchOrder:=xlByRows, _
+                MatchCase:=False
+            replaced = True
+        End If
+        
         If Not sheet.Cells.Find("'" & prefix & "finboxio.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
             sheet.Cells.Replace _
                 What:="'" & prefix & "finboxio.xlam'!", _

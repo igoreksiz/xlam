@@ -36,8 +36,8 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
     End If
 
     ' Check for updates on first use
-    If Not CheckedForUpdates Then CheckUpdates
-    CheckedForUpdates = True
+    ' If Not CheckedForUpdates Then CheckUpdates
+    ' CheckedForUpdates = True
 
     ' Check for null arguments
     If IsEmpty(ticker) Or ticker = "" Or IsEmpty(metric) Or metric = "" Then

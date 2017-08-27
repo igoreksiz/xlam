@@ -1,15 +1,13 @@
 Private replacer As WorkbookLinkReplacer
+Private isClosing As Boolean
 
 Private Sub Workbook_Activate()
     Call AddUDFCategoryDescription
 End Sub
 
 Private Sub Workbook_Open()
-    AppVersion = ThisWorkbook.Sheets("finboxio").range("AppVersion").value
-    ReleaseDate = ThisWorkbook.Sheets("finboxio").range("ReleaseDate").value
-    AppTitle = "finbox.io excel add-in v" & AppVersion & " (" & EXCEL_VERSION & " edition), released " & ReleaseDate
-
-    LogMessage "Welcome to the " & AppTitle
+    LogMessage "Welcome to the finbox.io excel add-in!"
+    LogMessage "Running add-in version: " & GetAPIHeader
     
     Call SetAPIKeyHandler(New APIKeyHandler)
     Call SetWorkbookLinkReplacer(New WorkbookLinkReplacer)
