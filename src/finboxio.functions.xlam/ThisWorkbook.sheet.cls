@@ -1,5 +1,4 @@
 Private replacer As WorkbookLinkReplacer
-Private isClosing As Boolean
 
 Private Sub Workbook_Activate()
     Call AddUDFCategoryDescription
@@ -15,8 +14,6 @@ Private Sub Workbook_Open()
     Call UpdateCustomMenu
     
     CheckQuota blockEvents:=True
-    
-    PromoteStagedUpdate
 End Sub
 
 Private Sub SetWorkbookLinkReplacer(wlr As WorkbookLinkReplacer)

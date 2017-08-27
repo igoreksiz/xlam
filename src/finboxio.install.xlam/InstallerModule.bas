@@ -99,7 +99,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' close the installed add-ins and continue
         If Not installed Is Nothing Then
             UnloadAddInFunctions
-            Workbooks(installed.name).Close
+            If installed.IsOpen Then Workbooks(installed.name).Close
         End If
     Else
         ' This add-in shouldn't be run outside

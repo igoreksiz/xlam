@@ -10,6 +10,15 @@ Attribute VB_Exposed = False
 Private WithEvents App As Application
 Attribute App.VB_VarHelpID = -1
 
+Private Sub App_AfterCalculate()
+    If HasStagedUpdate Then
+        Stop
+        Dim loadingManager As Boolean
+        loadingManager = Application.Run(AddInManagerFile & "!IsLoadingManager")
+        If Not loadingManager Then PromoteStagedUpdate
+    End If
+End Sub
+
 Private Sub Class_Initialize()
     Set App = Application
 End Sub
@@ -17,4 +26,5 @@ End Sub
 Private Sub App_WorkbookOpen(ByVal wb As Workbook)
     FinboxioFixLinksModule.FixAddinLinks wb
 End Sub
+
 

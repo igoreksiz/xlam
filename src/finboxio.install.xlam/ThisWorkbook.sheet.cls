@@ -1,4 +1,6 @@
 Private Sub Workbook_Open()
+    loadingManager = True
+    
     ' Install AddIn on first open
     AddInInstalled = InstallAddIn(Me)
     
@@ -15,6 +17,8 @@ Private Sub Workbook_Open()
     
     ' Load the FNBX functions
     Call LoadAddInFunctions
+    
+    loadingManager = False
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)

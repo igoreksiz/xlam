@@ -2,6 +2,12 @@ Attribute VB_Name = "LoaderModule"
 Option Explicit
 Option Private Module
 
+Public loadingManager As Boolean
+
+Public Function IsLoadingManager() As Boolean
+    IsLoadingManager = loadingManager
+End Function
+
 ' Check if the functions add-in is installed alongside
 Public Function HasAddInFunctions() As Boolean
     HasAddInFunctions = _
