@@ -1,4 +1,4 @@
-Private replacer As WorkbookLinkReplacer
+Private handler As AppEventHandler
 
 Private Sub Workbook_Activate()
     Call AddUDFCategoryDescription
@@ -8,14 +8,10 @@ Private Sub Workbook_Open()
     LogMessage "Welcome to the finbox.io excel add-in!"
     LogMessage "Running add-in version: " & GetAPIHeader
     
-    Call SetAPIKeyHandler(New APIKeyHandler)
-    Call SetWorkbookLinkReplacer(New WorkbookLinkReplacer)
+    Set handler = New AppEventHandler
     
+    Call SetAPIKeyHandler(New APIKeyHandler)
     Call UpdateCustomMenu
     
     CheckQuota blockEvents:=True
-End Sub
-
-Private Sub SetWorkbookLinkReplacer(wlr As WorkbookLinkReplacer)
-    Set replacer = wlr
 End Sub
