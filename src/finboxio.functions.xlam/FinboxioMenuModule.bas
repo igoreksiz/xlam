@@ -63,9 +63,15 @@ End Sub
 Public Sub FinboxioCheckQuota(Optional control)
     CheckQuota
     If QuotaTotal < 1 Then
-        MsgBox "Quota usage is unavailable at this time."
+        MsgBox _
+            Title:="[finbox.io] Quota Unavailable", _
+            Prompt:="Quota usage is unavailable at this time. Please try again and contact support@finbox.io if this problem persists.", _
+            Buttons:=vbCritical
     Else
-        MsgBox "You have used " & QuotaUsed & " datapoints of your " & QuotaTotal & " quota limit."
+        MsgBox _
+            Title:="[finbox.io] Quota Usage", _
+            Prompt:="You have used " & QuotaUsed & " datapoints of your " & QuotaTotal & " quota limit.", _
+            Buttons:=vbInformation
     End If
 End Sub
 
@@ -118,7 +124,9 @@ Public Sub FinboxioAbout(Optional control)
         vbCrLf & _
         "  Thank you for using finbox.io!"
         
-    MsgBox msg, Title:="[finbox.io] Add-in Information"
+    MsgBox _
+        Title:="[finbox.io] Add-in Information", _
+        Prompt:=msg
 End Sub
 
 Public Sub FinboxioMessages(Optional control)
@@ -165,7 +173,20 @@ Public Sub FinboxioUnlinkImage(control, ByRef image)
 End Sub
 
 Public Sub FinboxioUpdate(Optional control)
-    Application.Run (AddInInstalledFile & "!ForceUpdate")
+    Dim wasUpdated As Boolean
+    wasUpdated = Application.Run(AddInInstalledFile & "!ForceUpdate")
+    If wasUpdated Then
+        PromoteStagedUpdate
+        MsgBox _
+            Title:="[finbox.io] Update Successful", _
+            Prompt:="Your finbox.io add-in installation is now up-to-date. Stay fresh!", _
+            Buttons:=vbInformation
+    Else
+        MsgBox _
+            Title:="[finbox.io] No Updates Available", _
+            Prompt:="You're already using the latest version of the finbox.io add-in. Stay fresh!", _
+            Buttons:=vbInformation
+    End If
 End Sub
 
 Public Sub UpdateCustomMenu()
