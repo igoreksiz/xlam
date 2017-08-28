@@ -1,4 +1,9 @@
 
+0.21.0-14 / 2017-08-27
+======================
+
+  * Prevents functions add-in from promoting manager while being updated
+
 0.21.0-13 / 2017-08-27
 ======================
 
