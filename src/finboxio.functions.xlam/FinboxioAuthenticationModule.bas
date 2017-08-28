@@ -55,7 +55,10 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     
     Select Case webResponse.statusCode
         Case 401
-            MsgBox "The provided credentials are invalid.", vbCritical
+            MsgBox _
+                Title:="[finbox.io] Login Error", _
+                Prompt:="The provided credentials are invalid.", _
+                Buttons:=vbCritical
         Case 200
             ' Extract api_tier and api_key from json response
             APItier = ""
@@ -69,16 +72,17 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             
             ' Process api_tier and api_key
             If APItier = "inactive" Then
-                MsgBox "You have not verified your email address yet." & vbCrLf & _
-                    "To resend the verification email, visit https://finbox.io/profile.", _
-                    vbCritical
+                MsgBox _
+                    Title:="[finbox.io] Login Error", _
+                    Prompt:="You have not verified your email address yet." & vbCrLf & _
+                            "To resend the verification email, visit https://finbox.io/profile.", _
+                    Buttons:=vbCritical
             Else
                 APIKeyStore.StoreApiKey (APIKey)
                 Login = True
             End If
         Case Else
-            MsgBox "The finbox.io API returned http status code " & webResponse.statusCode & " = " & vbCr & _
-                VBA.Trim(webResponse.StatusDescription), vbCritical
+            GoTo ErrorHandler
     End Select
     
     tier = ""
@@ -97,7 +101,10 @@ ErrorHandler:
     CheckQuota
     InvalidateAppRibbon
     Dim answer As Integer
-    answer = MsgBox("Failed to authenticate with finbox.io. Contact support@finbox.io if this problem persists.", vbCritical, "finbox.io Addin")
+    MsgBox _
+        Title:="[finbox.io] Login Error", _
+        Prompt:="Unable to authenticate with finbox.io at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
 End Function
 
 Public Function GetTier()

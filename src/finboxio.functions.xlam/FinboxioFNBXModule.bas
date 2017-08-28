@@ -104,7 +104,7 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
         End If
     End If
 
-    ' Check if user is logged in and prompt if not
+    ' Check if user is logged in and show form if not
     If Not IsLoggedIn() And Not RequestedLogin Then ShowLoginForm
     RequestedLogin = True
 

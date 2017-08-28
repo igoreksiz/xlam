@@ -32,7 +32,7 @@ Public Sub PromoteStagedUpdate()
         
     If Not canUnloadManager Then Exit Sub
     
-    On Error GoTo Finish
+    On Error GoTo ReportError
     
     updatingManager = True
     
@@ -55,6 +55,16 @@ Public Sub PromoteStagedUpdate()
     
     ' Reinstall the manager
     If Not addIn Is Nothing Then addIn.Installed = True
+
+    GoTo Finish
+
+ReportError:
+
+    MsgBox _
+        Title:="[finbox.io] Add-in Error", _
+        Prompt:="The finbox.io add-in was not loaded correctly. " & _
+                "Please try restarting Excel and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
 
 Finish:
     updatingManager = False

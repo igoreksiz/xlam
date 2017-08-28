@@ -5,10 +5,11 @@ Option Private Module
 Private RedisplayWarning As Date
 
 Public Sub ShowRateLimitWarning(Optional reset As Boolean = True)
-    Dim ack As Integer
-    ack = MsgBox("You have exhausted your finbox.io data limit. Click OK to view your usage history.", vbCritical + vbOKCancel)
+    MsgBox _
+        Title:="[finbox.io] Limit Exceeded", _
+        Prompt:="You have exhausted your finbox.io data limit. Try again later or contact support@finbox.io to request a limit increase.", _
+        Buttons:=vbCritical
     If reset Then SetRateLimitTimer
-    If ack = vbOK Then ThisWorkbook.FollowHyperlink USAGE_URL
 End Sub
 
 Public Function IsRateLimited()
