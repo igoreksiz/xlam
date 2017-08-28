@@ -5,7 +5,7 @@ Option Private Module
 Private lastUpdateCheck As Date
 
 Public Sub DailyUpdateCheck()
-    If VBA.Now() - 1 > lastUpdateCheck Then
+    If VBA.Now() - (5 / (24 * 60)) > lastUpdateCheck Then
         Call DownloadUpdates(blockEvents:=True)
     End If
 End Sub
