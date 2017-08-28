@@ -34,7 +34,6 @@ Public Sub WriteSettings()
         Dim key
         For Each key In settings.keys
             Print #1, key & "=" & settings.Item(key)
-            Debug.Print key & "=" & settings.Item(key)
         Next key
     Close #1
 End Sub
@@ -52,7 +51,6 @@ Public Sub ReadSettings()
             If VBA.LCase(value) = "false" Then value = False
             If settings.Exists(key) Then settings.Remove (key)
             Call settings.Add(key, value)
-            Debug.Print "Key: " & key & ", Value: " & value
         Wend
     Close #1
 Finish:
