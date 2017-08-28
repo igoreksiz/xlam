@@ -3,9 +3,14 @@ Option Explicit
 Option Private Module
 
 Public loadingManager As Boolean
+Public updatingFunctions As Boolean
 
 Public Function IsLoadingManager() As Boolean
     IsLoadingManager = loadingManager
+End Function
+
+Public Function IsUpdatingFunctions() As Boolean
+    IsUpdatingFunctions = updatingFunctions
 End Function
 
 ' Check if the functions add-in is installed alongside
@@ -81,6 +86,8 @@ End Function
 
 ' Promotes the staged functions add-in to active
 Public Sub PromoteStagedUpdate()
+    If updatingFunctions Then Exit Sub
+
     If Not HasStagedUpdate Then Exit Sub
     
     On Error Resume Next
@@ -88,10 +95,24 @@ Public Sub PromoteStagedUpdate()
     updatingManager = Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
     If updatingManager Then Exit Sub
     
+    On Error GoTo Finish
+    
+    updatingFunctions = True
+    
+    Call UnloadAddInFunctions
+    
     If HasAddInFunctions Then
         SetAttr LocalPath(AddInFunctionsFile), vbNormal
         Kill LocalPath(AddInFunctionsFile)
     End If
     Name StagingPath(AddInFunctionsFile) As LocalPath(AddInFunctionsFile)
     VBA.SetAttr LocalPath(AddInFunctionsFile), vbHidden
+    
+    LoadAddInFunctions
+
+Finish:
+    updatingFunctions = False
+    
 End Sub
+
+
