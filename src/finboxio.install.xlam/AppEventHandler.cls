@@ -14,35 +14,42 @@ Private Sub Class_Initialize()
     Set App = Application
 End Sub
 
-Private Sub App_WorkbookOpen(ByVal Wb As Workbook)
-    FinboxioFixLinksModule.FixAddinLinks Wb
-    PromoteStagedUpdate
-End Sub
-
-Private Sub App_AfterCalculate()
-    PromoteStagedUpdate
-End Sub
-
 Private Sub App_SheetActivate(ByVal Sh As Object)
+    DailyUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_SheetDeactivate(ByVal Sh As Object)
+    DailyUpdateCheck
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_AfterCalculate()
+    DailyUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WindowActivate(ByVal Wb As Workbook, ByVal Wn As Window)
+    DailyUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WindowDeactivate(ByVal Wb As Workbook, ByVal Wn As Window)
+    DailyUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WorkbookActivate(ByVal Wb As Workbook)
+    DailyUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WorkbookDeactivate(ByVal Wb As Workbook)
+    DailyUpdateCheck
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_WorkbookOpen(ByVal Wb As Workbook)
+    DailyUpdateCheck
     PromoteStagedUpdate
 End Sub

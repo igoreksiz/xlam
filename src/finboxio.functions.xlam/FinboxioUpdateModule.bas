@@ -24,6 +24,11 @@ End Function
 Public Sub PromoteStagedUpdate()
     If Not HasStagedUpdate Then Exit Sub
     
+    On Error Resume Next
+    Dim loadingManager As Boolean
+    loadingManager = Application.Run(AddInManagerFile & "!IsLoadingManager")
+    If loadingManager Then Exit Sub
+    
     On Error GoTo Finish
     
     updatingManager = True
@@ -47,6 +52,7 @@ Public Sub PromoteStagedUpdate()
     
     ' Reinstall the manager
     If Not addIn Is Nothing Then addIn.Installed = True
+
 Finish:
     updatingManager = False
 End Sub

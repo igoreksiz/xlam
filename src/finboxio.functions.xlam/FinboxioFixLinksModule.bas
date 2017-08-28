@@ -4,7 +4,7 @@ Option Private Module
 
 Public IsReplacingLinks As Boolean
 
-Public Function FixAddinLinks(Optional wb As Workbook)
+Public Function FixAddinLinks(Optional Wb As Workbook)
     On Error GoTo CleanExit
     
     IsReplacingLinks = True
@@ -33,10 +33,10 @@ Public Function FixAddinLinks(Optional wb As Workbook)
     replaced = False
     
     Dim ws
-    If TypeName(wb) = "Empty" Or wb Is Nothing Then
+    If TypeName(Wb) = "Empty" Or Wb Is Nothing Then
         Set ws = Worksheets
     Else
-        Set ws = wb.Worksheets
+        Set ws = Wb.Worksheets
     End If
     
     For Each sheet In ws

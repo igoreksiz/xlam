@@ -1,3 +1,5 @@
+Private handler As AppEventHandler
+
 Private Sub Workbook_Open()
     loadingManager = True
     
@@ -18,6 +20,7 @@ Private Sub Workbook_Open()
     ' Load the FNBX functions
     Call LoadAddInFunctions
     
+    Set handler = New AppEventHandler
     loadingManager = False
 End Sub
 

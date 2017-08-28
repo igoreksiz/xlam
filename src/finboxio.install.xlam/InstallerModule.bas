@@ -72,18 +72,18 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' Add the workbook as an add-in
         ' if this is a new installation
         If installed Is Nothing Then
-            Dim wb As Workbook
+            Dim Wb As Workbook
             
             ' AddIns.Add will fail unless a workbook is open
             ' so we create a hidden one here and clean up after
             If Application.Workbooks.count = 0 Then
                 Application.ScreenUpdating = False
-                Set wb = Application.Workbooks.Add
+                Set Wb = Application.Workbooks.Add
             End If
             
             Set installed = Application.AddIns.Add(installPath, True)
             
-            If Not wb Is Nothing Then wb.Close
+            If Not Wb Is Nothing Then Wb.Close
         End If
         
         ' Activate the installed add-in
@@ -130,17 +130,17 @@ Function SavePath()
     #End If
 End Function
 
-Sub SaveCopy(wb, path As String)
+Sub SaveCopy(Wb, path As String)
     If ExcelVersion = "Mac2016" Then
-        SaveCopyAsExcel2016 wb, path
+        SaveCopyAsExcel2016 Wb, path
     Else
-        wb.SaveCopyAs path
+        Wb.SaveCopyAs path
     End If
 End Sub
 
-Sub SaveCopyAsExcel2016(wb, path As String)
+Sub SaveCopyAsExcel2016(Wb, path As String)
     Dim folder As String
     folder = Left(path, InStrRev(path, "/"))
     If VBA.Dir(folder, vbDirectory) = vbNullString Then VBA.MkDir folder
-    wb.SaveCopyAs path
+    Wb.SaveCopyAs path
 End Sub

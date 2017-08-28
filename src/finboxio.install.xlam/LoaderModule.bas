@@ -80,7 +80,14 @@ Private Function HasStagedUpdate() As Boolean
 End Function
 
 ' Promotes the staged functions add-in to active
-Private Sub PromoteStagedUpdate()
+Public Sub PromoteStagedUpdate()
+    If Not HasStagedUpdate Then Exit Sub
+    
+    On Error Resume Next
+    Dim updatingManager As Boolean
+    updatingManager = Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
+    If updatingManager Then Exit Sub
+    
     If HasAddInFunctions Then
         SetAttr LocalPath(AddInFunctionsFile), vbNormal
         Kill LocalPath(AddInFunctionsFile)

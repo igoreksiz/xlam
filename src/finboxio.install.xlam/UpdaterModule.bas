@@ -2,10 +2,20 @@ Attribute VB_Name = "UpdaterModule"
 Option Explicit
 Option Private Module
 
+Private lastUpdateCheck As Date
+
+Public Sub DailyUpdateCheck()
+    If VBA.Now() - (5 / (60 * 24)) > lastUpdateCheck Then
+        Call DownloadUpdates(blockEvents:=True)
+    End If
+End Sub
+
 ' Downloads and stages the latest release from github
 ' if not already up-to-date. Returns True if there are
 ' staged updates to be applied.
 Public Function DownloadUpdates(Optional blockEvents As Boolean) As Boolean
+    lastUpdateCheck = VBA.Now()
+    
     Dim allowPrereleases As Boolean: allowPrereleases = True
     
     Dim latest As String, _
