@@ -25,9 +25,12 @@ Public Sub PromoteStagedUpdate()
     If Not HasStagedUpdate Then Exit Sub
     
     On Error Resume Next
-    Dim loadingManager As Boolean
-    loadingManager = Application.Run(AddInManagerFile & "!IsLoadingManager")
-    If loadingManager Then Exit Sub
+    Dim canUnloadManager As Boolean
+    canUnloadManager = _
+        Not Application.Run(AddInManagerFile & "!IsLoadingManager") And _
+        Not Application.Run(AddInManagerFile & "!IsUpdatingFunctions")
+        
+    If Not canUnloadManager Then Exit Sub
     
     On Error GoTo Finish
     
@@ -56,3 +59,4 @@ Public Sub PromoteStagedUpdate()
 Finish:
     updatingManager = False
 End Sub
+
