@@ -11,7 +11,7 @@ Public Sub AutoUpdateCheck()
     ' for testing)
     Dim interval As Integer
     interval = CInt(GetSetting("autoUpdateMinutes", 24 * 60))
-    If VBA.Now() - (interval / 24 * 60) > lastUpdateCheck Then
+    If VBA.Now() - (interval / (24 * 60)) > lastUpdateCheck Then
         Call DownloadUpdates(blockEvents:=True)
     End If
 End Sub
