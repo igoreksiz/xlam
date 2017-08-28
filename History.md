@@ -1,4 +1,13 @@
 
+0.21.0-21 / 2017-08-28
+======================
+
+  * Updates workbook binaries
+  * Adds feedback to the manual update action
+  * Adds support for prerelease and autoupdate configuration
+  * Improves installation logic and error handling
+  * Adds consistency to MsgBox parameters
+
 0.21.0-20 / 2017-08-27
 ======================
 
