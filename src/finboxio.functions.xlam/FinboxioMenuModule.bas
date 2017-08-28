@@ -165,7 +165,7 @@ Public Sub FinboxioUnlinkImage(control, ByRef image)
 End Sub
 
 Public Sub FinboxioUpdate(Optional control)
-    Call PromoteStagedUpdate
+    Application.Run (AddInInstalledFile & "!ForceUpdate")
 End Sub
 
 Public Sub UpdateCustomMenu()

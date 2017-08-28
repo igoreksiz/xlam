@@ -5,16 +5,22 @@ Option Private Module
 Private lastUpdateCheck As Date
 
 Public Sub DailyUpdateCheck()
-    If VBA.Now() - (5 / (60 * 24)) > lastUpdateCheck Then
+    If VBA.Now() - 1 > lastUpdateCheck Then
         Call DownloadUpdates(blockEvents:=True)
     End If
 End Sub
 
+' Primarily used for testing staging transitions,
+' this forces a download of the latest version
+Public Function ForceUpdate()
+    ForceUpdate DownloadUpdates(blockEvents:=True, force:=True)
+End Function
+
 ' Downloads and stages the latest release from github
 ' if not already up-to-date. Returns True if there are
 ' staged updates to be applied.
-Public Function DownloadUpdates(Optional blockEvents As Boolean) As Boolean
-    If HasUpdates Then
+Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional force As Boolean) As Boolean
+    If HasUpdates And Not force Then
         DownloadUpdates = True
         Exit Function
     End If
@@ -125,7 +131,7 @@ Confirmation:
         download = vbYes
     End If
 
-    If download = vbYes Then
+    If force Or download = vbYes Then
         DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
         DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
         
@@ -146,3 +152,5 @@ Private Function IsStaged(file As String) As Boolean
         Dir(StagingPath(file)) <> "" Or _
         Dir(StagingPath(file), vbHidden) <> ""
 End Function
+
+
