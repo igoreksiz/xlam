@@ -1,4 +1,9 @@
 
+0.21.0-9 / 2017-08-27
+=====================
+
+  * Prevents update check if staged updates already exist
+
 0.21.0-8 / 2017-08-27
 =====================
 
