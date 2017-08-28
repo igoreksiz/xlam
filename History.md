@@ -1,4 +1,10 @@
 
+0.21.0-24 / 2017-08-28
+======================
+
+  * Fixes crash on update when no internet connection is available
+  * Removes unnecessary debug statements
+
 0.21.0-23 / 2017-08-28
 ======================
 
