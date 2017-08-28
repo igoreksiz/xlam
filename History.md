@@ -1,4 +1,9 @@
 
+0.21.0-12 / 2017-08-27
+======================
+
+  * Ensures function add-in is unloaded before applying update
+
 0.21.0-11 / 2017-08-27
 ======================
 
