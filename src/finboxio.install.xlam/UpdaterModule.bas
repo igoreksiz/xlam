@@ -4,16 +4,23 @@ Option Private Module
 
 Private lastUpdateCheck As Date
 
-Public Sub DailyUpdateCheck()
-    If VBA.Now() - (5 / (24 * 60)) > lastUpdateCheck Then
+Public Sub AutoUpdateCheck()
+    If Not GetSetting("autoUpdate", True) Then Exit Sub
+    ' Default to one auto-check per day, but allow
+    ' interval to be specified in minutes (primarily
+    ' for testing)
+    Dim interval As Integer
+    interval = CInt(GetSetting("autoUpdateMinutes", 24 * 60))
+    If VBA.Now() - (interval / 24 * 60) > lastUpdateCheck Then
         Call DownloadUpdates(blockEvents:=True)
     End If
 End Sub
 
 ' Primarily used for testing staging transitions,
-' this forces a download of the latest version
+' this forces the latest version to be downloaded
+' and staged.
 Public Function ForceUpdate()
-    ForceUpdate = DownloadUpdates(blockEvents:=True, force:=True)
+    ForceUpdate = DownloadUpdates(blockEvents:=True, force:=GetSetting("forceUpdate", False))
 End Function
 
 ' Downloads and stages the latest release from github
@@ -27,7 +34,8 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional force 
     
     lastUpdateCheck = VBA.Now()
     
-    Dim allowPrereleases As Boolean: allowPrereleases = True
+    Dim allowPrereleases As Boolean
+    allowPrereleases = GetSetting("allowPrereleases", False)
     
     Dim latest As String, _
         current As String, _
@@ -36,21 +44,34 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional force 
         loaderUrl As String, _
         functionsUrl As String, _
         releaseUrl As String, _
-        download As Integer
+        download As Integer, _
+        functionsVersion As String, _
+        autoSec As MsoAutomationSecurity, _
+        lReleaseDate As Date
         
     Dim WebClient As New WebClient, _
         WebRequest As New WebRequest, _
         WebResponse As WebResponse, _
         asset As Object
     
+    autoSec = Application.AutomationSecurity
     WebClient.BlockEventLoop = blockEvents
     
-    ' Skip update check if AppVersion is not set
+    ' Skip update check if AddInVersion is not set
     ' This probably indicates something is wrong
     ' with the current Excel session and it should
     ' be restarted.
     If AddInVersion = "" Then
         GoTo Finish
+    End If
+    
+    functionsVersion = AddInVersion(AddInFunctionsFile)
+    If functionsVersion = "" And HasAddInFunctions Then
+        Dim functionsWb As Workbook
+        Application.AutomationSecurity = msoAutomationSecurityForceDisable
+        Set functionsWb = Workbooks.Open(LocalPath(AddInFunctionsFile))
+        functionsVersion = AddInVersion(AddInFunctionsFile)
+        functionsWb.Close
     End If
     
 GetCurrent:
@@ -89,6 +110,7 @@ GetLatest:
         If TypeName(release) = "Collection" Then Set release = WebResponse.data(1)
         latest = release.Item("tag_name")
         lReleased = release.Item("created_at")
+        lReleaseDate = CDate(VBA.DateValue(VBA.Mid(lReleased, 1, 10)) + VBA.TimeValue(VBA.Mid(lReleased, 12, 8)))
         releaseUrl = release.Item("html_url")
         For Each asset In release.Item("assets")
             If asset.Item("name") = "finboxio.install.xlam" Then
@@ -103,17 +125,24 @@ GetLatest:
 Confirmation:
     On Error GoTo Finish
 
-    If Not HasAddInFunctions Then
-        ' The functions add-in isn't available. This can
-        ' happen on first-time installations.
+    ' The functions add-in isn't available, but we have
+    ' the latest release, download just the functions
+    ' component. This may happen during installation and
+    ' manual upgrades.
+    If functionsVersion = "" And cReleased = lReleased Then
+        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
+        VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
+        functionsVersion = AddInVersion
+    End If
+    
+    If functionsVersion <> AddInVersion Then
+        ' For some reason the manager and function components
+        ' are out of sync. Force a re-download of the latest
         download = vbYes
-    ' TODO: make sure installed versions are consistent
-    ' ElseIf Not AddInVersionsMatch Then
-    '    download = vbYes
     ElseIf lReleased = "" Then
         ' We were unable to get the latest release from github.
         ' TODO: Error handling here
-    ElseIf cReleased = "" Then
+    ElseIf cReleased = "" And lReleaseDate > AddInReleaseDate Then
         ' User is running an unreleased version of the add-in.
         ' This may happen if we delete a release from github or
         ' if we send a hotfixed/beta version.
@@ -125,7 +154,7 @@ Confirmation:
         ' to update unless the latest release was created after
         ' the hotfix version.
         '
-        ' TODO: How can we check this?
+        download = vbYes
     ElseIf cReleased < lReleased Then
         ' There is a newer version available
         download = vbYes
@@ -133,13 +162,14 @@ Confirmation:
 
     If force Or download = vbYes Then
         DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
-        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
-        
         VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
+        
+        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
         VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
     End If
     
 Finish:
+    Application.AutomationSecurity = autoSec
     DownloadUpdates = HasUpdates
 End Function
 
@@ -152,5 +182,3 @@ Private Function IsStaged(file As String) As Boolean
         Dir(StagingPath(file)) <> "" Or _
         Dir(StagingPath(file), vbHidden) <> ""
 End Function
-
-

@@ -15,41 +15,49 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub App_SheetActivate(ByVal Sh As Object)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnSheetActivate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_SheetDeactivate(ByVal Sh As Object)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnSheetDeactivate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_AfterCalculate()
-    DailyUpdateCheck
+    If Not GetSetting("updateOnAfterCalculate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WindowActivate(ByVal Wb As Workbook, ByVal Wn As Window)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnWindowActivate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WindowDeactivate(ByVal Wb As Workbook, ByVal Wn As Window)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnWindowDeactivate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WorkbookActivate(ByVal Wb As Workbook)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnWorkbookActivate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WorkbookDeactivate(ByVal Wb As Workbook)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnWorkbookDeactivate", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub
 
 Private Sub App_WorkbookOpen(ByVal Wb As Workbook)
-    DailyUpdateCheck
+    If Not GetSetting("updateOnWorkbookOpen", True) Then Exit Sub
+    AutoUpdateCheck
     PromoteStagedUpdate
 End Sub

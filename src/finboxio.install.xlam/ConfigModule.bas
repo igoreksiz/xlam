@@ -3,6 +3,7 @@ Option Explicit
 Option Private Module
 
 Public Const RELEASES_URL = "https://api.github.com/repos/finboxio/xlam/releases"
+Public Const DOWNLOADS_URL = "https://github.com/finboxio/xlam/releases/download"
 
 Public Const AddInInstalledFile = "finboxio.xlam"
 Public Const AddInInstallerFile = "finboxio.install.xlam"

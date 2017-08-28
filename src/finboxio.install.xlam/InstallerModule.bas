@@ -26,19 +26,19 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         End If
     Next i
     
-    Dim prompt As String, UpgradeVersion As String, CurrentVersion As String
+    Dim msg As String, UpgradeVersion As String, CurrentVersion As String
     UpgradeVersion = AddInVersion(ThisWorkbook.name)
     If Not installed Is Nothing Then
         CurrentVersion = AddInVersion(installed.name)
-        prompt = "This will upgrade your finbox.io add-in from v" & CurrentVersion & " to v" & UpgradeVersion & "."
+        msg = "This will upgrade your finbox.io add-in from v" & CurrentVersion & " to v" & UpgradeVersion & "."
     Else
-        prompt = "This will install version " & UpgradeVersion & " of the finbox.io add-in."
+        msg = "This will install version " & UpgradeVersion & " of the finbox.io add-in."
     End If
     
     Dim continue As Integer
     continue = MsgBox( _
-        Title:="finbox.io", _
-        prompt:=prompt & " Do you wish to continue?", _
+        Title:="[finbox.io] Add-in Installation", _
+        Prompt:=msg & " Do you wish to continue?", _
         Buttons:=vbYesNo Or vbQuestion)
 
     If continue = vbYes Then
@@ -53,20 +53,23 @@ Public Function InstallAddIn(self As Workbook) As Boolean
             installed.installed = False
         End If
         
-        ' Copy the workbook into the default
-        ' add-in location
+        ' Copy the workbook into the default add-in location
+        ' and remove any existing functions component. The
+        ' corresponding functions component will be installed
+        ' automatically
         SaveCopy self, installPath
+        RemoveAddInFunctions
         
         ' If there is a local version of the
         ' finboxio.functions.xlam add-in, we
-        ' stage that. This is primarily for
+        ' install that. This is primarily for
         ' convenient installation of dev
         ' (e.g. non-released) add-in versions
         If HasAddInFunctions Then
-            VBA.FileCopy _
-                LocalPath(AddInFunctionsFile), _
-                SavePath & StagingFile(AddInFunctionsFile)
-            VBA.SetAttr SavePath & StagingFile(AddInFunctionsFile), vbHidden
+            VBA.FileCopy LocalPath(AddInFunctionsFile), SavePath & AddInFunctionsFile
+            VBA.SetAttr SavePath & AddInFunctionsFile, vbHidden
+        Else
+            InstallAddInFunctions
         End If
             
         ' Add the workbook as an add-in
@@ -93,6 +96,10 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' workbook since the in-place add-in is
         ' now running
         Application.ScreenUpdating = True
+        MsgBox _
+            Title:="[finbox.io] Add-in Installation", _
+            Prompt:="The finbox.io is installed and ready to use! Enjoy!", _
+            Buttons:=vbInformation
         self.Close
     ElseIf VBA.Dir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
         ' If we're running this from a development directory,
@@ -110,11 +117,22 @@ Public Function InstallAddIn(self As Workbook) As Boolean
     GoTo Finish
     
 HandleError:
-    MsgBox "Got Error: " & Err.Description
+    MsgBox _
+        Title:="[finbox.io] Add-in Error", _
+        Prompt:="Unable to install the finbox.io add-on. Please try again and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
     
 Finish:
     Application.ScreenUpdating = True
 End Function
+
+Public Sub InstallAddInFunctions()
+    On Error GoTo Finish
+    DownloadFile DOWNLOADS_URL & "/v" & AddInVersion & "/" & AddInFunctionsFile, StagingPath(AddInFunctionsFile)
+    VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
+    PromoteStagedUpdate
+Finish:
+End Sub
 
 Function SavePath()
     #If Mac Then

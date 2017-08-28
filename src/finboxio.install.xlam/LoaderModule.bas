@@ -34,8 +34,37 @@ Public Sub LoadAddInFunctions()
         PromoteStagedUpdate
     End If
     
+    On Error GoTo RemoveAddInFunctions
+    
     ' Load the functions add-in
     Call Workbooks.Open(LocalPath(AddInFunctionsFile))
+    Exit Sub
+
+RemoveAddInFunctions:
+    ' If for some reason we can't open the functions
+    ' component, the workbook may be corrupted.
+    ' Just remove all traces so it will be re-downloaded
+    ' on the next restart.
+    
+    RemoveAddInFunctions
+    
+    MsgBox _
+        Title:="[finbox.io] Add-in Error", _
+        Prompt:="The finbox.io add-in was not loaded correctly. " & _
+                "Please try restarting Excel and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
+End Sub
+
+Public Sub RemoveAddInFunctions()
+    On Error Resume Next
+    UninstallAddInFunctions
+    UnloadAddInFunctions
+    
+    SetAttr LocalPath(AddInFunctionsFile), vbNormal
+    Kill LocalPath(AddInFunctionsFile)
+    
+    SetAttr StagingPath(AddInFunctionsFile), vbNormal
+    Kill StagingPath(AddInFunctionsFile)
 End Sub
 
 ' Ensures that functions add-in is uninstalled and unloaded

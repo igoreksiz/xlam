@@ -6,21 +6,21 @@ Private Sub Workbook_Open()
     ' Install AddIn on first open
     AddInInstalled = InstallAddIn(Me)
     
-    ' Download newer version if available
-    If AddInInstalled And Not HasUpdates Then
-        Call DownloadUpdates(blockEvents:=True)
+    ' Download functions component if not available
+    If AddInInstalled And Not HasAddInFunctions Then
+        InstallAddInFunctions
     End If
     
-    ' Unload the current functions add-in
-    ' if an update is available
-    If HasUpdates Then
-        Call UnloadAddInFunctions
+    ' Download newer version if available and auto-update is not disabled
+    If AddInInstalled And GetSetting("autoUpdate", True) And GetSetting("updateOnLaunch", True) Then
+        Call DownloadUpdates(blockEvents:=True)
     End If
     
     ' Load the FNBX functions
     Call LoadAddInFunctions
     
     Set handler = New AppEventHandler
+    
     loadingManager = False
 End Sub
 
