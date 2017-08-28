@@ -14,6 +14,11 @@ End Sub
 ' if not already up-to-date. Returns True if there are
 ' staged updates to be applied.
 Public Function DownloadUpdates(Optional blockEvents As Boolean) As Boolean
+    If HasUpdates Then
+        DownloadUpdates = True
+        Exit Function
+    End If
+    
     lastUpdateCheck = VBA.Now()
     
     Dim allowPrereleases As Boolean: allowPrereleases = True
