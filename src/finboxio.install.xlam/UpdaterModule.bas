@@ -161,11 +161,14 @@ Confirmation:
     End If
 
     If force Or download = vbYes Then
-        DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
-        VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
-        
-        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
-        VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
+        If loaderUrl <> "" Then
+            DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
+            VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
+        End If
+        If functionsUrl <> "" Then
+            DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
+            VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
+        End If
     End If
     
 Finish:
@@ -182,3 +185,5 @@ Private Function IsStaged(file As String) As Boolean
         Dir(StagingPath(file)) <> "" Or _
         Dir(StagingPath(file), vbHidden) <> ""
 End Function
+
+
