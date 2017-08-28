@@ -13,7 +13,7 @@ End Sub
 ' Primarily used for testing staging transitions,
 ' this forces a download of the latest version
 Public Function ForceUpdate()
-    ForceUpdate DownloadUpdates(blockEvents:=True, force:=True)
+    ForceUpdate = DownloadUpdates(blockEvents:=True, force:=True)
 End Function
 
 ' Downloads and stages the latest release from github
