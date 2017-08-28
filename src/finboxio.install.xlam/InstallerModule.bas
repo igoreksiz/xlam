@@ -97,8 +97,8 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' now running
         Application.ScreenUpdating = True
         MsgBox _
-            Title:="[finbox.io] Add-in Installation", _
-            Prompt:="The finbox.io is installed and ready to use! Enjoy!", _
+            Title:="[finbox.io] Installation Succeeded", _
+            Prompt:="The finbox.io add-in is now installed and ready to use! Enjoy!", _
             Buttons:=vbInformation
         self.Close
     ElseIf VBA.Dir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
