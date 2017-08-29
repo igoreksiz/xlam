@@ -28,9 +28,13 @@ Public Function InstallAddIn(self As Workbook) As Boolean
     
     Dim msg As String, UpgradeVersion As String, CurrentVersion As String
     UpgradeVersion = AddInVersion(ThisWorkbook.name)
-    CurrentVersion = AddInVersion(installed.name)
-    If Not installed Is Nothing And CurrentVersion <> "" Then
-        msg = "This will upgrade your finbox.io add-in from v" & CurrentVersion & " to v" & UpgradeVersion & "."
+    If Not installed Is Nothing Then
+        CurrentVersion = AddInVersion(installed.name)
+        If CurrentVersion = "" Then
+            msg = "This will install version " & UpgradeVersion & " of the finbox.io add-in."
+        Else
+            msg = "This will upgrade your finbox.io add-in from v" & CurrentVersion & " to v" & UpgradeVersion & "."
+        End If
     Else
         msg = "This will install version " & UpgradeVersion & " of the finbox.io add-in."
     End If
