@@ -1,4 +1,11 @@
 
+0.21.0-29 / 2017-08-29
+======================
+
+  * Fix installer bug for Mac
+  * Improves safety of function component upgrade on Mac
+  * Improves safety of manager component upgrade on Mac
+
 0.21.0-28 / 2017-08-28
 ======================
 
