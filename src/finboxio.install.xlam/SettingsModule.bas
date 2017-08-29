@@ -45,6 +45,7 @@ Public Sub ReadSettings()
     Open file For Input As #1
         While Not EOF(1)
             Line Input #1, line
+            line = VBA.Trim(Application.Clean(line))
             key = VBA.Left(line, VBA.InStr(line, "=") - 1)
             value = VBA.Mid(line, VBA.InStr(line, "=") + 1)
             If VBA.LCase(value) = "true" Then value = True

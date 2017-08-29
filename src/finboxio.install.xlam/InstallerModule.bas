@@ -13,7 +13,7 @@ Option Private Module
 
 Public Function InstallAddIn(self As Workbook) As Boolean
     On Error GoTo HandleError
-    
+    Stop
     ' Don't run if add-in is already installed
     InstallAddIn = (self.name = AddInInstalledFile)
     If InstallAddIn Then GoTo Finish
@@ -28,8 +28,8 @@ Public Function InstallAddIn(self As Workbook) As Boolean
     
     Dim msg As String, UpgradeVersion As String, CurrentVersion As String
     UpgradeVersion = AddInVersion(ThisWorkbook.name)
-    If Not installed Is Nothing Then
-        CurrentVersion = AddInVersion(installed.name)
+    CurrentVersion = AddInVersion(installed.name)
+    If Not installed Is Nothing And CurrentVersion <> "" Then
         msg = "This will upgrade your finbox.io add-in from v" & CurrentVersion & " to v" & UpgradeVersion & "."
     Else
         msg = "This will install version " & UpgradeVersion & " of the finbox.io add-in."
@@ -43,7 +43,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
 
     If continue = vbYes Then
         Dim installPath As String
-        installPath = SavePath & AddInInstalledFile
+        installPath = SavePath(AddInInstalledFile)
         
         ' TODO: Need to fully uninstall add-on if it's in wrong place
         
@@ -66,8 +66,8 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' convenient installation of dev
         ' (e.g. non-released) add-in versions
         If HasAddInFunctions Then
-            VBA.FileCopy LocalPath(AddInFunctionsFile), SavePath & AddInFunctionsFile
-            VBA.SetAttr SavePath & AddInFunctionsFile, vbHidden
+            VBA.FileCopy LocalPath(AddInFunctionsFile), SavePath(AddInFunctionsFile)
+            VBA.SetAttr SavePath(AddInFunctionsFile), vbHidden
         Else
             InstallAddInFunctions
         End If
@@ -106,7 +106,12 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' close the installed add-ins and continue
         If Not installed Is Nothing Then
             UnloadAddInFunctions
-            If installed.IsOpen Then Workbooks(installed.name).Close
+            
+            ' Originally wanted to use AddIn.IsOpen here, but that
+            ' seems to not be available on Mac so we have to just
+            ' try to close the workbook directly and ignore errors
+            On Error Resume Next
+            Workbooks(installed.name).Close
         End If
     Else
         ' This add-in shouldn't be run outside
@@ -127,6 +132,8 @@ Finish:
 End Function
 
 Public Sub InstallAddInFunctions()
+    cd SavePath
+    
     On Error GoTo HandleError
     DownloadFile DOWNLOADS_URL & "/v" & AddInVersion & "/" & AddInFunctionsFile, StagingPath(AddInFunctionsFile)
     VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
@@ -139,9 +146,27 @@ HandleError:
         Prompt:="The add-in functions could not be installed at this time. Please try again and contact support@finbox.io if this problem persists.", _
         Buttons:=vbCritical
     RemoveAddInFunctions
+    
+    cd ThisWorkbook.path
 End Sub
 
-Function SavePath()
+Public Sub RemoveAddInFunctions()
+    cd SavePath
+    
+    On Error Resume Next
+    UninstallAddInFunctions
+    UnloadAddInFunctions
+    
+    SetAttr LocalPath(AddInFunctionsFile), vbNormal
+    Kill LocalPath(AddInFunctionsFile)
+    
+    SetAttr StagingPath(AddInFunctionsFile), vbNormal
+    Kill StagingPath(AddInFunctionsFile)
+    
+    cd ThisWorkbook.path
+End Sub
+
+Function SavePath(Optional file As String)
     #If Mac Then
         If ExcelVersion = "Mac2016" Then
             SavePath = MacScript("return POSIX path of (path to desktop folder) as string")
@@ -153,6 +178,7 @@ Function SavePath()
     #Else
         SavePath = Application.UserLibraryPath
     #End If
+    If file <> "" Then SavePath = SavePath & file
 End Function
 
 Sub SaveCopy(Wb, path As String)

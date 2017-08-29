@@ -11,6 +11,7 @@ Public Const AddInFunctionsFile = "finboxio.functions.xlam"
 
 ' These will be loaded on Workbook_Open
 Public AddInInstalled As Boolean
+Public cwd As String
 
 Public Function AddInManagerFile() As String
     AddInManagerFile = ThisWorkbook.name
@@ -24,8 +25,13 @@ Public Function StagingPath(file As String) As String
     StagingPath = LocalPath(StagingFile(file))
 End Function
 
+Public Sub cd(path As String)
+    cwd = path
+End Sub
+
 Public Function LocalPath(file As String) As String
-    LocalPath = ThisWorkbook.path & Application.PathSeparator & file
+    If cwd = "" Then cwd = ThisWorkbook.path
+    LocalPath = cwd & Application.PathSeparator & file
 End Function
 
 Public Function AddInVersion(Optional file As String) As String

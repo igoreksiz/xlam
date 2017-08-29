@@ -117,9 +117,9 @@ Public Sub FinboxioAbout(Optional control)
         vbCrLf & _
         "  Contact Information: " & vbCrLf & _
         vbCrLf & _
-        "    Please help us improve your experience by reporting " & vbCrLf & _
-        "    any issues and sending suggestions to support@finbox.io, " & vbCrLf & _
-        "    or visit https://finbox.io to chat with us live." & vbCrLf & _
+        "    Please help us improve your experience by reporting " & _
+            "any issues and sending suggestions to support@finbox.io, " & _
+            "or visit https://finbox.io to chat with us live." & vbCrLf & _
         vbCrLf & _
         vbCrLf & _
         "  Thank you for using finbox.io!"

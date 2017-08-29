@@ -55,18 +55,6 @@ RemoveAddInFunctions:
         Buttons:=vbCritical
 End Sub
 
-Public Sub RemoveAddInFunctions()
-    On Error Resume Next
-    UninstallAddInFunctions
-    UnloadAddInFunctions
-    
-    SetAttr LocalPath(AddInFunctionsFile), vbNormal
-    Kill LocalPath(AddInFunctionsFile)
-    
-    SetAttr StagingPath(AddInFunctionsFile), vbNormal
-    Kill StagingPath(AddInFunctionsFile)
-End Sub
-
 ' Ensures that functions add-in is uninstalled and unloaded
 Public Function UninstallAddInFunctions() As Boolean
     Dim addIn As addIn

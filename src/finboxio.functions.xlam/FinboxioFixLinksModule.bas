@@ -16,7 +16,7 @@ Public Function FixAddinLinks(Optional Wb As Workbook)
     Dim replaced As Boolean
     
     #If Mac Then
-        If EXCEL_VERSION = "Mac2011" Then
+        If ExcelVersion = "Mac2011" Then
             ' TODO:
             ' This is not robust enough to handle references
             ' to add-ins saved on a network drive. Should replace
