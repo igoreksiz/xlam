@@ -1,4 +1,9 @@
 
+0.21.0-25 / 2017-08-28
+======================
+
+  * Improves error handling and user feedback for update sequence
+
 0.21.0-24 / 2017-08-28
 ======================
 
