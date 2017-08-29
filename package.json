@@ -1,7 +1,7 @@
 {
   "name": "xlam",
   "private": true,
-  "version": "0.21.0-26",
+  "version": "0.21.0-27",
   "description": "finbox.io excel add-in module",
   "main": "index.js",
   "directories": {
