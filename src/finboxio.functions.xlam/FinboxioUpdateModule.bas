@@ -24,14 +24,17 @@ End Function
 Public Sub PromoteStagedUpdate()
     If Not HasStagedUpdate Then Exit Sub
     
-    On Error Resume Next
-    Dim canUnloadManager As Boolean
+    On Error GoTo NoManager
+
+    Dim openName As String, canUnloadManager As Boolean
+    openName = Workbooks(AddInManagerFile).name
     canUnloadManager = _
         Not Application.Run(AddInManagerFile & "!IsLoadingManager") And _
         Not Application.Run(AddInManagerFile & "!IsUpdatingFunctions")
         
     If Not canUnloadManager Then Exit Sub
     
+NoManager:
     On Error GoTo ReportError
     
     updatingManager = True
@@ -54,9 +57,19 @@ Public Sub PromoteStagedUpdate()
     VBA.SetAttr LocalPath(AddInInstalledFile), vbNormal
     
     ' Reinstall the manager
-    If Not addIn Is Nothing Then addIn.Installed = True
-
+    If Not addIn Is Nothing Then
+        addIn.Installed = True
+    Else
+        Set addIn = Application.AddIns.Add(LocalPath(AddInInstalledFile), True)
+    End If
+    
+    ' Ensure the manager workbook is opened
+    Call Workbooks.Open(LocalPath(AddInInstalledFile))
+    
     GoTo Finish
+
+OpenWorkbook:
+    
 
 ReportError:
 
@@ -69,4 +82,7 @@ ReportError:
 Finish:
     updatingManager = False
 End Sub
+
+
+
 
