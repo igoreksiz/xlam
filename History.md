@@ -1,4 +1,9 @@
 
+0.21.0-30 / 2017-08-29
+======================
+
+  * Improves safety of function component upgrade on Mac
+
 0.21.0-29 / 2017-08-29
 ======================
 
