@@ -2,7 +2,7 @@ Attribute VB_Name = "FinboxioUpdateModule"
 Option Explicit
 Option Private Module
 
-Private updatingManager As Boolean
+Public updatingManager As Boolean
 
 Public Function IsUpdatingManager() As Boolean
     IsUpdatingManager = updatingManager

@@ -173,20 +173,12 @@ Public Sub FinboxioUnlinkImage(control, ByRef image)
 End Sub
 
 Public Sub FinboxioUpdate(Optional control)
-    Dim wasUpdated As Boolean
-    wasUpdated = Application.Run(AddInInstalledFile & "!ForceUpdate")
-    If wasUpdated Then
-        PromoteStagedUpdate
-        MsgBox _
-            Title:="[finbox.io] Update Successful", _
-            Prompt:="Your finbox.io add-in installation is now up-to-date. Stay fresh!", _
-            Buttons:=vbInformation
-    Else
-        MsgBox _
-            Title:="[finbox.io] No Updates Available", _
-            Prompt:="You're already using the latest version of the finbox.io add-in. Stay fresh!", _
-            Buttons:=vbInformation
-    End If
+    On Error GoTo Finish
+    updatingManager = True
+    Application.Run (AddInInstalledFile & "!CheckUpdates")
+    PromoteStagedUpdate
+Finish:
+    updatingManager = False
 End Sub
 
 Public Sub UpdateCustomMenu()

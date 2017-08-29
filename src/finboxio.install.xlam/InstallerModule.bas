@@ -127,11 +127,18 @@ Finish:
 End Function
 
 Public Sub InstallAddInFunctions()
-    On Error GoTo Finish
+    On Error GoTo HandleError
     DownloadFile DOWNLOADS_URL & "/v" & AddInVersion & "/" & AddInFunctionsFile, StagingPath(AddInFunctionsFile)
     VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
     PromoteStagedUpdate
-Finish:
+    Exit Sub
+HandleError:
+    On Error Resume Next
+    MsgBox _
+        Title:="[finbox.io] Installation Failed", _
+        Prompt:="The add-in functions could not be installed at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
+    RemoveAddInFunctions
 End Sub
 
 Function SavePath()

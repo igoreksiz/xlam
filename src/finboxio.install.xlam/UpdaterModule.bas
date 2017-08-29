@@ -12,21 +12,19 @@ Public Sub AutoUpdateCheck()
     Dim interval As Integer
     interval = CInt(GetSetting("autoUpdateMinutes", 24 * 60))
     If VBA.Now() - (interval / (24 * 60)) > lastUpdateCheck Then
-        Call DownloadUpdates(blockEvents:=True)
+        Call DownloadUpdates(blockEvents:=True, confirm:=True)
     End If
 End Sub
 
-' Primarily used for testing staging transitions,
-' this forces the latest version to be downloaded
-' and staged.
-Public Function ForceUpdate()
-    ForceUpdate = DownloadUpdates(blockEvents:=True, force:=GetSetting("forceUpdate", False))
+' Manually check for updates
+Public Function CheckUpdates()
+    CheckUpdates = DownloadUpdates(silent:=False, confirm:=True, force:=GetSetting("forceUpdate", False))
 End Function
 
 ' Downloads and stages the latest release from github
 ' if not already up-to-date. Returns True if there are
 ' staged updates to be applied.
-Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional force As Boolean) As Boolean
+Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional confirm As Boolean, Optional silent As Boolean = True, Optional force As Boolean) As Boolean
     If HasUpdates And Not force Then
         DownloadUpdates = True
         Exit Function
@@ -62,7 +60,7 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional force 
     ' with the current Excel session and it should
     ' be restarted.
     If AddInVersion = "" Then
-        GoTo Finish
+        GoTo GithubFail
     End If
     
     functionsVersion = AddInVersion(AddInFunctionsFile)
@@ -76,6 +74,7 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional force 
     
 GetCurrent:
     On Error GoTo GetLatest
+    
     WebClient.BaseUrl = RELEASES_URL & "/tags/v" & AddInVersion
     WebRequest.Method = WebMethod.HttpGet
     WebRequest.ResponseFormat = WebFormat.Json
@@ -120,28 +119,20 @@ GetLatest:
                 functionsUrl = asset.Item("browser_download_url")
             End If
         Next asset
+    Case Else
+        GoTo GithubFail
     End Select
 
 Confirmation:
-    On Error GoTo Finish
-
-    ' The functions add-in isn't available, but we have
-    ' the latest release, download just the functions
-    ' component. This may happen during installation and
-    ' manual upgrades.
-    If functionsVersion = "" And cReleased = lReleased Then
-        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
-        VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
-        functionsVersion = AddInVersion
-    End If
     
-    If functionsVersion <> AddInVersion Then
+    If force Then download = vbYes
+    
+    If lReleased = "" Then
+        GoTo GithubFail
+    ElseIf functionsVersion <> AddInVersion Then
         ' For some reason the manager and function components
         ' are out of sync. Force a re-download of the latest
         download = vbYes
-    ElseIf lReleased = "" Then
-        ' We were unable to get the latest release from github.
-        ' TODO: Error handling here
     ElseIf cReleased = "" And lReleaseDate > AddInReleaseDate Then
         ' User is running an unreleased version of the add-in.
         ' This may happen if we delete a release from github or
@@ -160,16 +151,52 @@ Confirmation:
         download = vbYes
     End If
 
-    If force Or download = vbYes Then
-        If loaderUrl <> "" Then
-            DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
-            VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
-        End If
-        If functionsUrl <> "" Then
-            DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
-            VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
-        End If
+    If download = vbYes And confirm Then
+        download = MsgBox( _
+            Title:="[finbox.io] Update Available", _
+            Prompt:="A newer version of the finbox.io add-in is available! Do you have a few seconds to install it now?", _
+            Buttons:=vbQuestion Or vbYesNo)
     End If
+
+    If download = vbYes Then
+        On Error GoTo DownloadFail
+        If loaderUrl = "" Or functionsUrl = "" Then GoTo DownloadFail
+
+        DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
+        VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
+        
+        DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
+        VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
+    End If
+
+    If Not HasUpdates And download = vbYes And confirm Then
+        MsgBox _
+            Title:="[finbox.io] No Updates Available", _
+            Prompt:="You're already using the latest version of the finbox.io add-in. Stay fresh!", _
+            Buttons:=vbInformation
+    ElseIf HasUpdates And download = vbYes And confirm Then
+        MsgBox _
+            Title:="[finbox.io] Update Successful", _
+            Prompt:="The update was installed successfully and Excel will now reload the add-in. Stay fresh!", _
+            Buttons:=vbInformation
+    End If
+    
+    GoTo Finish
+    
+GithubFail:
+    If Not silent Then MsgBox _
+        Title:="[finbox.io] Update Failed", _
+        Prompt:="Unable to check for updates at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
+    GoTo Finish
+
+DownloadFail:
+    If Not silent Then MsgBox _
+        Title:="[finbox.io] Update Failed", _
+        Prompt:="Unable to download updates at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Buttons:=vbCritical
+    RemoveStagedUpdates
+    GoTo Finish
     
 Finish:
     Application.AutomationSecurity = autoSec
@@ -186,4 +213,12 @@ Private Function IsStaged(file As String) As Boolean
         Dir(StagingPath(file), vbHidden) <> ""
 End Function
 
-
+Private Sub RemoveStagedUpdates()
+    On Error Resume Next
+    
+    SetAttr StagingPath(AddInInstalledFile), vbNormal
+    Kill StagingPath(AddInInstalledFile)
+    
+    SetAttr StagingPath(AddInFunctionsFile), vbNormal
+    Kill StagingPath(AddInFunctionsFile)
+End Sub
