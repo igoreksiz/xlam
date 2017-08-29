@@ -13,7 +13,7 @@ Option Private Module
 
 Public Function InstallAddIn(self As Workbook) As Boolean
     On Error GoTo HandleError
-    Stop
+
     ' Don't run if add-in is already installed
     InstallAddIn = (self.name = AddInInstalledFile)
     If InstallAddIn Then GoTo Finish

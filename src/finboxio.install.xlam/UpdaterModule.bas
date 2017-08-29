@@ -154,7 +154,7 @@ Confirmation:
     If download = vbYes And confirm Then
         download = MsgBox( _
             Title:="[finbox.io] Update Available", _
-            Prompt:="A newer version of the finbox.io add-in is available! Do you have a few seconds to install it now?", _
+            Prompt:="A newer version (v" & latest & ") of the finbox.io add-in is available! Do you have a few seconds to install it now?", _
             Buttons:=vbQuestion Or vbYesNo)
     End If
 
