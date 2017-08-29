@@ -84,19 +84,34 @@ End Function
 
 ' Unloads the currently loaded functions add-in.
 ' Does nothing if the add-in is not loaded.
-Public Sub UnloadAddInFunctions()
+Public Function UnloadAddInFunctions() As Boolean
     ' If the functions module is in the process of
     ' updating this add-in, we shouldn't unload it
     On Error GoTo NoFunctions
+    
     Dim openName As String, canUnloadFunctions As Boolean
     openName = Workbooks(AddInFunctionsFile).name
     canUnloadFunctions = Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
-    If Not canUnloadFunctions Then Exit Sub
+    
+    ' Workbook is open and can't be unloaded, so give up.
+    If Not canUnloadFunctions Then Exit Function
 
 NoFunctions:
+    'Try to close workbook (may not even be open)
     On Error Resume Next
     Workbooks(AddInFunctionsFile).Close
-End Sub
+    
+    ' If workbook was unloaded, this will raise an error.
+    On Error GoTo Unloaded
+    openName = Workbooks(AddInFunctionsFile).name
+    
+    ' Workbook must still be open
+    Exit Function
+    
+Unloaded:
+    ' Workbook is not loaded
+    UnloadAddInFunctions = True
+End Function
 
 ' Check if staged functions add-in is available
 Private Function HasStagedUpdate() As Boolean
@@ -108,32 +123,24 @@ End Function
 ' Promotes the staged functions add-in to active
 Public Sub PromoteStagedUpdate()
     If updatingFunctions Then Exit Sub
-
+    
     If Not HasStagedUpdate Then Exit Sub
     
-    On Error Resume Next
-    Dim updatingManager As Boolean
-    updatingManager = Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
-    If updatingManager Then Exit Sub
-    
     On Error GoTo Finish
-    
     updatingFunctions = True
-    
-    Call UnloadAddInFunctions
-    
-    If HasAddInFunctions Then
-        SetAttr LocalPath(AddInFunctionsFile), vbNormal
-        Kill LocalPath(AddInFunctionsFile)
+    If UnloadAddInFunctions Then
+        If HasAddInFunctions Then
+            SetAttr LocalPath(AddInFunctionsFile), vbNormal
+            Kill LocalPath(AddInFunctionsFile)
+        End If
+        Name StagingPath(AddInFunctionsFile) As LocalPath(AddInFunctionsFile)
+        VBA.SetAttr LocalPath(AddInFunctionsFile), vbHidden
+        
+        LoadAddInFunctions
     End If
-    Name StagingPath(AddInFunctionsFile) As LocalPath(AddInFunctionsFile)
-    VBA.SetAttr LocalPath(AddInFunctionsFile), vbHidden
     
-    LoadAddInFunctions
-
 Finish:
     updatingFunctions = False
     
 End Sub
-
 
