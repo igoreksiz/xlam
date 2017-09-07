@@ -85,24 +85,21 @@ End Function
 ' Unloads the currently loaded functions add-in.
 ' Does nothing if the add-in is not loaded.
 Public Function UnloadAddInFunctions() As Boolean
+    Dim openName As String, canUnloadFunctions As Boolean
+
+    ' If the workbook isn't open, this will fail
+    On Error GoTo Unloaded
+    openName = Workbooks(AddInFunctionsFile).name
+
     ' If the functions module is in the process of
     ' updating this add-in, we shouldn't unload it
-    On Error GoTo NoFunctions
-    
-    Dim openName As String, canUnloadFunctions As Boolean
-    openName = Workbooks(AddInFunctionsFile).name
-    canUnloadFunctions = Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
-    
-    ' Workbook is open and can't be unloaded, so give up.
+    canUnloadFunctions = Not Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
     If Not canUnloadFunctions Then Exit Function
 
-NoFunctions:
-    'Try to close workbook (may not even be open)
-    On Error Resume Next
+    ' Try to close workbook. If either of these
+    ' calls fail it likely means the workbook is
+    ' closed.
     Workbooks(AddInFunctionsFile).Close
-    
-    ' If workbook was unloaded, this will raise an error.
-    On Error GoTo Unloaded
     openName = Workbooks(AddInFunctionsFile).name
     
     ' Workbook must still be open

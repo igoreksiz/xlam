@@ -109,13 +109,13 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' If we're running this from a development directory,
         ' close the installed add-ins and continue
         If Not installed Is Nothing Then
-            UnloadAddInFunctions
-            
             ' Originally wanted to use AddIn.IsOpen here, but that
             ' seems to not be available on Mac so we have to just
             ' try to close the workbook directly and ignore errors
             On Error Resume Next
             Workbooks(installed.name).Close
+            UnloadAddInFunctions
+            LoadAddInFunctions
         End If
     Else
         ' This add-in shouldn't be run outside
