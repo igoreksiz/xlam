@@ -1,4 +1,9 @@
 
+0.21.0-35 / 2017-09-07
+======================
+
+  * Clarifies error message when add-in components fail to load
+
 0.21.0-34 / 2017-09-07
 ======================
 
