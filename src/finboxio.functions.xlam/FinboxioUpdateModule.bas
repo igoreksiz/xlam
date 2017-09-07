@@ -3,9 +3,14 @@ Option Explicit
 Option Private Module
 
 Public updatingManager As Boolean
+Public checkingUpdates As Boolean
 
 Public Function IsUpdatingManager() As Boolean
     IsUpdatingManager = updatingManager
+End Function
+
+Public Function IsCheckingUpdates() As Boolean
+    IsCheckingUpdates = checkingUpdates
 End Function
 
 Public Function HasInstalledAddInManager() As Boolean

@@ -174,11 +174,11 @@ End Sub
 
 Public Sub FinboxioUpdate(Optional control)
     On Error GoTo Finish
-    updatingManager = True
+    checkingUpdates = True
     Application.Run (AddInInstalledFile & "!CheckUpdates")
     PromoteStagedUpdate
 Finish:
-    updatingManager = False
+    checkingUpdates = False
 End Sub
 
 Public Sub UpdateCustomMenu()

@@ -101,7 +101,9 @@ Public Function UnloadAddInFunctions() As Boolean
 
     ' If the functions module is in the process of
     ' updating this add-in, we shouldn't unload it
-    canUnloadFunctions = Not Application.Run(AddInFunctionsFile & "!IsUpdatingManager")
+    canUnloadFunctions = _
+        Not Application.Run(AddInFunctionsFile & "!IsUpdatingManager") And _
+        Not Application.Run(AddInFunctionsFile & "!IsCheckingUpdates")
     If Not canUnloadFunctions Then Exit Function
 
     ' Try to close workbook. If either of these
