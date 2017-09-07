@@ -1,4 +1,9 @@
 
+0.21.0-33 / 2017-09-07
+======================
+
+  * Set AutomationSecurity to low before opening add-in workbooks
+
 0.21.0-32 / 2017-09-07
 ======================
 
