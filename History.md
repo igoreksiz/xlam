@@ -1,4 +1,9 @@
 
+0.21.0-34 / 2017-09-07
+======================
+
+  * Adds safety check to prevent unloading functions module while checking updates
+
 0.21.0-33 / 2017-09-07
 ======================
 
