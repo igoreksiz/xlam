@@ -123,6 +123,10 @@ Public Sub PromoteStagedUpdate()
     
     If Not HasStagedUpdate Then Exit Sub
     
+    Dim appSec As MsoAutomationSecurity
+    appSec = Application.AutomationSecurity
+    Application.AutomationSecurity = msoAutomationSecurityLow
+    
     On Error GoTo Finish
     updatingFunctions = True
     If UnloadAddInFunctions Then
@@ -138,6 +142,6 @@ Public Sub PromoteStagedUpdate()
     
 Finish:
     updatingFunctions = False
-    
+    Application.AutomationSecurity = appSec
 End Sub
 

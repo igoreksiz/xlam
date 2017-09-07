@@ -35,10 +35,14 @@ Public Sub PromoteStagedUpdate()
     If Not canUnloadManager Then Exit Sub
     
 NoManager:
+    Dim appSec As MsoAutomationSecurity
+    appSec = Application.AutomationSecurity
+    Application.AutomationSecurity = msoAutomationSecurityLow
+
     On Error GoTo ReportError
-    
+
     updatingManager = True
-    
+   
     ' Uninstall the active manager
     Dim addIn As addIn
     For Each addIn In Application.AddIns
@@ -68,9 +72,6 @@ NoManager:
     
     GoTo Finish
 
-OpenWorkbook:
-    
-
 ReportError:
 
     MsgBox _
@@ -81,8 +82,7 @@ ReportError:
 
 Finish:
     updatingManager = False
+    Application.AutomationSecurity = appSec
 End Sub
-
-
 
 
