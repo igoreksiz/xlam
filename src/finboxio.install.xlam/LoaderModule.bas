@@ -36,8 +36,14 @@ Public Sub LoadAddInFunctions()
     
     On Error GoTo RemoveAddInFunctions
     
+    Dim appSec As MsoAutomationSecurity
+    appSec = Application.AutomationSecurity
+    Application.AutomationSecurity = msoAutomationSecurityLow
+    
     ' Load the functions add-in
     Call Workbooks.Open(LocalPath(AddInFunctionsFile))
+    Application.AutomationSecurity = appSec
+    
     Exit Sub
 
 RemoveAddInFunctions:
@@ -45,6 +51,8 @@ RemoveAddInFunctions:
     ' component, the workbook may be corrupted.
     ' Just remove all traces so it will be re-downloaded
     ' on the next restart.
+    
+    Application.AutomationSecurity = appSec
     
     RemoveAddInFunctions
     
@@ -123,10 +131,6 @@ Public Sub PromoteStagedUpdate()
     
     If Not HasStagedUpdate Then Exit Sub
     
-    Dim appSec As MsoAutomationSecurity
-    appSec = Application.AutomationSecurity
-    Application.AutomationSecurity = msoAutomationSecurityLow
-    
     On Error GoTo Finish
     updatingFunctions = True
     If UnloadAddInFunctions Then
@@ -142,6 +146,5 @@ Public Sub PromoteStagedUpdate()
     
 Finish:
     updatingFunctions = False
-    Application.AutomationSecurity = appSec
 End Sub
 
