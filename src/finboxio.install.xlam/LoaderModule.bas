@@ -58,7 +58,7 @@ RemoveAddInFunctions:
     
     MsgBox _
         Title:="[finbox.io] Add-in Error", _
-        Prompt:="The finbox.io add-in was not loaded correctly. " & _
+        Prompt:="The finbox.io add-in functions were not loaded correctly. " & _
                 "Please try restarting Excel and contact support@finbox.io if this problem persists.", _
         Buttons:=vbCritical
 End Sub
