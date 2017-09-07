@@ -1,4 +1,9 @@
 
+0.21.0-32 / 2017-09-07
+======================
+
+  * Adds message for auto-confirmed upgrades alerting user about possible upcoming macros prompt
+
 0.21.0-31 / 2017-09-07
 ======================
 
