@@ -1,4 +1,10 @@
 
+0.21.0-42 / 2017-09-08
+======================
+
+  * Adds more event handlers for promoting staged updates
+  * Improves upgrade messaging on Mac
+
 0.21.0-41 / 2017-09-08
 ======================
 
