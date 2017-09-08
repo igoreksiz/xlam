@@ -27,14 +27,17 @@ End Function
 
 ' Promotes the staged add-in manager to active
 Public Sub PromoteStagedUpdate()
-    If Not HasStagedUpdate Then Exit Sub
-    
-    On Error GoTo NoManager
+    If updatingManager Or Not HasStagedUpdate Then Exit Sub
 
+    ' Test open the workbook to guarantee macros are
+    ' available before trying to run them
+    On Error GoTo NoManager
     Dim openName As String, canUnloadManager As Boolean
     openName = Workbooks(AddInManagerFile).name
+
+    ' Make sure manager isn't doing something that would
+    ' prevent us from unloading it properly
     canUnloadManager = _
-        Not updatingManager And _
         Not Application.Run(AddInManagerFile & "!IsLoadingManager") And _
         Not Application.Run(AddInManagerFile & "!IsUpdatingFunctions")
         

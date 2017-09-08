@@ -38,18 +38,18 @@ Private Sub emailBox_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift A
 End Sub
 
 Private Sub LoginButton_Click()
-    Dim success As Boolean
-    success = Login(Me.emailBox.value, Me.passBox.value)
-    If success Then
+    Dim Success As Boolean
+    Success = Login(Me.emailBox.value, Me.passBox.value)
+    If Success Then
         Unload Me
         Application.CalculateFull
     End If
 End Sub
 
 Private Sub LoginButtonBg_Click()
-    Dim success As Boolean
-    success = Login(Me.emailBox.value, Me.passBox.value)
-    If success Then
+    Dim Success As Boolean
+    Success = Login(Me.emailBox.value, Me.passBox.value)
+    If Success Then
         Unload Me
         Application.CalculateFull
     End If

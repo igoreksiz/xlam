@@ -24,6 +24,16 @@ Private Sub Workbook_Open()
     loadingManager = False
 End Sub
 
+Private Sub Workbook_AfterSave(ByVal Success As Boolean)
+    On Error GoTo Finish
+    If VBA.Dir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
+        Dim openName As String
+        openName = Workbooks("vbaDeveloper.xlam").name
+        Call Application.Run("vbaDeveloper.xlam!exportVbProject", "finboxioManager")
+    End If
+Finish:
+End Sub
+
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
     ' The functions add-in should NOT be formally installed
     ' (as indicated by a checkmark in the add-ins window),

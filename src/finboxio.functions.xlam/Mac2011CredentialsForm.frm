@@ -38,17 +38,17 @@ Private Sub passBox_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByV
 End Sub
 
 Private Sub LoginButton_Click()
-    Dim success As Boolean
-    success = Login(Me.emailBox.value, Me.passBox.value)
-    If success Then
+    Dim Success As Boolean
+    Success = Login(Me.emailBox.value, Me.passBox.value)
+    If Success Then
         Unload Me
     End If
 End Sub
 
 Private Sub LoginButtonBg_Click()
-    Dim success As Boolean
-    success = Login(Me.emailBox.value, Me.passBox.value)
-    If success Then
+    Dim Success As Boolean
+    Success = Login(Me.emailBox.value, Me.passBox.value)
+    If Success Then
         Unload Me
     End If
 End Sub
