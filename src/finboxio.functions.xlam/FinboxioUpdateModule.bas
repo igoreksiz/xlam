@@ -72,6 +72,14 @@ NoManager:
     Name StagingPath(AddInInstalledFile) As LocalPath(AddInInstalledFile)
     VBA.SetAttr LocalPath(AddInInstalledFile), vbNormal
     
+    #If Mac Then
+        MsgBox _
+            Title:="[finbox.io] Add-In Manager Updated", _
+            Prompt:="A new version of the add-in manager has been installed. " & _
+                    "You may be prompted to enable the updated macros. " & _
+                    "Macros must be enabled or the add-in will not function properly."
+    #End If
+    
     ' Reinstall the manager
     If Not addIn Is Nothing Then
         addIn.Installed = True

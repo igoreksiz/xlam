@@ -4,7 +4,7 @@ Option Private Module
 
 ' Locate all FNBX formulas in a string and evaluate required keys for each
 ' If formula can be resolved to a static value, this is returned
-Function ParseFormula(formula As String, cell As range, sheet As Worksheet, ByRef keys)
+Function ParseFormula(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
     Dim fn As String: fn = ""
     Dim resolved As String: resolved = ""
     Dim resolvable As Boolean: resolvable = True
@@ -87,7 +87,7 @@ End Function
 ' Determine all finql keys required by a FNBX formula
 ' Assumes that formula is a FNBX formula (may have nested arguments)
 ' If formula can be resolved to a static value, this value is returned
-Function ParseKeys(formula As String, cell As range, sheet As Worksheet, ByRef keys)
+Function ParseKeys(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
     ParseKeys = ""
     Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
     If argIndex = 0 Then Exit Function
@@ -231,10 +231,10 @@ End Function
 
 ' Evaluate the value of an argument that may include
 ' formulas or cell references
-Function EvalArgument(arg As String, cell As range, sheet As Worksheet)
+Function EvalArgument(arg As String, cell As Range, sheet As Worksheet)
     Dim value
     Dim address As String
-    Dim resolvedCell As range
+    Dim resolvedCell As Range
     If IsCellAddress(arg) Then
         ' Evaluate reference to another sheet/cell
         Dim parts
@@ -251,8 +251,8 @@ Function EvalArgument(arg As String, cell As range, sheet As Worksheet)
             cellAddr = parts(0)
         End If
             
-        address = sheet.Parent.Sheets(sheetName).range(cellAddr).address(External:=True)
-        Set resolvedCell = range(address)
+        address = sheet.Parent.Sheets(sheetName).Range(cellAddr).address(External:=True)
+        Set resolvedCell = Range(address)
         value = resolvedCell.value
         If IsEmpty(value) And resolvedCell.HasFormula Then
             value = resolvedCell.Worksheet.Evaluate(resolvedCell.formula)
@@ -272,9 +272,9 @@ End Function
 
 ' Determine if string represents a valid excel cell address
 Public Function IsCellAddress(strAddress As String) As Boolean
-    Dim r As range
+    Dim r As Range
     On Error Resume Next
-    Set r = range(strAddress)
+    Set r = Range(strAddress)
     If Not r Is Nothing Then IsCellAddress = True
 End Function
 
@@ -308,7 +308,7 @@ End Function
 
 ' Replaces any table references with direct cell
 ' references relative to the given cell
-Function ResolveTableAddresses(arg As String, cell As range)
+Function ResolveTableAddresses(arg As String, cell As Range)
     Dim i As Integer, j As Integer, c As String, _
     inQuotes As Boolean, _
     inTable As String, _
@@ -442,7 +442,7 @@ Function ResolveTableAddresses(arg As String, cell As range)
                 If (tableName = "") Then
                     Set table = cell.ListObject
                 Else
-                    Set table = Application.range(tableName & "[#All]").Parent.ListObjects(tableName)
+                    Set table = Application.Range(tableName & "[#All]").Parent.ListObjects(tableName)
                 End If
                 
                 Dim row As Long, row2 As Long, addr As String

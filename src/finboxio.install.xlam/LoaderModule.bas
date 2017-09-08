@@ -129,9 +129,7 @@ End Function
 
 ' Promotes the staged functions add-in to active
 Public Sub PromoteStagedUpdate()
-    If updatingFunctions Then Exit Sub
-    
-    If Not HasStagedUpdate Then Exit Sub
+    If updatingFunctions Or Not HasStagedUpdate Then Exit Sub
     
     On Error GoTo Finish
     updatingFunctions = True
@@ -142,6 +140,14 @@ Public Sub PromoteStagedUpdate()
         End If
         Name StagingPath(AddInFunctionsFile) As LocalPath(AddInFunctionsFile)
         VBA.SetAttr LocalPath(AddInFunctionsFile), vbHidden
+        
+        #If Mac Then
+            MsgBox _
+                Title:="[finbox.io] Add-In Functions Updated", _
+                Prompt:="A new version of the add-in functions have been installed. " & _
+                        "You may be prompted to enable the updated macros. " & _
+                        "Macros must be enabled or the add-in will not function properly."
+        #End If
         
         LoadAddInFunctions
     End If

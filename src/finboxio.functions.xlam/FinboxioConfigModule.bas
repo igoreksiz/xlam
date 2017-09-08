@@ -55,13 +55,13 @@ End Function
 
 Public Function AddInVersion(file As String) As String
     On Error Resume Next
-    AddInVersion = Workbooks(file).Sheets("finboxio").range("AppVersion").value
+    AddInVersion = Workbooks(file).Sheets("finboxio").Range("AppVersion").value
 End Function
 
 Public Function AddInReleaseDate(file As String) As Date
     AddInReleaseDate = VBA.Now()
     On Error Resume Next
-    AddInReleaseDate = Workbooks(file).Sheets("finboxio").range("ReleaseDate").value
+    AddInReleaseDate = Workbooks(file).Sheets("finboxio").Range("ReleaseDate").value
 End Function
 
 Public Function AddInLocation(file As String) As String

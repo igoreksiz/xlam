@@ -169,6 +169,11 @@ Confirmation:
         VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
     End If
 
+    Dim macMsg As String
+    #If Mac Then
+        macMsg = "You may see a few more prompts while Excel reloads the updated components. "
+    #End If
+
     If Not HasUpdates And download = vbYes And confirm Then
         MsgBox _
             Title:="[finbox.io] No Updates Available", _
@@ -177,12 +182,12 @@ Confirmation:
     ElseIf HasUpdates And download = vbYes And confirm Then
         MsgBox _
             Title:="[finbox.io] Update Successful", _
-            Prompt:="The update was installed successfully and Excel will now reload the add-in. You may be prompted to enable macros for the new version. Stay fresh!", _
+            Prompt:="The update was successfully installed. " & macMsg & "Stay fresh!", _
             Buttons:=vbInformation
     ElseIf HasUpdates And download = vbYes And Not confirm Then
         MsgBox _
             Title:="[finbox.io] Update Installed", _
-            Prompt:="A new version of the finbox.io add-in was installed successfully. You may be prompted to enable macros for the new version. Stay fresh!", _
+            Prompt:="A new version of the finbox.io add-in was installed. " & macMsg & "Stay fresh!", _
             Buttons:=vbInformation
     End If
     

@@ -23,14 +23,6 @@ Private Sub App_AfterCalculate()
     PromoteStagedUpdate
 End Sub
 
-Private Sub App_SheetActivate(ByVal Sh As Object)
-    PromoteStagedUpdate
-End Sub
-
-Private Sub App_SheetDeactivate(ByVal Sh As Object)
-    PromoteStagedUpdate
-End Sub
-
 Private Sub App_WindowActivate(ByVal Wb As Workbook, ByVal Wn As Window)
     PromoteStagedUpdate
 End Sub
@@ -46,3 +38,36 @@ End Sub
 Private Sub App_WorkbookDeactivate(ByVal Wb As Workbook)
     PromoteStagedUpdate
 End Sub
+
+Private Sub App_WorkbookBeforeClose(ByVal Wb As Workbook, Cancel As Boolean)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_WorkbookAfterSave(ByVal Wb As Workbook, ByVal Success As Boolean)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_NewWorkbook(ByVal Wb As Workbook)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_SheetActivate(ByVal Sh As Object)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_SheetCalculate(ByVal Sh As Object)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_SheetDeactivate(ByVal Sh As Object)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_SheetSelectionChange(ByVal Sh As Object, ByVal Target As Range)
+    PromoteStagedUpdate
+End Sub
+
+Private Sub App_WorkbookNewSheet(ByVal Wb As Workbook, ByVal Sh As Object)
+    PromoteStagedUpdate
+End Sub
+

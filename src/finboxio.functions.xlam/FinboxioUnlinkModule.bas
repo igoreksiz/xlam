@@ -41,7 +41,7 @@ Public Sub UnlinkFormulas()
             
                 Dim calcType: calcType = Application.Calculation
                 Application.Calculation = xlCalculationManual
-                Dim r As range, i As Long
+                Dim r As Range, i As Long
                 For i = 1 To Sheets.count
                     On Error Resume Next
                     For Each r In Sheets(i).UsedRange.SpecialCells(xlCellTypeFormulas)

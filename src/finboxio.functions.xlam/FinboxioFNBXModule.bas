@@ -22,9 +22,9 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
     On Error GoTo HandleErrors
 
     ' Get the address of the cell this was called from
-    Dim address As String, cell As range
+    Dim address As String, cell As Range
     address = CurrentCaller()
-    Set cell = range(address)
+    Set cell = Range(address)
 
     ' Dont try to calculate during a link replacement.
     ' Link replacement converts FNBX references in
@@ -175,11 +175,11 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
     ReDim uncached(0)
     Dim i As Long, j As Long
     If Not book Is Nothing Then
-        Dim fnd As String, range As range, cell As range, formula As String
+        Dim fnd As String, rng As Range, cell As Range, formula As String
         Dim sheet As Worksheet
         For Each sheet In book.Worksheets
             fnd = "FNBX("
-            Set range = sheet.UsedRange
+            Set rng = sheet.UsedRange
             #If Mac Then
                 ' VBA on Mac does not allow us to use Find while running in the context
                 ' of a UDF. So we have to iterate all the cells and check for FNBX. A
@@ -189,13 +189,13 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
                 ' to only include cells with formulas.
                 Dim formulas As Variant
                 On Error Resume Next
-                formulas = range.SpecialCells(xlCellTypeFormulas).formula
+                formulas = rng.SpecialCells(xlCellTypeFormulas).formula
                 For i = LBound(formulas, 1) To UBound(formulas, 1)
                     For j = LBound(formulas, 2) To UBound(formulas, 2)
                         If Not formulas(i, j) = "" Then
                             If VBA.InStr(VBA.UCase(formulas(i, j)), fnd) > 0 Then
                                 formula = formulas(i, j)
-                                Set cell = range.Cells(i, j)
+                                Set cell = rng.Cells(i, j)
                                 Call ParseFormula(formula, cell, sheet, keys)
                             End If
                         End If
@@ -209,14 +209,14 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
                 ' single call. So there may be a need to optimize this call for very large
                 ' workbooks with a high ratio of FNBXs-to-cells (TODO: test performance
                 ' trade-off for workbooks with increasing FNBX count)
-                Dim FirstFound As String, LastCell As range, FoundCell As range
-                Set LastCell = range.Cells(range.Cells.count)
-                Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell, MatchCase:=False)
+                Dim FirstFound As String, LastCell As Range, FoundCell As Range
+                Set LastCell = rng.Cells(rng.Cells.count)
+                Set FoundCell = rng.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell, MatchCase:=False)
                 If Not FoundCell Is Nothing Then
                     FirstFound = FoundCell.address
                     On Error Resume Next
                     Do Until FoundCell Is Nothing
-                        Set FoundCell = range.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell, MatchCase:=False)
+                        Set FoundCell = rng.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell, MatchCase:=False)
                         If FoundCell.HasFormula Then
                             formula = FoundCell.formula
                             Call ParseFormula(formula, FoundCell, sheet, keys)

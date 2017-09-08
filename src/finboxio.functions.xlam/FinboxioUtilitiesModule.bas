@@ -17,7 +17,7 @@ End Function
 
 Public Sub ResetFindReplace()
    'Resets the find/replace dialog box options
-   Dim r As range
+   Dim r As Range
 
    On Error Resume Next
 
@@ -51,8 +51,8 @@ Public Function DescapeQuotes(str As String) As String
 End Function
 
 Public Function CurrentCaller() As String
-    If TypeOf Application.Caller Is range Then
-        Dim rng As range
+    If TypeOf Application.Caller Is Range Then
+        Dim rng As Range
         Set rng = Application.Caller
 
         CurrentCaller = rng.address(External:=True)

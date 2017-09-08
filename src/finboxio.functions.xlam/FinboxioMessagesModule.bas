@@ -38,7 +38,7 @@ Public Sub ShowMessages()
     With LogWorkbook.Sheets(1)
         .Columns("A:A").ColumnWidth = 120
         .Columns("A:A").WrapText = True
-        .range(.Cells(1, 1), .Cells(msgs, 1)).value = r
+        .Range(.Cells(1, 1), .Cells(msgs, 1)).value = r
         .name = "finbox.io messages"
     End With
 
