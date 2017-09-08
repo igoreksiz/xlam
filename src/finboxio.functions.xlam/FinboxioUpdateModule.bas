@@ -58,7 +58,8 @@ NoManager:
             Exit For
         End If
     Next addIn
-    
+
+PromoteStaged:
     ' Promote staged manager
     If HasInstalledAddInManager Then
         SetAttr LocalPath(AddInInstalledFile), vbNormal
