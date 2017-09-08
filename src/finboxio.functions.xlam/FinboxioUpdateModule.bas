@@ -51,15 +51,15 @@ NoManager:
     ' Uninstall the active manager
     Dim addIn As addIn
     For Each addIn In Application.AddIns
-        If addIn.name = AddInInstalledFile Then
-            On Error GoTo PromoteStaged
-            Workbooks(AddInInstalledFile).Close
-            On Error GoTo ReportError
+        If addIn.name = AddInInstalledFile And addIn.Installed Then
+            addIn.Installed = False
             Exit For
         End If
     Next addIn
+    
+    ' Ensure the manager is unloaded
+    UnloadAddInManager
 
-PromoteStaged:
     ' Promote staged manager
     If HasInstalledAddInManager Then
         SetAttr LocalPath(AddInInstalledFile), vbNormal
@@ -93,4 +93,25 @@ Finish:
     Application.AutomationSecurity = appSec
 End Sub
 
+' Unloads the currently loaded add-in manager.
+' Does nothing if the add-in is not loaded.
+Private Function UnloadAddInManager() As Boolean
+    Dim openName As String
 
+    ' If the workbook isn't open, this will fail
+    On Error GoTo Unloaded
+    openName = Workbooks(AddInInstalledFile).name
+
+    ' Try to close workbook. If either of these
+    ' calls fail it likely means the workbook is
+    ' closed.
+    Workbooks(AddInFunctionsFile).Close
+    openName = Workbooks(AddInFunctionsFile).name
+    
+    ' Workbook must still be open
+    Exit Function
+    
+Unloaded:
+    ' Workbook is not loaded
+    UnloadAddInManager = True
+End Function
