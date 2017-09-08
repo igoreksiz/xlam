@@ -34,6 +34,7 @@ Public Sub PromoteStagedUpdate()
     Dim openName As String, canUnloadManager As Boolean
     openName = Workbooks(AddInManagerFile).name
     canUnloadManager = _
+        Not updatingManager And _
         Not Application.Run(AddInManagerFile & "!IsLoadingManager") And _
         Not Application.Run(AddInManagerFile & "!IsUpdatingFunctions")
         
