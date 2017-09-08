@@ -1,4 +1,9 @@
 
+0.21.0-36 / 2017-09-07
+======================
+
+  * Closes Add-In manager instead of uninstalling during upgrade
+
 0.21.0-35 / 2017-09-07
 ======================
 
