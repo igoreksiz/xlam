@@ -51,8 +51,10 @@ NoManager:
     ' Uninstall the active manager
     Dim addIn As addIn
     For Each addIn In Application.AddIns
-        If addIn.name = AddInInstalledFile And addIn.Installed Then
-            addIn.Installed = False
+        If addIn.name = AddInInstalledFile Then
+            On Error GoTo PromoteStaged
+            Workbooks(AddInInstalledFile).Close
+            On Error GoTo ReportError
             Exit For
         End If
     Next addIn
