@@ -6,6 +6,8 @@ Option Private Module
 
 Public Sub DownloadFile(url As String, file As String)
     Dim result As ShellResult
+    If Application.PathSeparator = ":" Then file = VBA.Mid(file, VBA.InStr(file, ":") + 1)
+    file = VBA.Replace(file, Application.PathSeparator, "/")
     result = xHelpersWeb.ExecuteInShell("curl -L -s -o '" & file & "' " & url)
     If result.ExitCode > 0 Then xHelpersWeb.RaiseCurlError result, url
 End Sub

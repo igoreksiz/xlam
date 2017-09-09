@@ -26,7 +26,11 @@ Public Function StagingPath(file As String) As String
 End Function
 
 Public Sub cd(path As String)
-    cwd = path
+    If VBA.Right(path, 1) = Application.PathSeparator Then
+        cwd = VBA.Left(path, VBA.Len(path) - 1)
+    Else
+        cwd = path
+    End If
 End Sub
 
 Public Function LocalPath(file As String) As String
