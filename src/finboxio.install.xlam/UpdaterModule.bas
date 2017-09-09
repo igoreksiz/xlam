@@ -174,7 +174,7 @@ Confirmation:
         macMsg = "You may see a few more prompts while Excel reloads the updated components. "
     #End If
 
-    If Not HasUpdates And download = vbYes And confirm Then
+    If Not HasUpdates And Not silent Then
         MsgBox _
             Title:="[finbox.io] No Updates Available", _
             Prompt:="You're already using the latest version of the finbox.io add-in. Stay fresh!", _
