@@ -49,10 +49,11 @@ Public Sub LoadAddInFunctions()
         Next addin
         
         If addin Is Nothing Then
-            Set installed = Application.AddIns.Add(StagingPath(AddInFunctionsFile), True)
+            Set installed = Application.AddIns.Add(LocalPath(AddInFunctionsFile), True)
         End If
         
         installed.installed = True
+        Call Workbooks.Open(LocalPath(AddInFunctionsFile))
     Else
         Application.AutomationSecurity = msoAutomationSecurityLow
         ' Load the functions add-in
