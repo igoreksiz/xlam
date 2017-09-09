@@ -2,6 +2,12 @@ Attribute VB_Name = "InstallerModule"
 Option Explicit
 Option Private Module
 
+Public installing As Boolean
+
+Public Function IsInstalling() As Boolean
+    IsInstalling = installing
+End Function
+
 ' Install this workbook as an add-in in the default
 ' Excel add-in location. This simplifies deployment
 ' and management across different platforms and
@@ -46,6 +52,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         Buttons:=vbYesNo Or vbQuestion)
 
     If continue = vbYes Then
+        installing = True
         Dim installPath As String
         installPath = SavePath(AddInInstalledFile)
         
@@ -75,7 +82,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         Else
             InstallAddInFunctions
         End If
-            
+        
         ' Add the workbook as an add-in
         ' if this is a new installation
         If installed Is Nothing Then
@@ -100,6 +107,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
         ' workbook since the in-place add-in is
         ' now running
         Application.ScreenUpdating = True
+        installing = False
         MsgBox _
             Title:="[finbox.io] Installation Succeeded", _
             Prompt:="The finbox.io add-in is now installed and ready to use! Enjoy!", _
@@ -169,6 +177,17 @@ Public Sub RemoveAddInFunctions()
     Kill StagingPath(AddInFunctionsFile)
     
     cd ThisWorkbook.path
+End Sub
+
+Public Sub CloseInstaller()
+    If ThisWorkbook.name = AddInInstallerFile Then Exit Sub
+    On Error GoTo Closed
+    Dim opened As String
+    opened = Workbooks(AddInInstallerFile).name
+    If Not Application.Run(AddInInstallerFile & "!IsInstalling") Then
+        Workbooks(AddInInstallerFile).Close
+    End If
+Closed:
 End Sub
 
 Function SavePath(Optional file As String)
