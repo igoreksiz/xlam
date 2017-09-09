@@ -44,5 +44,12 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     ' functions add-in actually ends up in an installed
     ' state since it is a hidden file and won't show up
     ' in the add-ins list, but it doesn't hurt to check.
-    Call UninstallAddInFunctions
+    '
+    ' Note: Mac2011 is the only exception to this. We
+    ' actually DO need to install it on Mac2011 or we
+    ' get macro prompts every time excel is opened.
+    
+    If ExcelVersion <> "Mac2011" Then
+        Call UninstallAddInFunctions
+    End If
 End Sub

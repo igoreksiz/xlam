@@ -26,6 +26,9 @@ Public Sub LoadAddInFunctions()
     ' we should just exit.
     If LoadedAddInFunctions Then Exit Sub
     
+    Dim appSec As MsoAutomationSecurity
+    appSec = Application.AutomationSecurity
+    
     ' If an update is staged, promote it to the active
     ' add-in. Only do this if this is an installed add-in
     ' so that we don't accidentally overwrite a dev
@@ -36,13 +39,26 @@ Public Sub LoadAddInFunctions()
     
     On Error GoTo RemoveAddInFunctions
     
-    Dim appSec As MsoAutomationSecurity
-    appSec = Application.AutomationSecurity
-    Application.AutomationSecurity = msoAutomationSecurityLow
-    
-    ' Load the functions add-in
-    Call Workbooks.Open(LocalPath(AddInFunctionsFile))
-    Application.AutomationSecurity = appSec
+    If ExcelVersion = "Mac2011" Then
+        Dim addin As addin, installed As addin
+        For Each addin In Application.AddIns
+            If addin.name = AddInFunctionsFile Then
+                Set installed = addin
+                Exit For
+            End If
+        Next addin
+        
+        If addin Is Nothing Then
+            Set installed = Application.AddIns.Add(StagingPath(AddInFunctionsFile), True)
+        End If
+        
+        installed.installed = True
+    Else
+        Application.AutomationSecurity = msoAutomationSecurityLow
+        ' Load the functions add-in
+        Call Workbooks.Open(LocalPath(AddInFunctionsFile))
+        Application.AutomationSecurity = appSec
+    End If
     
     Exit Sub
 
@@ -65,14 +81,14 @@ End Sub
 
 ' Ensures that functions add-in is uninstalled and unloaded
 Public Function UninstallAddInFunctions() As Boolean
-    Dim addIn As addIn
-    For Each addIn In Application.AddIns
-        If addIn.name = AddInFunctionsFile And addIn.installed Then
-            addIn.installed = False
+    Dim addin As addin
+    For Each addin In Application.AddIns
+        If addin.name = AddInFunctionsFile And addin.installed Then
+            addin.installed = False
             UninstallAddInFunctions = True
             Exit Function
         End If
-    Next addIn
+    Next addin
 End Function
 
 ' Checks if the functions add-in is currently loaded

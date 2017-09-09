@@ -18,7 +18,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
     InstallAddIn = (self.name = AddInInstalledFile)
     If InstallAddIn Then GoTo Finish
     
-    Dim i As addIn, installed As addIn
+    Dim i As addin, installed As addin
     For Each i In Application.AddIns
         If i.name = AddInInstalledFile Then
             Set installed = i
@@ -142,6 +142,7 @@ Public Sub InstallAddInFunctions()
     DownloadFile DOWNLOADS_URL & "/v" & AddInVersion & "/" & AddInFunctionsFile, StagingPath(AddInFunctionsFile)
     VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
     PromoteStagedUpdate
+    
     Exit Sub
 HandleError:
     On Error Resume Next
