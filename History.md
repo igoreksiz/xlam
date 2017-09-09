@@ -1,4 +1,10 @@
 
+0.21.0-46 / 2017-09-08
+======================
+
+  * Fixes repeated macro prompt on Mac 2011
+  * Fixes missing up-to-date prompt on manual upgrade check
+
 0.21.0-45 / 2017-09-08
 ======================
 
