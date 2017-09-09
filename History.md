@@ -1,4 +1,10 @@
 
+0.21.0-47 / 2017-09-09
+======================
+
+  * Fix Mac2011 bug loading functions add-in
+  * Adds  andler to close installer workbook to fix self-closing bug on Mac
+
 0.21.0-46 / 2017-09-08
 ======================
 
