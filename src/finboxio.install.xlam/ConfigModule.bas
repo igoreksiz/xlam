@@ -63,17 +63,16 @@ Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) 
 End Function
 
 Public Function ExcelVersion() As String
+    Dim version As Integer: version = MSOfficeVersion
+    ExcelVersion = "Unsupported"
+    
     #If Mac Then
-        #If MAC_OFFICE_VERSION = 14 Then
+        If version = 14 Then
             ExcelVersion = "Mac2011"
-        #ElseIf MAC_OFFICE_VERSION = 15 Then
+        ElseIf version = 15 Then
             ExcelVersion = "Mac2016"
-        #Else
-            ExcelVersion = "Unsupported"
-        #End If
+        End If
     #Else
-        Dim version As Integer
-        version = MSOfficeVersion
         If version = 12 Then
             ExcelVersion = "Win2007"
         ElseIf version = 14 Then
@@ -82,8 +81,6 @@ Public Function ExcelVersion() As String
             ExcelVersion = "Win2013"
         ElseIf version = 16 Then
             ExcelVersion = "Win2016"
-        Else
-            ExcelVersion = "Unsupported"
         End If
     #End If
 End Function
