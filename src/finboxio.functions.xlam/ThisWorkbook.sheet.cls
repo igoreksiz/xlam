@@ -6,7 +6,7 @@ End Sub
 
 Private Sub Workbook_AfterSave(ByVal Success As Boolean)
     On Error GoTo Finish
-    If VBA.Dir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
+    If SafeDir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
         Dim openName As String
         openName = Workbooks("vbaDeveloper.xlam").name
         Call Application.Run("vbaDeveloper.xlam!exportVbProject", "finboxioFunctions")

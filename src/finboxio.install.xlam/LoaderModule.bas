@@ -16,8 +16,8 @@ End Function
 ' Check if the functions add-in is installed alongside
 Public Function HasAddInFunctions() As Boolean
     HasAddInFunctions = _
-        Dir(LocalPath(AddInFunctionsFile)) <> "" Or _
-        Dir(LocalPath(AddInFunctionsFile), vbHidden) <> ""
+        SafeDir(LocalPath(AddInFunctionsFile)) <> "" Or _
+        SafeDir(LocalPath(AddInFunctionsFile), vbHidden) <> ""
 End Function
 
 ' Load the functions add-in installed alongside
@@ -123,8 +123,8 @@ End Function
 ' Check if staged functions add-in is available
 Private Function HasStagedUpdate() As Boolean
     HasStagedUpdate = _
-        Dir(StagingPath(AddInFunctionsFile)) <> "" Or _
-        Dir(StagingPath(AddInFunctionsFile), vbHidden) <> ""
+        SafeDir(StagingPath(AddInFunctionsFile)) <> "" Or _
+        SafeDir(StagingPath(AddInFunctionsFile), vbHidden) <> ""
 End Function
 
 ' Promotes the staged functions add-in to active

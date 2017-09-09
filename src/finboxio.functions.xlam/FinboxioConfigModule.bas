@@ -69,3 +69,7 @@ Public Function AddInLocation(file As String) As String
     AddInLocation = Workbooks(file).FullName
 End Function
 
+Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) As String
+    On Error Resume Next
+    SafeDir = VBA.Dir(file, attributes)
+End Function

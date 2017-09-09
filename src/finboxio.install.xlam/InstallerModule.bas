@@ -105,7 +105,7 @@ Public Function InstallAddIn(self As Workbook) As Boolean
             Prompt:="The finbox.io add-in is now installed and ready to use! Enjoy!", _
             Buttons:=vbInformation
         self.Close
-    ElseIf VBA.Dir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
+    ElseIf SafeDir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
         ' If we're running this from a development directory,
         ' close the installed add-ins and continue
         If Not installed Is Nothing Then
@@ -196,6 +196,6 @@ End Sub
 Sub SaveCopyAsExcel2016(Wb, path As String)
     Dim folder As String
     folder = Left(path, InStrRev(path, "/"))
-    If VBA.Dir(folder, vbDirectory) = vbNullString Then VBA.MkDir folder
+    If SafeDir(folder, vbDirectory) = vbNullString Then VBA.MkDir folder
     Wb.SaveCopyAs path
 End Sub

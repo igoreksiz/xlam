@@ -219,8 +219,8 @@ End Function
 
 Private Function IsStaged(file As String) As Boolean
     IsStaged = _
-        Dir(StagingPath(file)) <> "" Or _
-        Dir(StagingPath(file), vbHidden) <> ""
+        SafeDir(StagingPath(file)) <> "" Or _
+        SafeDir(StagingPath(file), vbHidden) <> ""
 End Function
 
 Private Sub RemoveStagedUpdates()

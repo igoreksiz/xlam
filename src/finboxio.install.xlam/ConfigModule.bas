@@ -53,6 +53,11 @@ Public Function AddInLocation(Optional file As String) As String
     AddInLocation = Workbooks(file).FullName
 End Function
 
+Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) As String
+    On Error Resume Next
+    SafeDir = VBA.Dir(file, attributes)
+End Function
+
 Public Function ExcelVersion() As String
     #If Mac Then
         #If MAC_OFFICE_VERSION = 14 Then

@@ -15,14 +15,14 @@ End Function
 
 Public Function HasInstalledAddInManager() As Boolean
     HasInstalledAddInManager = _
-        Dir(LocalPath(AddInInstalledFile)) <> "" Or _
-        Dir(LocalPath(AddInInstalledFile), vbHidden) <> ""
+        SafeDir(LocalPath(AddInInstalledFile)) <> "" Or _
+        SafeDir(LocalPath(AddInInstalledFile), vbHidden) <> ""
 End Function
 
 Public Function HasStagedUpdate() As Boolean
     HasStagedUpdate = _
-        Dir(StagingPath(AddInInstalledFile)) <> "" Or _
-        Dir(StagingPath(AddInInstalledFile), vbHidden) <> ""
+        SafeDir(StagingPath(AddInInstalledFile)) <> "" Or _
+        SafeDir(StagingPath(AddInInstalledFile), vbHidden) <> ""
 End Function
 
 ' Promotes the staged add-in manager to active
