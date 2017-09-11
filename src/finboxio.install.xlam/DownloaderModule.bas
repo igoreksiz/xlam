@@ -12,7 +12,7 @@ Public Sub DownloadFile(url As String, file As String)
     If result.ExitCode > 0 Then xHelpersWeb.RaiseCurlError result, url
 End Sub
 
-#Else
+#ElseIf VBA7 Then
 
 Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" ( _
     ByVal pCaller As Long, _
@@ -25,5 +25,19 @@ Public Sub DownloadFile(url As String, file As String)
     result = URLDownloadToFile(0, url, file, 0, 0)
 End Sub
 
+#Else
+
+Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" ( _
+    ByVal pCaller As Long, _
+    ByVal szURL As String, _
+    ByVal szFileName As String, _
+    ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
+
+Public Sub DownloadFile(url As String, file As String)
+    Dim result As Long
+    result = URLDownloadToFile(0, url, file, 0, 0)
+End Sub
+
 #End If
+
 
