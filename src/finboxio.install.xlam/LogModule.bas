@@ -11,7 +11,7 @@ Public Sub LogMessage(msg As String)
     If trigger <> "" Then msg = "(" & trigger & ") -> " & msg
     msg = "[" & VBA.Format(VBA.Now(), "yyyy-MM-dd hh:mm:ss") & "] " & source & "- " & msg
     Debug.Print (msg)
-    Open LocalPath(AddInLogFile) For Append As #1
+    Open SavePath(AddInLogFile) For Append As #1
         Print #1, msg
     Close #1
 End Sub
@@ -20,9 +20,9 @@ Public Sub TrimLog(Optional days As Integer = 0)
     If days = 0 Then days = GetSetting("logRetentionDays", 30)
     Dim line As String, timestamp As String, time As Date, trimmed As Integer
     trimmed = 0
-    VBA.FileCopy LocalPath(AddInLogFile), LocalPath(AddInLogFile & ".tmp")
-    Open LocalPath(AddInLogFile) For Output As #1
-    Open LocalPath(AddInLogFile & ".tmp") For Input As #2
+    VBA.FileCopy SavePath(AddInLogFile), SavePath(AddInLogFile & ".tmp")
+    Open SavePath(AddInLogFile) For Output As #1
+    Open SavePath(AddInLogFile & ".tmp") For Input As #2
         While Not EOF(2)
             Line Input #2, line
             line = VBA.Trim(Application.Clean(line))
@@ -37,7 +37,7 @@ Public Sub TrimLog(Optional days As Integer = 0)
     Close #2
     Close #1
     
-    VBA.Kill LocalPath(AddInLogFile & ".tmp")
+    VBA.Kill SavePath(AddInLogFile & ".tmp")
     
     If trimmed > 0 Then
         LogMessage "Trimmed " & trimmed & " messages older than " & (VBA.Now() - days)

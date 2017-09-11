@@ -32,9 +32,9 @@ and do not save any changes made to test workbooks.
   - [ ] VERIFY that finboxio* components are present in add-in folder.
   - [ ] VERIFY that all component versions are matching.
   - [ ] Restart Excel.
-  - [ ] VERIFY that all component versions are matching.
   - [ ] VERIFY that no macros prompt is displayed on startup.
-  - [ ] VERIFY that the FNBX formula is available
+  - [ ] VERIFY that all component versions are matching.
+  - [ ] VERIFY that the FNBX formula is available.
 
 ###### Excel Add-In should successfully upgrade an existing installation
   > **finboxio.cfg**<br/>
@@ -82,28 +82,137 @@ and do not save any changes made to test workbooks.
 #### Update
 
 Unless otherwise specified, the following tests assume you are using an
-unreleased workbook version, and is newer than the latest released
-version available on finbox.io.
+unreleased workbook version, that it is installed (i.e. not running from
+dev) and that it is newer than the latest released version available on finbox.io.
 
 ###### Excel Add-In should silently check for updates on launch
 
+  - [ ] Delete the finboxio.log file.
+  - [ ] Open a new workbook Excel.
+  - [ ] VERIFY that no update prompts are displayed.
+  - [ ] Click the "Message Log" button in the finbox.io ribbon.
+  - [ ] VERIFY that a message indicates that no new updates are available.
+
 ###### Excel Add-In should silently check for updates on application events
+  > **finboxio.cfg**<br/>
+  > updateOnLaunch=False
 
-###### Excel Add-In should install available updates on launch
+  - [ ] Delete the finboxio.log file.
+  - [ ] Open a new workbook in Excel.
+  - [ ] VERIFY that no update prompts are displayed.
+  - [ ] Click the "Message Log" button in the finbox.io ribbon.
+  - [ ] VERIFY that no messages indicate that updates were checked.
+  - [ ] Add a new sheet to the current workbook.
+  - [ ] Click the "Message Log" button in the finbox.io ribbon.
+  - [ ] VERIFY that a message indicates that no new updates are available.
 
-###### Excel Add-In should install available updates on application events
+###### Excel Add-In should automatically install available updates on launch
+  > **finboxio.cfg**<br/>
+  > autoUpdate=False
+
+  - [ ] Install an older version of the excel add-in.
+  - [ ] Exit Excel.
+  - [ ] Modify the finboxio.cfg file to set autoUpdate=True.
+  - [ ] Open a new workbook Excel.
+  - [ ] VERIFY that you are shown a prompt indicating that a new version was installed.
+  - [ ] Click through any additional macro prompts.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the latest version was installed and loaded.
+  - [ ] Restart Excel.
+  - [ ] VERIFY that you receive no macro prompts on startup.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the latest version is still installed and loaded.
+
+###### Excel Add-In should prompt to install available updates on application events
+  > **finboxio.cfg**<br/>
+  > autoUpdate=False
+  > updateOnLaunch=False
+
+  - [ ] Install an older version of the excel add-in.
+  - [ ] Exit Excel.
+  - [ ] Modify the finboxio.cfg file to set autoUpdate=True.
+  - [ ] Open a new workbook Excel.
+  - [ ] VERIFY that no update prompts are displayed.
+  - [ ] Select a new cell in the open workbook.
+  - [ ] VERIFY that you are prompted to install the latest release.
+  - [ ] Accept the installation and wait for it to finish.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the latest version was installed and loaded.
+  - [ ] Restart Excel.
+  - [ ] VERIFY that you receive no macro prompts on startup.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the latest version is still installed and loaded.
 
 ###### Excel Add-In should wait an interval before checking updates again
+  > **finboxio.cfg**<br/>
+  > autoUpdateMinutes=1
+
+  - [ ] Open a new workbook Excel.
+  - [ ] Click the "Message Log" button in the finbox.io ribbon.
+  - [ ] VERIFY that a message indicates that no new updates are available.
+  - [ ] Create a new workbook sheet.
+  - [ ] Click the "Message Log" button in the finbox.io ribbon.
+  - [ ] VERIFY that no additional messages inicate that updates were checked.
+  - [ ] Wait at least 1 minute.
+  - [ ] Delete the new workbook sheet.
+  - [ ] Click the "Message Log" button in the finbox.io ribbon.
+  - [ ] VERIFY that another message indicates that no new updates are available.
 
 ###### Excel Add-In should confirm latest when manually checking updates
+  > **finboxio.cfg**<br/>
+  > autoUpdate=False
+
+  - [ ] Open a new workbook Excel.
+  - [ ] Click the "Check Updates" button in the finbox.io ribbon.
+  - [ ] VERIFY that a prompt is shown indicating the latest version is already installed.
 
 ###### Excel Add-In should install updates when manually checked and confirmed
+  > **finboxio.cfg**<br/>
+  > autoUpdate=False
+
+  - [ ] Install an older version of the excel add-in.
+  - [ ] Exit Excel.
+  - [ ] Open a new workbook Excel.
+  - [ ] Click the "Check Updates" button in the finbox.io ribbon.
+  - [ ] VERIFY that a prompt is shown indicating that an update is available.
+  - [ ] Accept the installation and wait for it to finish.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the latest version was installed and loaded.
+  - [ ] Restart Excel.
+  - [ ] VERIFY that you receive no macro prompts on startup.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the latest version is still installed and loaded.
 
 ###### Excel Add-In should allow user to cancel an automatic update
+  > **finboxio.cfg**<br/>
+  > autoUpdate=False
+  > updateOnLaunch=False
+
+  - [ ] Install an older version of the excel add-in.
+  - [ ] Exit Excel.
+  - [ ] Modify the finboxio.cfg file to set autoUpdate=True.
+  - [ ] Open a new workbook Excel.
+  - [ ] VERIFY that no update prompts are displayed.
+  - [ ] Select a new cell in the open workbook.
+  - [ ] VERIFY that you are prompted to install the latest release.
+  - [ ] Cancel the installation.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the older version is still installed and loaded.
+  - [ ] VERIFY that no staged updates were downloaded to the add-in folder.
 
 ###### Excel Add-In should allow user to cancel a manual update
+  > **finboxio.cfg**<br/>
+  > autoUpdate=False
 
-###### Excel should successfully update a legacy version
+  - [ ] Install an older version of the excel add-in.
+  - [ ] Exit Excel.
+  - [ ] Open a new workbook Excel.
+  - [ ] Click the "Check Updates" button in the finbox.io ribbon.
+  - [ ] VERIFY that a prompt is shown indicating that an update is available.
+  - [ ] Cancel the installation.
+  - [ ] Click the "About" button in the finbox.io ribbon.
+  - [ ] VERIFY that the older version is still installed and loaded.
+  - [ ] VERIFY that no staged updates were downloaded to the add-in folder.
 
 
 #### Authentication
