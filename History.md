@@ -1,4 +1,9 @@
 
+0.21.0-49 / 2017-09-10
+======================
+
+  * Prevents install of local functions component outside dev
+
 0.21.0-48 / 2017-09-10
 ======================
 
