@@ -1,4 +1,11 @@
 
+0.21.0-48 / 2017-09-10
+======================
+
+  * User-friendly install prompt
+  * Installation fixes for Mac
+  * Uninstall functions
+
 0.21.0-47 / 2017-09-09
 ======================
 
