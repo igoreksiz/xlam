@@ -22,6 +22,24 @@ End Function
 
 ' Load the functions add-in installed alongside
 Public Sub LoadAddInFunctions()
+
+    ' Make sure add-in is installed on Mac 2011
+    If ExcelVersion = "Mac2011" Then
+        Dim addin As addin, installed As addin
+        For Each addin In Application.AddIns
+            If addin.name = AddInFunctionsFile Then
+                Set installed = addin
+                Exit For
+            End If
+        Next addin
+        
+        If addin Is Nothing Then
+            Set installed = Application.AddIns.Add(LocalPath(AddInFunctionsFile), True)
+        End If
+        
+        installed.installed = True
+    End If
+
     ' If the functions add-in is already loaded,
     ' we should just exit.
     If LoadedAddInFunctions Then Exit Sub
@@ -40,19 +58,6 @@ Public Sub LoadAddInFunctions()
     On Error GoTo RemoveAddInFunctions
     
     If ExcelVersion = "Mac2011" Then
-        Dim addin As addin, installed As addin
-        For Each addin In Application.AddIns
-            If addin.name = AddInFunctionsFile Then
-                Set installed = addin
-                Exit For
-            End If
-        Next addin
-        
-        If addin Is Nothing Then
-            Set installed = Application.AddIns.Add(LocalPath(AddInFunctionsFile), True)
-        End If
-        
-        installed.installed = True
         Call Workbooks.Open(LocalPath(AddInFunctionsFile))
     Else
         Application.AutomationSecurity = msoAutomationSecurityLow

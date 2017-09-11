@@ -73,3 +73,8 @@ Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) 
     On Error Resume Next
     SafeDir = VBA.Dir(file, attributes)
 End Function
+
+Sub auto_add()
+End Sub
+Sub auto_remove()
+End Sub

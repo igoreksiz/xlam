@@ -14,6 +14,10 @@ Private Sub Workbook_AfterSave(ByVal Success As Boolean)
 Finish:
 End Sub
 
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Call RemoveCustomMenu
+End Sub
+
 Private Sub Workbook_Open()
     LogMessage "Welcome to the finbox.io excel add-in!"
     LogMessage "Running add-in version: " & GetAPIHeader
@@ -25,4 +29,3 @@ Private Sub Workbook_Open()
     
     CheckQuota blockEvents:=True
 End Sub
-

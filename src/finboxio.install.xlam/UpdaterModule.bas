@@ -69,6 +69,7 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional confir
         Application.AutomationSecurity = msoAutomationSecurityForceDisable
         Set functionsWb = Workbooks.Open(LocalPath(AddInFunctionsFile))
         functionsVersion = AddInVersion(AddInFunctionsFile)
+        On Error Resume Next
         functionsWb.Close
     End If
     

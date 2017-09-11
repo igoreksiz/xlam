@@ -49,7 +49,9 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     ' actually DO need to install it on Mac2011 or we
     ' get macro prompts every time excel is opened.
     
+    On Error Resume Next
     If ExcelVersion <> "Mac2011" Then
         Call UninstallAddInFunctions
+        Unload InstallPrompt
     End If
 End Sub

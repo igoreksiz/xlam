@@ -260,3 +260,16 @@ Public Sub UpdateCustomMenu()
         If QuotaImage = "HighImportance" Then CustomMenu.Controls.Item(4).FaceId = 459
     End If
 End Sub
+
+Public Sub RemoveCustomMenu()
+    If ExcelVersion = "Mac2011" Then
+        Dim CustomMenu As CommandBarPopup
+        Dim Controls, i As Integer
+        Set Controls = Application.CommandBars("Worksheet Menu Bar").Controls
+        For i = 1 To Controls.count
+            Dim control
+            Set control = Controls.Item(i)
+            If control.Tag = "finbox.io" Then control.Delete
+        Next i
+    End If
+End Sub

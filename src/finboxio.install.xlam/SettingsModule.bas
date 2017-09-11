@@ -2,8 +2,6 @@ Attribute VB_Name = "SettingsModule"
 Option Explicit
 Option Private Module
 
-Private Const AddInSettingsFile = "finboxio.cfg"
-
 ' Sample config file:
 '
 ' ---------

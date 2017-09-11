@@ -8,6 +8,8 @@ Public Const DOWNLOADS_URL = "https://github.com/finboxio/xlam/releases/download
 Public Const AddInInstalledFile = "finboxio.xlam"
 Public Const AddInInstallerFile = "finboxio.install.xlam"
 Public Const AddInFunctionsFile = "finboxio.functions.xlam"
+Public Const AddInKeyFile = "finboxio.key"
+Public Const AddInSettingsFile = "finboxio.cfg"
 
 ' These will be loaded on Workbook_Open
 Public AddInInstalled As Boolean
@@ -105,3 +107,8 @@ Public Function MSOfficeVersion() As Integer
         MSOfficeVersion = CInt(verStr)
     End If
 End Function
+
+Sub auto_add()
+End Sub
+Sub auto_remove()
+End Sub
