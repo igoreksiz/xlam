@@ -7,7 +7,16 @@ Public trigger As String
 Public Sub ShowMessages()
     Application.Run (AddInManagerFile & "!TrimLog")
     #If Mac Then
-        Call xHelpersWeb.ExecuteInShell("open '" & LocalPath(AddInLogFile) & "'")
+        Dim file As String
+        file = LocalPath(AddInLogFile)
+        
+        ' Remove the disk specifier (e.g. 'Mac HD:')
+        If Application.PathSeparator = ":" Then file = VBA.Mid(file, VBA.InStr(file, ":") + 1)
+        
+        ' Normalize the path separator
+        file = VBA.Replace(file, Application.PathSeparator, "/")
+        
+        Call xHelpersWeb.ExecuteInShell("open '" & file & "'")
     #Else
         Dim shell As Object
         Set shell = CreateObject("Shell.Application")
