@@ -1,4 +1,9 @@
 
+0.23.3 / 2017-09-11
+===================
+
+  * Updates test procedures for installation/update
+
 0.23.3-0 / 2017-09-11
 =====================
 
