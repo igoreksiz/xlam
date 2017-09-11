@@ -6,7 +6,13 @@ Public trigger As String
 
 Public Sub ShowMessages()
     Application.Run (AddInManagerFile & "!TrimLog")
-    ThisWorkbook.FollowHyperlink address:=LocalPath(AddInLogFile), AddHistory:=False
+    #If Mac Then
+        Call xHelpersWeb.ExecuteInShell("open '" & LocalPath(AddInLogFile) & "'")
+    #Else
+        Dim shell As Object
+        Set shell = CreateObject("Shell.Application")
+        shell.Open LocalPath(AddInLogFile)
+    #End If
 End Sub
 
 Public Sub LogMessage(ByVal msg As String, Optional ByVal key As String = "")
