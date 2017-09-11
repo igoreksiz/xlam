@@ -56,9 +56,11 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     ' get macro prompts every time excel is opened.
     
     On Error Resume Next
+    
     If ExcelVersion <> "Mac2011" Then
         Call UninstallAddInFunctions
         Unload InstallPrompt
+        Unload MacInstallPrompt
     End If
     
     TrimLog

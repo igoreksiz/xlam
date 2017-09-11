@@ -70,7 +70,7 @@ Private Sub InstallButtonBg_Click()
     ' needs to be unloaded or workbooks will fail to close
     ' during the install function.
     ' See https://stackoverflow.com/questions/10612502/error-when-closing-an-opened-workbook-in-vba-userform
-    If ExcelVersion = "Mac2011" Then Unload Me
+    Unload Me
     
     FinishInstalling
 End Sub
@@ -98,7 +98,7 @@ Private Sub UninstallButtonBg_Click()
     ' needs to be unloaded or workbooks will fail to close
     ' during the uninstall function.
     ' See https://stackoverflow.com/questions/10612502/error-when-closing-an-opened-workbook-in-vba-userform
-    If ExcelVersion = "Mac2011" Then Unload Me
+    Unload Me
     
     UninstallAddIn
 End Sub

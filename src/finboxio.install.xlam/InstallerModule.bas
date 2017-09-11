@@ -49,7 +49,26 @@ Public Sub FinishInstalling()
     ' we need to overwrite the workbook
     If Not installed Is Nothing Then
         installed.installed = False
+        
+        On Error Resume Next
+        Workbooks(installed.name).Close
+        If SafeDir(installed.FullName) <> "" Then Kill installed.FullName
+        If SafeDir(installed.FullName, vbHidden) <> "" Then
+            SetAttr installed.FullName, vbNormal
+            Kill installed.FullName
+        End If
     End If
+    
+    ' Make sure any existing installation is removed
+    ' because Mac will not overwrite existing file
+    On Error Resume Next
+    Workbooks(AddInInstalledFile).Close
+    If SafeDir(installPath) <> "" Then Kill installPath
+    If SafeDir(installPath, vbHidden) <> "" Then
+        SetAttr installPath, vbNormal
+        Kill installPath
+    End If
+    On Error GoTo HandleError
     
     ' Copy the workbook into the default add-in location
     ' and remove any existing functions component. The
