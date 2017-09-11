@@ -1,4 +1,10 @@
 
+0.23.5 / 2017-09-11
+===================
+
+  * Ensures finboxio.xlam is fully removed before installing
+  * Closes install dialog on Mac2016
+
 0.23.4 / 2017-09-11
 ===================
 
