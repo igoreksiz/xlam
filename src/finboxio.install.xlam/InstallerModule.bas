@@ -63,7 +63,7 @@ Public Sub FinishInstalling()
     ' install that. This is primarily for
     ' convenient installation of dev
     ' (e.g. non-released) add-in versions
-    If HasAddInFunctions Then
+    If HasAddInFunctions And IsDevDir Then
         VBA.FileCopy LocalPath(AddInFunctionsFile), SavePath(AddInFunctionsFile)
         VBA.SetAttr SavePath(AddInFunctionsFile), vbHidden
     Else
@@ -122,7 +122,7 @@ Public Sub CancelInstall()
         End If
     Next i
     
-    If SafeDir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
+    If IsDevDir Then
         ' If we're running this from a development directory,
         ' close the installed add-ins and continue
         If Not installed Is Nothing Then
@@ -298,3 +298,7 @@ Sub SaveCopyAsExcel2016(Wb, path As String)
     If SafeDir(folder, vbDirectory) = vbNullString Then VBA.MkDir folder
     Wb.SaveCopyAs path
 End Sub
+
+Function IsDevDir() As Boolean
+    IsDevDir = SafeDir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> ""
+End Function
