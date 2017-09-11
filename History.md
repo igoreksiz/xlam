@@ -1,4 +1,9 @@
 
+0.23.3-0 / 2017-09-11
+=====================
+
+  * Moves installer log messages to default add-in location
+
 0.23.2 / 2017-09-11
 ===================
 
