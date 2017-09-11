@@ -3196,7 +3196,7 @@ AutoProxy_Cleanup:
     ' Error handling
     If Err.Number <> 0 Then
         ' Unmanaged error
-        Err.Raise Err.Number, "AutoProxy:" & Err.Source, Err.description, Err.HelpFile, Err.HelpContext
+        Err.Raise Err.Number, "AutoProxy:" & Err.source, Err.description, Err.HelpFile, Err.HelpContext
     ElseIf AutoProxy_Error <> 0 Then
         Err.Raise AutoProxy_Error, "AutoProxy", AutoProxy_ErrorMsg
     End If

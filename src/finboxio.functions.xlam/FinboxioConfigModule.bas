@@ -11,17 +11,11 @@ Public Const SCREENER_URL = "https://finbox.io/screener"
 Public Const TEMPLATES_URL = "https://finbox.io/templates"
 Public Const SIGNUP_URL = "https://finbox.io/signup"
 Public Const HELP_URL = "https://finbox.io/blog/using-the-excel-add-in/"
-Public Const USAGE_URL = "https://finbox.io/profile/api"
 Public Const UPGRADE_URL = "https://finbox.io/premium"
-Public Const UPDATE_URL = "https://finbox.io/integrations/excel?dl=1"
-
-Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
-Public Const RELEASES_URL = "https://api.github.com/repos/finboxio/xlam/releases"
-Public Const INSTALLER_URL = "https://github.com/finboxio/xlam/releases/download/v"
 
 Public Const TIER_URL = "https://api.finbox.io/beta/usage"
 Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
-Public Const DOWNLOAD_URL = "https://api.finbox.io/v2/add-ons/excel"
+Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
 
 Public Const LIMIT_EXCEEDED_ERROR = 20400
 Public Const INVALID_AUTH_ERROR = 20401
@@ -38,6 +32,8 @@ Public Const UNSPECIFIED_API_ERROR = 20500
 Public Const AddInInstalledFile = "finboxio.xlam"
 Public Const AddInInstallerFile = "finboxio.install.xlam"
 Public Const AddInFunctionsFile = "finboxio.functions.xlam"
+Public Const AddInKeyFile = "finboxio.key"
+Public Const AddInLogFile = "finboxio.log"
 
 Public Function AddInManagerFile() As String
     On Error Resume Next
@@ -53,18 +49,21 @@ Public Function LocalPath(file As String) As String
     LocalPath = ThisWorkbook.path & Application.PathSeparator & file
 End Function
 
-Public Function AddInVersion(file As String) As String
+Public Function AddInVersion(Optional file As String) As String
+    If file = "" Then file = ThisWorkbook.name
     On Error Resume Next
     AddInVersion = Workbooks(file).Sheets("finboxio").Range("AppVersion").value
 End Function
 
-Public Function AddInReleaseDate(file As String) As Date
+Public Function AddInReleaseDate(Optional file As String) As Date
+    If file = "" Then file = ThisWorkbook.name
     AddInReleaseDate = VBA.Now()
     On Error Resume Next
     AddInReleaseDate = Workbooks(file).Sheets("finboxio").Range("ReleaseDate").value
 End Function
 
-Public Function AddInLocation(file As String) As String
+Public Function AddInLocation(Optional file As String) As String
+    If file = "" Then file = ThisWorkbook.name
     On Error Resume Next
     AddInLocation = Workbooks(file).FullName
 End Function

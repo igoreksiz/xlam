@@ -30,6 +30,8 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional confir
         Exit Function
     End If
     
+    LogMessage "Checking for updates"
+    
     lastUpdateCheck = VBA.Now()
     
     Dim allowPrereleases As Boolean
@@ -134,6 +136,7 @@ Confirmation:
         ' For some reason the manager and function components
         ' are out of sync. Force a re-download of the latest
         download = vbYes
+        LogMessage "Manager component (" & AddInVersion & ") does not match functions component (" & functionsVersion & ")"
     ElseIf cReleased = "" And lReleaseDate > AddInReleaseDate Then
         ' User is running an unreleased version of the add-in.
         ' This may happen if we delete a release from github or
@@ -147,9 +150,11 @@ Confirmation:
         ' the hotfix version.
         '
         download = vbYes
+        LogMessage "Currently running an unreleased add-in version"
     ElseIf cReleased < lReleased Then
         ' There is a newer version available
         download = vbYes
+        LogMessage "New version " & latest & " is available"
     End If
 
     If download = vbYes And confirm Then
@@ -157,15 +162,22 @@ Confirmation:
             Title:="[finbox.io] Update Available", _
             Prompt:="A newer version (" & latest & ") of the finbox.io add-in is available! Do you have a few seconds to install it now?", _
             Buttons:=vbQuestion Or vbYesNo)
+            
+        If download = vbNo Then
+            LogMessage "Upgrade to " & latest & " was postponed"
+            GoTo Finish
+        End If
     End If
 
     If download = vbYes Then
         On Error GoTo DownloadFail
         If loaderUrl = "" Or functionsUrl = "" Then GoTo DownloadFail
 
+        LogMessage "Downloading add-in manager from " & loaderUrl
         DownloadFile loaderUrl, StagingPath(AddInInstalledFile)
         VBA.SetAttr StagingPath(AddInInstalledFile), vbHidden
         
+        LogMessage "Downloading add-in functions from " & functionsUrl
         DownloadFile functionsUrl, StagingPath(AddInFunctionsFile)
         VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
     End If
@@ -192,9 +204,16 @@ Confirmation:
             Buttons:=vbInformation
     End If
     
+    If HasUpdates Then
+        LogMessage "Add-in updates were downloaded and staged"
+    Else
+        LogMessage "No updates available"
+    End If
+    
     GoTo Finish
     
 GithubFail:
+    LogMessage "Failed to get release information from GitHub: " & Err.Description
     If Not silent Then MsgBox _
         Title:="[finbox.io] Update Failed", _
         Prompt:="Unable to check for updates at this time. Please try again and contact support@finbox.io if this problem persists.", _
@@ -202,6 +221,7 @@ GithubFail:
     GoTo Finish
 
 DownloadFail:
+    LogMessage "Failed to download releases: " & Err.Description
     If Not silent Then MsgBox _
         Title:="[finbox.io] Update Failed", _
         Prompt:="Unable to download updates at this time. Please try again and contact support@finbox.io if this problem persists.", _

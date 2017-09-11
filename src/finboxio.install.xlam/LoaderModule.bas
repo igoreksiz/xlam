@@ -23,7 +23,9 @@ End Function
 ' Load the functions add-in installed alongside
 Public Sub LoadAddInFunctions()
 
-    ' Make sure add-in is installed on Mac 2011
+    ' Make sure add-in is installed on Mac 2011 because
+    ' otherwise we'll get a macro prompt every time we
+    ' open excel
     If ExcelVersion = "Mac2011" Then
         Dim addin As addin, installed As addin
         For Each addin In Application.AddIns
@@ -57,14 +59,12 @@ Public Sub LoadAddInFunctions()
     
     On Error GoTo RemoveAddInFunctions
     
-    If ExcelVersion = "Mac2011" Then
-        Call Workbooks.Open(LocalPath(AddInFunctionsFile))
-    Else
-        Application.AutomationSecurity = msoAutomationSecurityLow
-        ' Load the functions add-in
-        Call Workbooks.Open(LocalPath(AddInFunctionsFile))
-        Application.AutomationSecurity = appSec
-    End If
+    ' Load the functions add-in
+    LogMessage "Loading add-in functions from " & LocalPath(AddInFunctionsFile)
+    Application.AutomationSecurity = msoAutomationSecurityLow
+    Call Workbooks.Open(LocalPath(AddInFunctionsFile))
+    Application.AutomationSecurity = appSec
+    LogMessage "Loaded add-in functions v" & AddInVersion(AddInFunctionsFile)
     
     Exit Sub
 
@@ -73,6 +73,8 @@ RemoveAddInFunctions:
     ' component, the workbook may be corrupted.
     ' Just remove all traces so it will be re-downloaded
     ' on the next restart.
+    
+    LogMessage "Unable to load add-in functions: " & Err.Description
     
     Application.AutomationSecurity = appSec
     
@@ -90,6 +92,7 @@ Public Function UninstallAddInFunctions() As Boolean
     Dim addin As addin
     For Each addin In Application.AddIns
         If addin.name = AddInFunctionsFile And addin.installed Then
+            LogMessage "Uninstalling add-in functions"
             addin.installed = False
             UninstallAddInFunctions = True
             Exit Function
@@ -109,7 +112,6 @@ Public Function LoadedAddInFunctions() As Boolean
     name = Workbooks(AddInFunctionsFile).name
     LoadedAddInFunctions = True
 Finish:
-
 End Function
 
 ' Unloads the currently loaded functions add-in.
@@ -131,6 +133,7 @@ Public Function UnloadAddInFunctions() As Boolean
     ' Try to close workbook. If either of these
     ' calls fail it likely means the workbook is
     ' closed.
+    LogMessage "Unloading add-in functions v" & AddInVersion(AddInFunctionsFile)
     Workbooks(AddInFunctionsFile).Close
     openName = Workbooks(AddInFunctionsFile).name
     
@@ -156,6 +159,7 @@ Public Sub PromoteStagedUpdate()
     On Error GoTo Finish
     updatingFunctions = True
     If UnloadAddInFunctions Then
+        LogMessage "Promoting staged add-in functions"
         If HasAddInFunctions Then
             SetAttr LocalPath(AddInFunctionsFile), vbNormal
             Kill LocalPath(AddInFunctionsFile)

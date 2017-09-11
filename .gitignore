@@ -3,3 +3,4 @@ finboxio.key
 ~$*
 node_modules/
 finboxio.cfg
+finboxio.log

@@ -25,41 +25,85 @@ and do not save any changes made to test workbooks.
   - [ ] VERIFY that any previous add-in installation is completely removed.
   - [ ] Open Excel Add-In workbook.
   - [ ] Accept "Enable Macros" prompt.
-  - [ ] VERIFY user is prompted to approve installation.
-  - [ ] Accept installation prompt.
-  - [ ] VERIFY that user is prompted to quit excel.
-  - [ ] Accept prompt to quit excel.
-  - [ ] Restart Excel.
-  - [ ] Open a new workbook.
+  - [ ] VERIFY that a form is presented with install options.
+  - [ ] Click "Install" and wait for installation to complete.
+  - [ ] VERIFY that a prompt is displayed indicating successful installation.
   - [ ] VERIFY that finbox.io ribbon is present.
-  - [ ] VERIFY that finboxio.xlam is present in add-in folder.
-  - [ ] VERIFY that FNBX formula is available.
+  - [ ] VERIFY that finboxio* components are present in add-in folder.
+  - [ ] VERIFY that all component versions are matching.
+  - [ ] Restart Excel.
+  - [ ] VERIFY that all component versions are matching.
+  - [ ] VERIFY that no macros prompt is displayed on startup.
+  - [ ] VERIFY that the FNBX formula is available
 
-###### Excel Add-In should successfully overwrite an existing installation
+###### Excel Add-In should successfully upgrade an existing installation
+  > **finboxio.cfg**<br/>
+  > autoUpdate = False
 
   - [ ] VERIFY that a previous add-in is installed (follow documented installation procedure).
   - [ ] Open Excel Add-In workbook.
   - [ ] Accept "Enable Macros" prompt.
-  - [ ] VERIFY user is prompted to approve installation.
-  - [ ] Accept installation prompt.
-  - [ ] VERIFY that user is prompted to quit excel.
-  - [ ] Accept prompt to quit excel.
-  - [ ] Restart excel.
+  - [ ] VERIFY that a form is presented with install options.
+  - [ ] Click "Upgrade" and wait for installation to complete.
+  - [ ] VERIFY that a prompt is displayed indicating successful installation.
   - [ ] VERIFY that finbox.io ribbon is present.
-  - [ ] VERIFY that finboxio.xlam is present in add-in folder.
-  - [ ] VERIFY that FNBX formula is available.
-  - [ ] VERIFY that older version was overwritten and only latest install is present.
+  - [ ] VERIFY that finboxio* components are present in add-in folder.
+  - [ ] VERIFY that all component versions are upgraded and matching.
+  - [ ] Restart Excel.
+  - [ ] VERIFY that all component versions are upgraded and matching.
+  - [ ] VERIFY that no macros prompt is displayed on startup.
+  - [ ] VERIFY that the FNBX formula is available
 
 ###### Excel Add-In should not install if user declines installation prompt
 
   - [ ] Open Excel Add-In workbook.
   - [ ] Accept "Enable Macros" prompt.
-  - [ ] VERIFY user is prompted to approve installation.
-  - [ ] Decline installation prompt.
+  - [ ] VERIFY that a form is presented with install options.
+  - [ ] Close form.
   - [ ] VERIFY that no more prompts are displayed.
-  - [ ] VERIFY that finboxio.xlam is not present in add-in folder.
+  - [ ] VERIFY that the finbox.io ribbon is not present.
+  - [ ] VERIFY that finboxio* components are NOT present in add-in folder.
   - [ ] Restart excel.
   - [ ] VERIFY that finbox.io ribbon is not present after restart.
+
+###### Excel Add-In should uninstall successfully
+
+  - [ ] Open Excel Add-In workbook.
+  - [ ] Accept "Enable Macros" prompt.
+  - [ ] VERIFY that a form is presented with install options.
+  - [ ] Click "Uninstall" and wait for uninstallation to complete.
+  - [ ] VERIFY that a prompt is displayed indicating successful uninstallation.
+  - [ ] VERIFY that the finbox.io ribbon is not present.
+  - [ ] VERIFY that finboxio* components are NOT present in add-in folder.
+  - [ ] Restart excel.
+  - [ ] VERIFY that finbox.io ribbon is not present after restart.
+
+
+#### Update
+
+Unless otherwise specified, the following tests assume you are using an
+unreleased workbook version, and is newer than the latest released
+version available on finbox.io.
+
+###### Excel Add-In should silently check for updates on launch
+
+###### Excel Add-In should silently check for updates on application events
+
+###### Excel Add-In should install available updates on launch
+
+###### Excel Add-In should install available updates on application events
+
+###### Excel Add-In should wait an interval before checking updates again
+
+###### Excel Add-In should confirm latest when manually checking updates
+
+###### Excel Add-In should install updates when manually checked and confirmed
+
+###### Excel Add-In should allow user to cancel an automatic update
+
+###### Excel Add-In should allow user to cancel a manual update
+
+###### Excel should successfully update a legacy version
 
 
 #### Authentication
@@ -386,53 +430,6 @@ and do not save any changes made to test workbooks.
   - [ ] VERIFY that a prompt is displayed indicating that the user must first save the workbook.
   - [ ] Click "OK" to acknowledge the prompt.
   - [ ] VERIFY that the FNBX formula has not been modified.
-
-
-#### Update
-
-Unless otherwise specified, the following tests assume you are using an
-unreleased workbook version, and is newer than the latest released
-version available on finbox.io.
-
-###### Excel Add-In should silently automatically check for updates on the first use of the FNBX formula when no updates are available
-
-  - [ ] Open Excel.
-  - [ ] Create a new workbook.
-  - [ ] Click the "Message Log" button.
-  - [ ] VERIFY that no message exists about checking for updates.
-  - [ ] Close the message log.
-  - [ ] Enter a FNBX formula into an empty cell. Log in if necessary.
-  - [ ] VERIFY that no prompt about updates is displayed.
-  - [ ] Click the "Message Log" button.
-  - [ ] VERIFY that a message exists indicating that no updates are available.
-
-###### Excel Add-In should automatically check for updates only once per session
-
-  - [ ] Open Excel.
-  - [ ] Create a new workbook.
-  - [ ] Enter a FNBX formula into an empty cell. Log in if necessary.
-  - [ ] Click the "Message Log" button.
-  - [ ] VERIFY that a message exists indicating that no updates are available.
-  - [ ] Close the message log.
-  - [ ] Enter another FNBX formula into an empty cell
-  - [ ] Click the "Message Log" button.
-  - [ ] VERIFY that still only one message exists indicating that no updates are available.
-
-###### Excel Add-In should indicate that no updates are available when manually checked and no updates are available
-
-  - [ ] Open Excel.
-  - [ ] Click the "Check for Updates" button in the finbox.io ribbon.
-  - [ ] VERIFY that a prompt is displayed indicating that no updates are available.
-
-###### Excel Add-In should automatically notify user when updates are available on the first use of the FNBX formula
-
-  - [ ] Install an older version of the add-on.
-  - [ ] Restart excel.
-  - [ ] Create a new workbook.
-  - [ ] Enter a FNBX formula into an empty cell.
-  - [ ] VERIFY that the user is alerted to the availability of an update and given the option to download.
-  - [ ] Choose not to download the update.
-  - [ ] VERIFY that the formula resolves properly. Log in if necessary.
 
 
 #### FNBX Formula

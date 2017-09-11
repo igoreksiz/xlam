@@ -44,7 +44,7 @@ End Sub
 
 Private Sub WriteKey(key As String)
     Dim keyfile As String
-    keyfile = ThisWorkbook.path & Application.PathSeparator & "finboxio.key"
+    keyfile = LocalPath(AddInKeyFile)
     Open keyfile For Output As #1
     Write #1, key
     Close #1
@@ -54,7 +54,7 @@ Private Function ReadKey()
     On Error GoTo Finish
     Dim key As String, keyfile As String
     key = ""
-    keyfile = ThisWorkbook.path & Application.PathSeparator & "finboxio.key"
+    keyfile = LocalPath(AddInKeyFile)
     Open keyfile For Input As #1
     Line Input #1, key
     key = VBA.Replace(key, """", "")

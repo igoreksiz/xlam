@@ -114,17 +114,17 @@ HandleError:
 End Sub
 
 Public Sub CancelInstall()
-    Dim i As addin, installed As addin
-    For Each i In Application.AddIns
-        If i.name = AddInInstalledFile Then
-            Set installed = i
-            Exit For
-        End If
-    Next i
-    
     If IsDevDir Then
         ' If we're running this from a development directory,
         ' close the installed add-ins and continue
+        Dim i As addin, installed As addin
+        For Each i In Application.AddIns
+            If i.name = AddInInstalledFile Then
+                Set installed = i
+                Exit For
+            End If
+        Next i
+
         If Not installed Is Nothing Then
             ' Originally wanted to use AddIn.IsOpen here, but that
             ' seems to not be available on Mac so we have to just
@@ -137,11 +137,14 @@ Public Sub CancelInstall()
     Else
         ' This add-in shouldn't be run outside
         ' of the installation directory
+        LogMessage "Installation canceled"
         ThisWorkbook.Close
     End If
 End Sub
 
 Public Sub UninstallAddIn()
+    LogMessage "Uninstalling add-in"
+    
     uninstalling = True
     
     On Error Resume Next
@@ -213,6 +216,8 @@ Public Sub UninstallAddIn()
         Prompt:="The finbox.io add-in has been successfully removed. Hope to see you back soon!", _
         Buttons:=vbInformation
     
+    LogMessage "Add-in uninstalled"
+    
     ThisWorkbook.Close
 End Sub
 
@@ -222,15 +227,22 @@ Public Sub InstallAddInFunctions()
     On Error GoTo HandleError
     DownloadFile DOWNLOADS_URL & "/v" & AddInVersion & "/" & AddInFunctionsFile, StagingPath(AddInFunctionsFile)
     VBA.SetAttr StagingPath(AddInFunctionsFile), vbHidden
+    
+    LogMessage "Add-in functions v" & AddInVersion & " have been downloaded and staged"
+    
     PromoteStagedUpdate
     
     Exit Sub
 HandleError:
     On Error Resume Next
+    
+    LogMessage "Unable to install add-in functions: " & Err.Description
+    
     MsgBox _
         Title:="[finbox.io] Installation Failed", _
         Prompt:="The add-in functions could not be installed at this time. Please try again and contact support@finbox.io if this problem persists.", _
         Buttons:=vbCritical
+        
     RemoveAddInFunctions
     
     cd ThisWorkbook.path
@@ -248,6 +260,8 @@ Public Sub RemoveAddInFunctions()
     
     SetAttr StagingPath(AddInFunctionsFile), vbNormal
     Kill StagingPath(AddInFunctionsFile)
+    
+    LogMessage "Removed add-in functions workbook"
     
     cd ThisWorkbook.path
 End Sub

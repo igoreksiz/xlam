@@ -308,7 +308,7 @@ Private Sub web_LoadValues(web_Headers As String, web_Content As String, web_Bod
             xHelpersWeb.ParseByFormat(web_Content, web_Request.ResponseFormat, web_Request.CustomResponseFormat, web_Body)
 
         If Err.Number <> 0 Then
-            xHelpersWeb.LogError Err.description, Err.Source, Err.Number
+            xHelpersWeb.LogError Err.description, Err.source, Err.Number
             Err.Clear
         End If
         On Error GoTo 0

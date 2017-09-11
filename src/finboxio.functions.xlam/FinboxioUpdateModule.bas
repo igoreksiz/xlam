@@ -51,7 +51,7 @@ NoManager:
     On Error GoTo ReportError
 
     updatingManager = True
-   
+    
     ' Uninstall the active manager
     Dim addIn As addIn
     For Each addIn In Application.AddIns
@@ -64,6 +64,8 @@ NoManager:
     ' Ensure the manager is unloaded
     UnloadAddInManager
 
+    LogMessage "Promoting staged manager"
+    
     ' Promote staged manager
     If HasInstalledAddInManager Then
         SetAttr LocalPath(AddInInstalledFile), vbNormal
@@ -80,6 +82,8 @@ NoManager:
                     "Macros must be enabled or the add-in will not function properly."
     #End If
     
+    LogMessage "Reloading updated manager from " & LocalPath(AddInInstalledFile)
+    
     ' Reinstall the manager
     If Not addIn Is Nothing Then
         addIn.Installed = True
@@ -90,9 +94,12 @@ NoManager:
     ' Ensure the manager workbook is opened
     Call Workbooks.Open(LocalPath(AddInInstalledFile))
     
+    LogMessage "Loaded add-in manager v" & AddInVersion(AddInInstalledFile)
+    
     GoTo Finish
 
 ReportError:
+    LogMessage "Failed to load add-in manager: " & Err.description
 
     MsgBox _
         Title:="[finbox.io] Add-in Error", _
@@ -117,6 +124,7 @@ Private Function UnloadAddInManager() As Boolean
     ' Try to close workbook. If either of these
     ' calls fail it likely means the workbook is
     ' closed.
+    LogMessage "Unloading add-in manager"
     Workbooks(AddInFunctionsFile).Close
     openName = Workbooks(AddInFunctionsFile).name
     

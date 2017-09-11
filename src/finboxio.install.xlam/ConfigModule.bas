@@ -10,6 +10,7 @@ Public Const AddInInstallerFile = "finboxio.install.xlam"
 Public Const AddInFunctionsFile = "finboxio.functions.xlam"
 Public Const AddInKeyFile = "finboxio.key"
 Public Const AddInSettingsFile = "finboxio.cfg"
+Public Const AddInLogFile = "finboxio.log"
 
 ' These will be loaded on Workbook_Open
 Public AddInInstalled As Boolean

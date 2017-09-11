@@ -16,11 +16,11 @@ End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
     Call RemoveCustomMenu
+    LogMessage "Unloaded add-in functions"
 End Sub
 
 Private Sub Workbook_Open()
-    LogMessage "Welcome to the finbox.io excel add-in!"
-    LogMessage "Running add-in version: " & GetAPIHeader
+    LogMessage "Loading add-in functions"
     
     Set handler = New AppEventHandler
     
@@ -28,4 +28,6 @@ Private Sub Workbook_Open()
     Call UpdateCustomMenu
     
     CheckQuota blockEvents:=True
+    
+    LogMessage "Add-in functions are ready"
 End Sub

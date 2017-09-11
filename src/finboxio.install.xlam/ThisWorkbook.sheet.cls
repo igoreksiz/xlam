@@ -1,6 +1,8 @@
 Private handler As AppEventHandler
 
 Private Sub Workbook_Open()
+    LogMessage "Loading add-in manager"
+    
     loadingManager = True
     
     ' Install AddIn on first open
@@ -22,6 +24,10 @@ Private Sub Workbook_Open()
     Set handler = New AppEventHandler
     
     loadingManager = False
+    
+    TrimLog
+    
+    LogMessage "Add-in manager is ready"
 End Sub
 
 Private Sub Workbook_AfterSave(ByVal Success As Boolean)
@@ -54,4 +60,8 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
         Call UninstallAddInFunctions
         Unload InstallPrompt
     End If
+    
+    TrimLog
+    
+    LogMessage "Unloaded add-in manager"
 End Sub
