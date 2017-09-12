@@ -1,4 +1,9 @@
 
+0.24.3 / 2017-09-12
+===================
+
+  * Removes debug statement from uninstall procedure
+
 0.24.2 / 2017-09-12
 ===================
 
