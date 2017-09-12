@@ -169,6 +169,7 @@ Public Sub CancelInstall()
 End Sub
 
 Public Sub UninstallAddIn()
+    Stop
     LogMessage "Uninstalling add-in"
     
     uninstalling = True
@@ -179,8 +180,8 @@ Public Sub UninstallAddIn()
     Dim i As addin, installed As addin
     For Each i In Application.AddIns
         If VBA.InStr(i.name, "finbox") > 0 Then
-            Workbooks(i.name).Close
             i.installed = False
+            Workbooks(i.name).Close
             If SafeDir(i.FullName) <> "" Then Kill i.FullName
             If SafeDir(i.FullName, vbHidden) <> "" Then
                 SetAttr i.FullName, vbNormal

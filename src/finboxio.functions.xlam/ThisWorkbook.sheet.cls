@@ -15,6 +15,7 @@ Finish:
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Call RemoveCustomMenu
     LogMessage "Unloaded add-in functions"
 End Sub
 
