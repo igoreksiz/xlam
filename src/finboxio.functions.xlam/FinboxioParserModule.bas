@@ -4,7 +4,7 @@ Option Private Module
 
 ' Locate all FNBX formulas in a string and evaluate required keys for each
 ' If formula can be resolved to a static value, this is returned
-Function ParseFormula(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
+Function ParseFormula(Formula As String, cell As Range, sheet As Worksheet, ByRef keys)
     Dim fn As String: fn = ""
     Dim resolved As String: resolved = ""
     Dim resolvable As Boolean: resolvable = True
@@ -13,9 +13,9 @@ Function ParseFormula(formula As String, cell As Range, sheet As Worksheet, ByRe
     Dim hasFNBX As Boolean: hasFNBX = False
     Dim parens As Long: parens = 0
     Dim i As Long
-    For i = 1 To VBA.Len(formula)
+    For i = 1 To VBA.Len(Formula)
         Dim char As String
-        char = VBA.Mid(formula, i, 1)
+        char = VBA.Mid(Formula, i, 1)
         resolved = resolved & char
         If char = """" Then
             quotes = Not quotes
@@ -87,13 +87,13 @@ End Function
 ' Determine all finql keys required by a FNBX formula
 ' Assumes that formula is a FNBX formula (may have nested arguments)
 ' If formula can be resolved to a static value, this value is returned
-Function ParseKeys(formula As String, cell As Range, sheet As Worksheet, ByRef keys)
+Function ParseKeys(Formula As String, cell As Range, sheet As Worksheet, ByRef keys)
     ParseKeys = ""
-    Dim argIndex As String: argIndex = VBA.InStr(formula, "(")
+    Dim argIndex As String: argIndex = VBA.InStr(Formula, "(")
     If argIndex = 0 Then Exit Function
     
-    Dim name As String: name = VBA.UCase(VBA.Left(formula, argIndex - 1))
-    Dim args() As String: args = ParseArguments(formula)
+    Dim name As String: name = VBA.UCase(VBA.Left(Formula, argIndex - 1))
+    Dim args() As String: args = ParseArguments(Formula)
     Dim argsCount As Long: argsCount = NumElements(args)
 
     If name = "FNBX" Or name = "=FNBX" Or name = "=-FNBX" Then
@@ -197,7 +197,7 @@ Function ParseKeys(formula As String, cell As Range, sheet As Worksheet, ByRef k
 End Function
 
 ' Parse a list of argument strings given an excel formula
-Function ParseArguments(formula As String) As String()
+Function ParseArguments(Formula As String) As String()
     Dim func As String
     Dim args() As String
     Dim safeArgs As String
@@ -206,7 +206,7 @@ Function ParseArguments(formula As String) As String()
     Dim quoted As Boolean
 
     quoted = False
-    func = VBA.Trim(formula)
+    func = VBA.Trim(Formula)
     i = VBA.InStr(func, "(")
     func = VBA.Mid(func, i + 1)
     func = VBA.Mid(func, 1, VBA.Len(func) - 1)
@@ -255,7 +255,7 @@ Function EvalArgument(arg As String, cell As Range, sheet As Worksheet)
         Set resolvedCell = Range(address)
         value = resolvedCell.value
         If IsEmpty(value) And resolvedCell.HasFormula Then
-            value = resolvedCell.Worksheet.Evaluate(resolvedCell.formula)
+            value = resolvedCell.Worksheet.Evaluate(resolvedCell.Formula)
         End If
 
         EvalArgument = value

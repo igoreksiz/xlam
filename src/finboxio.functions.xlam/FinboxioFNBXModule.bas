@@ -112,7 +112,7 @@ Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n1"
     If period = "" Then
         Dim cellKeys() As String, ik As Integer, sameKey As Boolean
         ReDim cellKeys(0)
-        Call ParseFormula(cell.formula, cell, cell.Worksheet, cellKeys)
+        Call ParseFormula(cell.Formula, cell, cell.Worksheet, cellKeys)
         For ik = 1 To UBound(cellKeys)
             If key = cellKeys(ik) Then sameKey = True
         Next ik
@@ -193,7 +193,7 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
     ReDim uncached(0)
     Dim i As Long, j As Long
     If Not book Is Nothing Then
-        Dim fnd As String, rng As Range, cell As Range, formula As String
+        Dim fnd As String, rng As Range, cell As Range, Formula As String
         Dim sheet As Worksheet
         For Each sheet In book.Worksheets
             fnd = "FNBX("
@@ -207,14 +207,14 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
                 ' to only include cells with formulas.
                 Dim formulas As Variant
                 On Error Resume Next
-                formulas = rng.SpecialCells(xlCellTypeFormulas).formula
+                formulas = rng.SpecialCells(xlCellTypeFormulas).Formula
                 For i = LBound(formulas, 1) To UBound(formulas, 1)
                     For j = LBound(formulas, 2) To UBound(formulas, 2)
                         If Not formulas(i, j) = "" Then
                             If VBA.InStr(VBA.UCase(formulas(i, j)), fnd) > 0 Then
-                                formula = formulas(i, j)
+                                Formula = formulas(i, j)
                                 Set cell = rng.Cells(i, j)
-                                Call ParseFormula(formula, cell, sheet, keys)
+                                Call ParseFormula(Formula, cell, sheet, keys)
                             End If
                         End If
                     Next j
@@ -236,8 +236,8 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
                     Do Until FoundCell Is Nothing
                         Set FoundCell = rng.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell, MatchCase:=False)
                         If FoundCell.HasFormula Then
-                            formula = FoundCell.formula
-                            Call ParseFormula(formula, FoundCell, sheet, keys)
+                            Formula = FoundCell.Formula
+                            Call ParseFormula(Formula, FoundCell, sheet, keys)
                         End If
                         If FoundCell.address = FirstFound Then Exit Do
                     Loop

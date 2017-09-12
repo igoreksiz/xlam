@@ -2,102 +2,62 @@ Attribute VB_Name = "FinboxioFixLinksModule"
 Option Explicit
 Option Private Module
 
+Public Const FNBXFND = "!FNBX("
+
 Public IsReplacingLinks As Boolean
 
-Public Function FixAddinLinks(Optional Wb As Workbook)
+Public Function FixAddInLinks(Optional wb As Workbook)
     On Error GoTo CleanExit
+    Dim sheet As Worksheet, replaced As Boolean, rng As Range
     
     IsReplacingLinks = True
     Application.ScreenUpdating = False
     
-    Dim calc As Long
-    Dim prefix As String
-    Dim sheet As Worksheet
-    Dim replaced As Boolean
-    
-    #If Mac Then
-        If ExcelVersion = "Mac2011" Then
-            ' TODO:
-            ' This is not robust enough to handle references
-            ' to add-ins saved on a network drive. Should replace
-            ' this to find and iterate range of cells, replacing
-            ' add-in paths manually
-            prefix = "Mac HD:*"
-        Else
-            prefix = "file:///*"
-        End If
-    #Else
-        prefix = "?:\*"
-    #End If
-    
     replaced = False
     
     Dim ws
-    If TypeName(Wb) = "Empty" Or Wb Is Nothing Then
+    If TypeName(wb) = "Empty" Or wb Is Nothing Then
         Set ws = Worksheets
     Else
-        Set ws = Wb.Worksheets
+        Set ws = wb.Worksheets
     End If
-    
+
     For Each sheet In ws
-        If Not sheet.Cells.Find("'" & prefix & "finboxio.install.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
-            sheet.Cells.Replace _
-                What:="'" & prefix & "finboxio.install.xlam'!", _
-                Replacement:="", _
-                LookAt:=xlPart, _
-                SearchOrder:=xlByRows, _
-                MatchCase:=False
-            replaced = True
-        ElseIf Not sheet.Cells.Find("finboxio.install.xlam!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
-            sheet.Cells.Replace _
-                What:="finboxio.install.xlam!", _
-                Replacement:="", _
-                LookAt:=xlPart, _
-                SearchOrder:=xlByRows, _
-                MatchCase:=False
-            replaced = True
-        End If
-        
-        If Not sheet.Cells.Find("'" & prefix & "finboxio.functions.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
-            sheet.Cells.Replace _
-                What:="'" & prefix & "finboxio.functions.xlam'!", _
-                Replacement:="", _
-                LookAt:=xlPart, _
-                SearchOrder:=xlByRows, _
-                MatchCase:=False
-            replaced = True
-        ElseIf Not sheet.Cells.Find("finboxio.functions.xlam!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
-            sheet.Cells.Replace _
-                What:="finboxio.functions.xlam!", _
-                Replacement:="", _
-                LookAt:=xlPart, _
-                SearchOrder:=xlByRows, _
-                MatchCase:=False
-            replaced = True
-        End If
-        
-        If Not sheet.Cells.Find("'" & prefix & "finboxio.xlam'!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
-            sheet.Cells.Replace _
-                What:="'" & prefix & "finboxio.xlam'!", _
-                Replacement:="", _
-                LookAt:=xlPart, _
-                SearchOrder:=xlByRows, _
-                MatchCase:=False
-            replaced = True
-        ElseIf Not sheet.Cells.Find("finboxio.xlam!", , xlFormulas, xlPart, xlByRows, , False) Is Nothing And Not sheet.ProtectionMode Then
-            sheet.Cells.Replace _
-                What:="finboxio.xlam!", _
-                Replacement:="", _
-                LookAt:=xlPart, _
-                SearchOrder:=xlByRows, _
-                MatchCase:=False
-            replaced = True
+        Set rng = sheet.UsedRange
+        Dim FirstFound As String, LastCell As Range, FoundCell As Range
+        Set LastCell = rng.Cells(rng.Cells.count)
+        Set FoundCell = rng.Find(What:=FNBXFND, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell, MatchCase:=False)
+        If Not FoundCell Is Nothing Then
+            FirstFound = FoundCell.address
+            On Error Resume Next
+            Do Until FoundCell Is Nothing
+                Set FoundCell = rng.Find(What:=FNBXFND, LookIn:=xlFormulas, LookAt:=xlPart, After:=FoundCell, MatchCase:=False)
+                If FoundCell.HasFormula Then
+                    FoundCell.Formula = DereferenceFNBX(FoundCell.Formula)
+                    replaced = True
+                End If
+                If FoundCell.address = FirstFound Then Exit Do
+            Loop
         End If
     Next sheet
-
+    
 CleanExit:
     ResetFindReplace
     Application.ScreenUpdating = True
     IsReplacingLinks = False
     If replaced Then Application.CalculateFull
+End Function
+
+Function DereferenceFNBX(ByVal Formula As String)
+    DereferenceFNBX = Formula
+    Dim replaced As String
+    replaced = Formula
+    On Error GoTo Finish
+    While VBA.InStr(replaced, FNBXFND) > 0
+        replaced = _
+            VBA.Left(replaced, VBA.InStrRev(replaced, "'", VBA.InStr(replaced, FNBXFND) - 2) - 1) & _
+            VBA.Mid(replaced, VBA.InStr(replaced, FNBXFND) + 1)
+    Wend
+    DereferenceFNBX = replaced
+Finish:
 End Function
