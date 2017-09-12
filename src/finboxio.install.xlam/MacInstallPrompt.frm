@@ -53,6 +53,7 @@ End Sub
 
 Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
     If CloseMode = vbFormControlMenu Then
+        Unload Me
         CancelInstall
     End If
 End Sub
