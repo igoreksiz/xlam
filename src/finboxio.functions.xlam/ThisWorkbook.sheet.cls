@@ -15,7 +15,6 @@ Finish:
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
-    Call RemoveCustomMenu
     LogMessage "Unloaded add-in functions"
 End Sub
 
@@ -25,6 +24,7 @@ Private Sub Workbook_Open()
     Set handler = New AppEventHandler
     
     Call SetAPIKeyHandler(New APIKeyHandler)
+    Call RemoveCustomMenu
     Call UpdateCustomMenu
     
     CheckQuota blockEvents:=True
