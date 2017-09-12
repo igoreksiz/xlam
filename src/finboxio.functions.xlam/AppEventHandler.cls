@@ -40,6 +40,7 @@ Private Sub App_WindowDeactivate(ByVal Wb As Workbook, ByVal Wn As Window)
 End Sub
 
 Private Sub App_WorkbookActivate(ByVal Wb As Workbook)
+    Call AddUDFCategoryDescription
     trigger = "WorkbookActivate"
     PromoteStagedUpdate
     trigger = ""

@@ -1,7 +1,7 @@
 Private handler As AppEventHandler
 
 Private Sub Workbook_Activate()
-    Call AddUDFCategoryDescription
+    
 End Sub
 
 Private Sub Workbook_AfterSave(ByVal Success As Boolean)
@@ -24,6 +24,7 @@ Private Sub Workbook_Open()
     Set handler = New AppEventHandler
     
     Call SetAPIKeyHandler(New APIKeyHandler)
+    Call AddUDFCategoryDescription
     Call RemoveCustomMenu
     Call UpdateCustomMenu
     

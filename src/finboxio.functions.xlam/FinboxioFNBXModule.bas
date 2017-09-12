@@ -5,17 +5,35 @@ Public CheckedForUpdates As Boolean
 Public RequestedLogin As Boolean
 
 Public Sub AddUDFCategoryDescription()
+    On Error Resume Next
     #If Mac Then
         ' Excel for Mac does not support the property .MacroOptions
         Exit Sub
+    #ElseIf VBA7 Then
+        Application.MacroOptions _
+            Macro:="FNBX", _
+            Category:=1, _
+            description:="Returns a datapoint representing a selected company metric at a given point in time.", _
+            StatusBar:="Downloading data from finbox.io", _
+            HelpFile:=HELP_URL, _
+            ArgumentDescriptions:=Array( _
+                "The company's ticker or finbox.io ID (e.g. AAPL or FINBOX:AAPL). Visit finbox.io to see a complete list of supported companies.", _
+                "The metric ID for the data you wish to retrieve (e.g revenue or roic). See the finbox.io data explorer for a complete list of supported metrics.", _
+                "The period of the data you want to retrieve. Accepts a date or finbox.io period string (e.g. 2017-03-01 or FY-1). This parameter is optional and may not be supported for some metrics." _
+            )
+    #Else
+        Application.MacroOptions _
+            Macro:="FNBX", _
+            Category:=1, _
+            description:="Returns a datapoint representing a selected company metric at a given point in time.", _
+            StatusBar:="Downloading data from finbox.io", _
+            HelpFile:=HELP_URL
     #End If
-    Application.MacroOptions Macro:="FNBX", Category:="finbox.io", _
-        description:="Returns a datapoint representing a selected company metric at a given point in time."
 End Sub
 
 Public Function FNBX(ByRef ticker As String, ByRef metric As String, Optional ByRef period = "") As Variant
 Attribute FNBX.VB_Description = "Returns a datapoint representing a selected company metric at a given point in time."
-Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n19"
+Attribute FNBX.VB_ProcData.VB_Invoke_Func = " \n1"
     ' Must be marked volatile to enable recalculation on refresh
     Application.Volatile
     
