@@ -1,4 +1,9 @@
 
+0.23.6 / 2017-09-12
+===================
+
+  * Adds cleanup logic for older Mac2016 add-in versions installed in the wrong place
+
 0.23.5 / 2017-09-11
 ===================
 
