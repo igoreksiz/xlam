@@ -1,4 +1,9 @@
 
+0.23.7 / 2017-09-12
+===================
+
+  * Reload finboxio menu completely when opening add-in functions
+
 0.23.6 / 2017-09-12
 ===================
 
