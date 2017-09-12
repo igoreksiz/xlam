@@ -169,7 +169,6 @@ Public Sub CancelInstall()
 End Sub
 
 Public Sub UninstallAddIn()
-    Stop
     LogMessage "Uninstalling add-in"
     
     uninstalling = True
