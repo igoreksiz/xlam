@@ -82,7 +82,7 @@ Public Body As Variant
 ' @property Data
 ' @type Dictionary|Collection
 ''
-Public data As Object
+Public Data As Object
 
 ''
 ' Headers that were included with the response.
@@ -120,7 +120,7 @@ Public Sub Update(Updated As WebResponse)
     Me.Body = Updated.Body
     Set Me.Headers = Updated.Headers
     Set Me.Cookies = Updated.Cookies
-    Set Me.data = Updated.data
+    Set Me.Data = Updated.Data
 End Sub
 
 ''
@@ -304,7 +304,7 @@ Private Sub web_LoadValues(web_Headers As String, web_Content As String, web_Bod
     ' Convert content to data by format
     If web_Request.ResponseFormat <> WebFormat.PlainText Then
         On Error Resume Next
-        Set Me.data = _
+        Set Me.Data = _
             xHelpersWeb.ParseByFormat(web_Content, web_Request.ResponseFormat, web_Request.CustomResponseFormat, web_Body)
 
         If Err.Number <> 0 Then

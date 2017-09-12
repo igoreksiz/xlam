@@ -53,13 +53,18 @@ NoManager:
     updatingManager = True
     
     ' Uninstall the active manager
-    Dim addIn As addIn
-    For Each addIn In Application.AddIns
-        If addIn.name = AddInInstalledFile And addIn.Installed Then
-            addIn.Installed = False
-            Exit For
+    On Error Resume Next
+    Dim i As addIn, installed As addIn
+    For Each i In Application.AddIns
+        If i.name = AddInInstalledFile Then
+            i.installed = False
+            Workbooks(i.name).Close
+            SetAttr i.FullName, vbNormal
+            Kill i.FullName
+            If i.path = ThisWorkbook.path Then Set installed = i
         End If
-    Next addIn
+    Next i
+    On Error GoTo ReportError
     
     ' Ensure the manager is unloaded
     UnloadAddInManager
@@ -85,10 +90,10 @@ NoManager:
     LogMessage "Reloading updated manager from " & LocalPath(AddInInstalledFile)
     
     ' Reinstall the manager
-    If Not addIn Is Nothing Then
-        addIn.Installed = True
+    If Not installed Is Nothing Then
+        installed.installed = True
     Else
-        Set addIn = Application.AddIns.Add(LocalPath(AddInInstalledFile), True)
+        Set installed = Application.AddIns.Add(LocalPath(AddInInstalledFile), True)
     End If
     
     ' Ensure the manager workbook is opened

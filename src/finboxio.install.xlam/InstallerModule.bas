@@ -31,33 +31,24 @@ End Function
 Public Sub FinishInstalling()
     On Error GoTo HandleError
     
-    Dim i As addin, installed As addin
-    For Each i In Application.AddIns
-        If i.name = AddInInstalledFile Then
-            Set installed = i
-            Exit For
-        End If
-    Next i
-
     installing = True
     Dim installPath As String
     installPath = SavePath(AddInInstalledFile)
     
-    ' TODO: Need to fully uninstall add-on if it's in wrong place
-    
-    ' Uninstall the existing add-in since
-    ' we need to overwrite the workbook
-    If Not installed Is Nothing Then
-        installed.installed = False
-        
-        On Error Resume Next
-        Workbooks(installed.name).Close
-        If SafeDir(installed.FullName) <> "" Then Kill installed.FullName
-        If SafeDir(installed.FullName, vbHidden) <> "" Then
-            SetAttr installed.FullName, vbNormal
-            Kill installed.FullName
+    Dim i As addin, installed As addin
+    For Each i In Application.AddIns
+        If i.name = AddInInstalledFile Then
+            i.installed = False
+            On Error Resume Next
+            Workbooks(i.name).Close
+            If SafeDir(i.FullName) <> "" Then Kill i.FullName
+            If SafeDir(i.FullName, vbHidden) <> "" Then
+                SetAttr i.FullName, vbNormal
+                Kill i.FullName
+            End If
+            If i.FullName = installPath Then Set installed = i
         End If
-    End If
+    Next i
     
     ' Make sure any existing installation is removed
     ' because Mac will not overwrite existing file
@@ -89,8 +80,8 @@ Public Sub FinishInstalling()
         InstallAddInFunctions
     End If
     
-    ' Add the workbook as an add-in
-    ' if this is a new installation
+    ' Add the workbook as an add-in if this is a
+    ' new installation or if the path has changed
     If installed Is Nothing Then
         Dim Wb As Workbook
         
@@ -114,10 +105,30 @@ Public Sub FinishInstalling()
     ' now running
     Application.ScreenUpdating = True
     installing = False
-    MsgBox _
-        Title:="[finbox.io] Installation Succeeded", _
-        Prompt:="The finbox.io add-in is now installed and ready to use! Enjoy!", _
-        Buttons:=vbInformation
+    
+    ' Warn about restarts
+    Dim leftover As addin
+    For Each i In Application.AddIns
+        If i.name = AddInInstalledFile And i.FullName <> installPath Then
+            Set leftover = i
+            Exit For
+        End If
+    Next i
+    
+    If leftover Is Nothing Then
+        MsgBox _
+            Title:="[finbox.io] Installation Succeeded", _
+            Prompt:="The finbox.io add-in is now installed and ready to use! Enjoy!", _
+            Buttons:=vbInformation
+    Else
+        MsgBox _
+            Title:="[finbox.io] Restart Required", _
+            Prompt:="Excel must be restarted to continue the installation. " & _
+                    "You may be required to restart Excel once more before the installation is complete.", _
+            Buttons:=vbInformation
+        Application.Quit
+        ThisWorkbook.Close
+    End If
     
     On Error Resume Next
     ThisWorkbook.Close
@@ -136,23 +147,19 @@ Public Sub CancelInstall()
     If IsDevDir Then
         ' If we're running this from a development directory,
         ' close the installed add-ins and continue
-        Dim i As addin, installed As addin
+        Dim i As addin
         For Each i In Application.AddIns
             If i.name = AddInInstalledFile Then
-                Set installed = i
+                ' Originally wanted to use AddIn.IsOpen here, but that
+                ' seems to not be available on Mac so we have to just
+                ' try to close the workbook directly and ignore errors
+                On Error Resume Next
+                Workbooks(i.name).Close
+                UnloadAddInFunctions
+                LoadAddInFunctions
                 Exit For
             End If
         Next i
-
-        If Not installed Is Nothing Then
-            ' Originally wanted to use AddIn.IsOpen here, but that
-            ' seems to not be available on Mac so we have to just
-            ' try to close the workbook directly and ignore errors
-            On Error Resume Next
-            Workbooks(installed.name).Close
-            UnloadAddInFunctions
-            LoadAddInFunctions
-        End If
     Else
         ' This add-in shouldn't be run outside
         ' of the installation directory
@@ -251,6 +258,8 @@ Public Sub InstallAddInFunctions()
     
     PromoteStagedUpdate
     
+    cd ThisWorkbook.path
+    
     Exit Sub
 HandleError:
     On Error Resume Next
@@ -300,7 +309,7 @@ Function SavePath(Optional file As String)
     #If Mac Then
         If ExcelVersion = "Mac2016" Then
             SavePath = MacScript("return POSIX path of (path to desktop folder) as string")
-            SavePath = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/AppData/Microsoft/Office/16.0/"
+            SavePath = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/AppData/Office/15.0/"
             SavePath = SavePath & "Add-Ins/"
         Else
             SavePath = Application.LibraryPath
@@ -334,4 +343,48 @@ End Sub
 
 Function IsDevDir() As Boolean
     IsDevDir = SafeDir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> ""
+End Function
+
+' Changing the location of an existing add-in causes serious
+' problems in Excel. Since the Mac2016 version was originally
+' installed in a different location, we need to do some cleanup
+' of database entries that may get out of sync.
+
+Sub CleanUpUninstalledAddIns()
+    Dim installPath As String
+    installPath = SavePath(AddInInstalledFile)
+    Dim i As addin, installed As addin
+    For Each i In Application.AddIns
+        If i.name = AddInInstalledFile And Not i.installed And i.FullName <> installPath Then
+            ClearAddInRegKey i.FullName
+            MsgBox _
+                Title:="[finbox.io] Installation Succeeded", _
+                Prompt:="The installation succeeded, but Excel must be restarted twice to remove all traces of the previous version. " & _
+                        "This should not be necessary for future updates. Click OK to exit Excel now.", _
+                Buttons:=vbInformation
+            Call Application.Workbooks.Add
+            Application.Quit
+            ThisWorkbook.Close
+            Exit Sub
+        End If
+    Next i
+End Sub
+
+Sub ClearAddInRegKey(path As String)
+    If ExcelVersion = "Mac2016" Then
+        Dim cmd As String, result As ShellResult
+        cmd = "echo 'DELETE FROM HKEY_CURRENT_USER_values WHERE value='""'""'""" & path & """'""'""';' | sqlite3 '" & Mac2016Registry & "'"
+        Debug.Print cmd
+        result = xHelpersWeb.ExecuteInShell(cmd)
+        cmd = "echo 'DELETE FROM HKEY_CURRENT_USER_values WHERE name=""" & path & """;' | sqlite3 '" & Mac2016Registry & "'"
+        Debug.Print cmd
+        result = xHelpersWeb.ExecuteInShell(cmd)
+    End If
+End Sub
+
+Function Mac2016Registry() As String
+    If ExcelVersion = "Mac2016" Then
+        Mac2016Registry = MacScript("return POSIX path of (path to desktop folder) as string")
+        Mac2016Registry = Replace(Mac2016Registry, "/Desktop", "") & "Library/Group Containers/UBF8T346G9.Office/MicrosoftRegistrationDB.reg"
+    End If
 End Function

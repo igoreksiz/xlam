@@ -22,7 +22,7 @@ Private Sub UserForm_Initialize()
     
     Dim i As addin, installed As addin
     For Each i In Application.AddIns
-        If i.name = AddInInstalledFile Then
+        If i.name = AddInInstalledFile And i.FullName = SavePath(i.name) Then
             Set installed = i
             Exit For
         End If
