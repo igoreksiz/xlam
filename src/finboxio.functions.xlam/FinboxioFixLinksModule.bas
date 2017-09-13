@@ -54,9 +54,17 @@ Function DereferenceFNBX(ByVal Formula As String)
     replaced = Formula
     On Error GoTo Finish
     While VBA.InStr(replaced, FNBXFND) > 0
-        replaced = _
-            VBA.Left(replaced, VBA.InStrRev(replaced, "'", VBA.InStr(replaced, FNBXFND) - 2) - 1) & _
-            VBA.Mid(replaced, VBA.InStr(replaced, FNBXFND) + 1)
+        Dim i As Integer: i = VBA.InStr(replaced, FNBXFND)
+        Dim p As String: p = VBA.Mid(replaced, i - 1, 1)
+        If p = "'" Then
+            replaced = _
+                VBA.Left(replaced, VBA.InStrRev(replaced, "'", i - 2) - 1) & _
+                VBA.Mid(replaced, i + 1)
+        Else
+            replaced = _
+                VBA.Left(replaced, VBA.InStrRev(replaced, "finboxio", i - 1) - 1) & _
+                VBA.Mid(replaced, i + 1)
+        End If
     Wend
     DereferenceFNBX = replaced
 Finish:
