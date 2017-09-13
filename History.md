@@ -1,4 +1,16 @@
 
+1.0.0 / 2017-09-12
+==================
+
+  * Improved performance with key batching
+  * Better support for nested and table-based formulas
+  * Support for international date and number formats
+  * Improved installation flow
+  * Fully automatic upgrades
+  * Login persistence
+  * Real-time quota indicator
+  * Many other improvements related to stability and maintainability
+
 0.24.5 / 2017-09-12
 ===================
 
