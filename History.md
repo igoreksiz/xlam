@@ -1,4 +1,13 @@
 
+0.24.5 / 2017-09-12
+===================
+
+  * Completed install/upgrade tests for Win2013
+  * Fixes link replacement for links with unquoted filenames
+  * Completed install/upgrade tests for Win2007 & Win2010
+  * Completed install/upgrade tests for Mac2016
+  * Finished Mac2011 install/upgrade tests
+
 0.24.4 / 2017-09-12
 ===================
 
