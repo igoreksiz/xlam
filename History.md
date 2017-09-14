@@ -1,4 +1,11 @@
 
+1.1.0 / 2017-09-14
+==================
+
+  * Switches default parse method on windows to iterate to improve performance for large workbooks
+  * Adds settings module to functions add-in
+  * Adds settings module to functions add-in
+
 1.0.0 / 2017-09-12
 ==================
 
