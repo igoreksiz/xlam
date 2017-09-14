@@ -193,40 +193,28 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
     ReDim uncached(0)
     Dim i As Long, j As Long
     If Not book Is Nothing Then
-        Dim fnd As String, rng As Range, cell As Range, Formula As String
+        Dim fnd As String, rng As Range, cell As Range, Formula As String, formulas As Variant
         Dim sheet As Worksheet
         For Each sheet In book.Worksheets
             fnd = "FNBX("
             Set rng = sheet.UsedRange
-            #If Mac Then
-                ' VBA on Mac does not allow us to use Find while running in the context
-                ' of a UDF. So we have to iterate all the cells and check for FNBX. A
-                ' couple of optimizations are important for making this usable with very
-                ' large sheets. First, load the 2D array of formulas from the entire range
-                ' instead of individual cells. Second, use SpecialCells to reduce the range
-                ' to only include cells with formulas.
-                Dim formulas As Variant
-                On Error Resume Next
-                formulas = rng.SpecialCells(xlCellTypeFormulas).Formula
-                For i = LBound(formulas, 1) To UBound(formulas, 1)
-                    For j = LBound(formulas, 2) To UBound(formulas, 2)
-                        If Not formulas(i, j) = "" Then
-                            If VBA.InStr(VBA.UCase(formulas(i, j)), fnd) > 0 Then
-                                Formula = formulas(i, j)
-                                Set cell = rng.Cells(i, j)
-                                Call ParseFormula(Formula, cell, sheet, keys)
-                            End If
-                        End If
-                    Next j
-                Next i
-            #Else
-                ' On Windows, we can do a search for all FNBX cells. Generally, this gives
-                ' better performance because we don't have to iterate through all cells in
+            
+            If GetSetting("debugParseTimes", False) Then
+                Dim count As Long, start As Date
+                LogMessage "Parsing " & rng.count & " cells in sheet " & sheet.name
+                start = VBA.Now()
+            End If
+            
+            Dim parseAlgorithm As String
+            parseAlgorithm = GetSetting("parseAlgorithm", "iterate")
+            
+            If parseAlgorithm = "find" And VBA.Left(ExcelVersion, 3) = "Win" Then
+                ' On Windows, we can do a search for all FNBX cells. This may give better
+                ' performance because we don't have to iterate through all of the cells in
                 ' the workbook. However, we are accessing each formula on individual cells
                 ' which could be more expensive than loading all formulas for a range in a
                 ' single call. So there may be a need to optimize this call for very large
-                ' workbooks with a high ratio of FNBXs-to-cells (TODO: test performance
-                ' trade-off for workbooks with increasing FNBX count)
+                ' workbooks with a high ratio of FNBXs-to-cells
                 Dim FirstFound As String, LastCell As Range, FoundCell As Range
                 Set LastCell = rng.Cells(rng.Cells.count)
                 Set FoundCell = rng.Find(What:=fnd, LookIn:=xlFormulas, LookAt:=xlPart, After:=LastCell, MatchCase:=False)
@@ -245,7 +233,36 @@ Private Function FindUncachedKeys(ByRef book As Workbook) As String()
                 
                 ' Reset the Find/Replace dialog after Find (not 100% sure this is necessary)
                 ResetFindReplace
-            #End If
+            Else
+                ' Iterate all the cells and check for FNBX. A couple of optimizations are
+                ' important for making this usable with very large sheets. First, load the
+                ' 2D array of formulas from the entire range instead of individual cells.
+                ' Second, use SpecialCells to reduce the range to only include cells with
+                ' formulas. This is the default method and works on all platforms
+                '
+                ' Note that for Excel 2007, SpecialCells can return a maximum of 8,192
+                ' non-contiguous ranges.
+                parseAlgorithm = "iterate"
+                On Error Resume Next
+                formulas = rng.SpecialCells(xlCellTypeFormulas).Formula
+                For i = LBound(formulas, 1) To UBound(formulas, 1)
+                    For j = LBound(formulas, 2) To UBound(formulas, 2)
+                        If Not formulas(i, j) = "" Then
+                            If VBA.InStr(VBA.UCase(formulas(i, j)), fnd) > 0 Then
+                                Formula = formulas(i, j)
+                                Set cell = rng.Cells(i, j)
+                                Call ParseFormula(Formula, cell, sheet, keys)
+                            End If
+                        End If
+                    Next j
+                Next i
+            End If
+            
+            If GetSetting("debugParseTimes", False) Then
+                LogMessage "Parsed " & (UBound(keys) - count) & " keys in " & ((VBA.Now() - start) * 60 * 60 * 24) & " sec using " & parseAlgorithm & " method"
+                count = UBound(keys)
+            End If
+        
         Next sheet
     End If
 

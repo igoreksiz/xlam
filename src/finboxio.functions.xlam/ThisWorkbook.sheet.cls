@@ -1,9 +1,5 @@
 Private handler As AppEventHandler
 
-Private Sub Workbook_Activate()
-    
-End Sub
-
 Private Sub Workbook_AfterSave(ByVal Success As Boolean)
     On Error GoTo Finish
     If SafeDir(ThisWorkbook.path & Application.PathSeparator & ".git", vbDirectory Or vbHidden) <> "" Then
