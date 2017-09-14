@@ -34,6 +34,7 @@ Public Const AddInInstallerFile = "finboxio.install.xlam"
 Public Const AddInFunctionsFile = "finboxio.functions.xlam"
 Public Const AddInKeyFile = "finboxio.key"
 Public Const AddInLogFile = "finboxio.log"
+Public Const AddInSettingsFile = "finboxio.cfg"
 
 Public Function AddInManagerFile() As String
     On Error Resume Next
