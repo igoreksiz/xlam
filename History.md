@@ -1,4 +1,9 @@
 
+1.1.1 / 2017-09-14
+==================
+
+  * Add warning to Mac2016 login prompt about missing cursor
+
 1.1.0 / 2017-09-14
 ==================
 
