@@ -74,6 +74,8 @@ Public Function ExcelVersion() As String
             ExcelVersion = "Mac2011"
         ElseIf version = 15 Then
             ExcelVersion = "Mac2016"
+        ElseIf version = 16 Then
+            ExcelVersion = "Mac2016"
         End If
     #Else
         If version = 12 Then
@@ -95,6 +97,7 @@ End Function
 '   12 = Office 2007
 '   14 = Office 2010 or Office 2011 for Mac
 '   15 = Office 2013 or Office 2016 for Mac
+'   16 = Office 2016 for Mac or Windows
 Public Function MSOfficeVersion() As Integer
     Dim verStr As String
     Dim startPos As Integer
