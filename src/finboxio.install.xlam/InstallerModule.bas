@@ -309,8 +309,14 @@ Function SavePath(Optional file As String)
     #If Mac Then
         If ExcelVersion = "Mac2016" Then
             SavePath = MacScript("return POSIX path of (path to desktop folder) as string")
-            SavePath = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/AppData/Office/15.0/"
-            SavePath = SavePath & "Add-Ins/"
+            Dim Path15 As String, Path16 As String
+            Path15 = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/AppData/Office/15.0"
+            Path16 = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/Office/16.0"
+            If SafeDir(Path16, vbDirectory) Then
+                SavePath = Path16 & "/Add-Ins/"
+            ElseIf SafeDir(Path15, vbDirectory) Then
+                SavePath = Path15 & "/Add-Ins/"
+            End If
         Else
             SavePath = Application.LibraryPath
         End If
