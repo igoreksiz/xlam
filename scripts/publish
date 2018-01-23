@@ -13,11 +13,13 @@ git checkout tags/v$PUBLISH_VERSION &> /dev/null || {
   exit 1
 }
 
-git status | grep "nothing to commit, working directory clean" || {
+if [ -n "$(git status --porcelain)" ]; then
   echo "Working directory is not clean!"
   git checkout $CURRENT_BRANCH &> /dev/null
   exit 1
-}
+fi
+
+exit 0
 
 if hub release --include-drafts | grep -q "^v${PUBLISH_VERSION}\$"; then
   echo "Release already exists!"
