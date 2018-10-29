@@ -1,7 +1,8 @@
 
-1.1.4-beta0 / 2018-10-29
-====================
+1.1.4-beta0.0 / 2018-10-29
+==========================
 
+  * Prerelease 1.1.4-beta0
   * Merge pull request #9 from finboxio/fix/vba-install-bug
   * Fix installation bug with new version of VBA
 
