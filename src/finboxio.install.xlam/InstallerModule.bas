@@ -20,7 +20,7 @@ End Function
 
 Public Function InstallAddIn(self As Workbook) As Boolean
     ' Don't run if add-in is already installed
-    InstallAddIn = (self.name = AddInInstalledFile)
+    InstallAddIn = (VBA.LCase(self.name) = VBA.LCase(AddInInstalledFile))
     #If Mac Then
         If Not InstallAddIn Then MacInstallPrompt.Show
     #Else
@@ -37,7 +37,7 @@ Public Sub FinishInstalling()
     
     Dim i As addin, installed As addin
     For Each i In Application.AddIns
-        If i.name = AddInInstalledFile Then
+        If VBA.LCase(i.name) = VBA.LCase(AddInInstalledFile) Then
             i.installed = False
             On Error Resume Next
             Workbooks(i.name).Close
@@ -46,7 +46,7 @@ Public Sub FinishInstalling()
                 SetAttr i.FullName, vbNormal
                 Kill i.FullName
             End If
-            If i.FullName = installPath Then Set installed = i
+            If VBA.LCase(i.FullName) = VBA.LCase(installPath) Then Set installed = i
         End If
     Next i
     
@@ -109,7 +109,7 @@ Public Sub FinishInstalling()
     ' Warn about restarts
     Dim leftover As addin
     For Each i In Application.AddIns
-        If i.name = AddInInstalledFile And i.FullName <> installPath Then
+        If VBA.LCase(i.name) = VBA.LCase(AddInInstalledFile) And VBA.LCase(i.FullName) <> VBA.LCase(installPath) Then
             Set leftover = i
             Exit For
         End If
@@ -149,7 +149,7 @@ Public Sub CancelInstall()
         ' close the installed add-ins and continue
         Dim i As addin
         For Each i In Application.AddIns
-            If i.name = AddInInstalledFile Then
+            If VBA.LCase(i.name) = VBA.LCase(AddInInstalledFile) Then
                 ' Originally wanted to use AddIn.IsOpen here, but that
                 ' seems to not be available on Mac so we have to just
                 ' try to close the workbook directly and ignore errors
@@ -178,7 +178,7 @@ Public Sub UninstallAddIn()
     ' Uninstall and delete installed add-in files
     Dim i As addin, installed As addin
     For Each i In Application.AddIns
-        If VBA.InStr(i.name, "finbox") > 0 Then
+        If VBA.InStr(VBA.LCase(i.name), "finbox") > 0 Then
             i.installed = False
             Workbooks(i.name).Close
             If SafeDir(i.FullName) <> "" Then Kill i.FullName
@@ -295,7 +295,7 @@ Public Sub RemoveAddInFunctions()
 End Sub
 
 Public Sub CloseInstaller()
-    If ThisWorkbook.name = AddInInstallerFile Then Exit Sub
+    If VBA.LCase(ThisWorkbook.name) = VBA.LCase(AddInInstallerFile) Then Exit Sub
     On Error GoTo Closed
     Dim opened As String
     opened = Workbooks(AddInInstallerFile).name
@@ -312,9 +312,9 @@ Function SavePath(Optional file As String)
             Dim Path15 As String, Path16 As String
             Path15 = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/AppData/Office/15.0"
             Path16 = Replace(SavePath, "/Desktop", "") & "Library/Containers/com.microsoft.Excel/Data/Library/Application Support/Microsoft/Office/16.0"
-            If SafeDir(Path16, vbDirectory) Then
+            If SafeDir(Path16, vbDirectory) <> "" Then
                 SavePath = Path16 & "/Add-Ins/"
-            ElseIf SafeDir(Path15, vbDirectory) Then
+            ElseIf SafeDir(Path15, vbDirectory) <> "" Then
                 SavePath = Path15 & "/Add-Ins/"
             End If
         Else
@@ -361,7 +361,7 @@ Sub CleanUpUninstalledAddIns()
     installPath = SavePath(AddInInstalledFile)
     Dim i As addin, installed As addin
     For Each i In Application.AddIns
-        If i.name = AddInInstalledFile And Not i.installed And i.FullName <> installPath Then
+        If VBA.LCase(i.name) = VBA.LCase(AddInInstalledFile) And Not i.installed And VBA.LCase(i.FullName) <> VBA.LCase(installPath) Then
             ClearAddInRegKey i.FullName
             MsgBox _
                 Title:="[finbox.io] Installation Succeeded", _
