@@ -341,9 +341,7 @@ Sub SaveCopy(Wb, path As String)
 End Sub
 
 Sub SaveCopyAsExcel2016(Wb, path As String)
-    Dim folder As String
-    folder = Left(path, InStrRev(path, "/"))
-    If SafeDir(folder, vbDirectory) = vbNullString Then VBA.MkDir folder
+    SafeMkDir path
     Wb.SaveCopyAs path
 End Sub
 

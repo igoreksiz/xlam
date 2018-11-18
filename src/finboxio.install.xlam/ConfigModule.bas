@@ -65,6 +65,20 @@ Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) 
     SafeDir = VBA.Dir(file, attributes)
 End Function
 
+Public Sub SafeMkDir(path As String)
+    Dim folder As String
+    folder = Left(path, InStrRev(path, "/"))
+    If SafeDir(folder, vbDirectory) = vbNullString Then
+        #If Mac Then
+            Dim appleScript As String
+            appleScript = "do shell script ""mkdir '" & folder & "'"""
+            MacScript Script
+        #Else
+            VBA.MkDir folder
+        #End If
+    End
+End Sub
+
 Public Function ExcelVersion() As String
     Dim version As Integer: version = MSOfficeVersion
     ExcelVersion = "Unsupported"

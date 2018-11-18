@@ -1,9 +1,8 @@
 Private handler As AppEventHandler
 
 Private Sub Workbook_Open()
-    Dim folder As String
-    folder = Left(SavePath, InStrRev(SavePath, "/"))
-    If SafeDir(folder, vbDirectory) = vbNullString Then VBA.MkDir folder
+    SafeMkDir SavePath
+    
     CleanUpUninstalledAddIns
 
     LogMessage "Loading add-in manager"
