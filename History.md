@@ -1,4 +1,9 @@
 
+1.1.6 / 2018-11-17
+==================
+
+  * Fixes bug with Mac update that broke VBA.MkDir
+
 1.1.5 / 2018-11-01
 ==================
 
