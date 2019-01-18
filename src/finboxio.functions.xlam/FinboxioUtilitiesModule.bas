@@ -72,6 +72,7 @@ End Function
 
 Public Function GetAPIHeader() As String
     GetAPIHeader = "{ ""application"": ""Excel" & _
+        """, ""file_name"": """ & ActiveWorkbook.name & _
         """, ""operating_system"": """ & OperatingSystem & _
         """, ""release_year"": """ & ReleaseYear & _
         """, ""application_version"": """ & Application.version & _
