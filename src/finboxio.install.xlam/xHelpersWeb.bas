@@ -158,6 +158,14 @@ Private Declare PtrSafe Function utc_fread Lib "libc.dylib" Alias "fread" _
 Private Declare PtrSafe Function utc_feof Lib "libc.dylib" Alias "feof" _
     (ByVal utc_File As LongPtr) As LongPtr
 
+Private Declare PtrSafe Function utc_popen_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "popen" _
+    (ByVal utc_Command As String, ByVal utc_Mode As String) As LongPtr
+Private Declare PtrSafe Function utc_pclose_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "pclose" _
+    (ByVal utc_File As Long) As LongPtr
+Private Declare PtrSafe Function utc_fread_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "fread" _
+    (ByVal utc_Buffer As String, ByVal utc_Size As LongPtr, ByVal utc_Number As LongPtr, ByVal utc_File As LongPtr) As LongPtr
+Private Declare PtrSafe Function utc_feof_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "feof" _
+    (ByVal utc_File As LongPtr) As LongPtr
 #Else
 
 ' 32-bit Mac
@@ -170,6 +178,14 @@ Private Declare Function utc_fread Lib "libc.dylib" Alias "fread" _
 Private Declare Function utc_feof Lib "libc.dylib" Alias "feof" _
     (ByVal utc_File As Long) As Long
 
+Private Declare Function utc_popen_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "popen" _
+    (ByVal utc_Command As String, ByVal utc_Mode As String) As Long
+Private Declare Function utc_pclose_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "pclose" _
+    (ByVal utc_File As Long) As Long
+Private Declare Function utc_fread_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "fread" _
+    (ByVal utc_Buffer As String, ByVal utc_Size As Long, ByVal utc_Number As Long, ByVal utc_File As Long) As Long
+Private Declare Function utc_feof_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "feof" _
+    (ByVal utc_File As Long) As Long
 #End If
 
 #ElseIf VBA7 Then
@@ -275,11 +291,21 @@ Private Declare PtrSafe Function web_popen Lib "libc.dylib" Alias "popen" (ByVal
 Private Declare PtrSafe Function web_pclose Lib "libc.dylib" Alias "pclose" (ByVal web_File As LongPtr) As LongPtr
 Private Declare PtrSafe Function web_fread Lib "libc.dylib" Alias "fread" (ByVal web_OutStr As String, ByVal web_Size As LongPtr, ByVal web_Items As LongPtr, ByVal web_Stream As LongPtr) As LongPtr
 Private Declare PtrSafe Function web_feof Lib "libc.dylib" Alias "feof" (ByVal web_File As LongPtr) As LongPtr
+
+Private Declare PtrSafe Function web_popen_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "popen" (ByVal web_Command As String, ByVal web_Mode As String) As LongPtr
+Private Declare PtrSafe Function web_pclose_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "pclose" (ByVal web_File As LongPtr) As LongPtr
+Private Declare PtrSafe Function web_fread_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "fread" (ByVal web_OutStr As String, ByVal web_Size As LongPtr, ByVal web_Items As LongPtr, ByVal web_Stream As LongPtr) As LongPtr
+Private Declare PtrSafe Function web_feof_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "feof" (ByVal web_File As LongPtr) As LongPtr
 #Else
 Private Declare Function web_popen Lib "libc.dylib" Alias "popen" (ByVal web_Command As String, ByVal web_Mode As String) As Long
 Private Declare Function web_pclose Lib "libc.dylib" Alias "pclose" (ByVal web_File As Long) As Long
 Private Declare Function web_fread Lib "libc.dylib" Alias "fread" (ByVal web_OutStr As String, ByVal web_Size As Long, ByVal web_Items As Long, ByVal web_Stream As Long) As Long
 Private Declare Function web_feof Lib "libc.dylib" Alias "feof" (ByVal web_File As Long) As Long
+
+Private Declare Function web_popen_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "popen" (ByVal web_Command As String, ByVal web_Mode As String) As Long
+Private Declare Function web_pclose_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "pclose" (ByVal web_File As Long) As Long
+Private Declare Function web_fread_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "fread" (ByVal web_OutStr As String, ByVal web_Size As Long, ByVal web_Items As Long, ByVal web_Stream As Long) As Long
+Private Declare Function web_feof_system Lib "/usr/lib/system/libsystem_c.dylib" Alias "feof" (ByVal web_File As Long) As Long
 #End If
 #End If
 
@@ -1643,6 +1669,41 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
 
     On Error GoTo web_Cleanup
 
+#If Mac Then
+    If VersionAtLeast(16, 22, 0) Then
+        web_File = web_popen_system(web_Command, "r")
+
+        If web_File = 0 Then
+            ' TODO Investigate why this could happen and what should be done if it happens
+            Exit Function
+        End If
+
+        Do While web_feof_system(web_File) = 0
+            web_Chunk = VBA.Space$(50)
+            web_Read = CLng(web_fread_system(web_Chunk, 1, VBA.Len(web_Chunk) - 1, web_File))
+            If web_Read > 0 Then
+                web_Chunk = VBA.Left$(web_Chunk, web_Read)
+                ExecuteInShell.Output = ExecuteInShell.Output & web_Chunk
+            End If
+        Loop
+    Else
+        web_File = web_popen(web_Command, "r")
+
+        If web_File = 0 Then
+            ' TODO Investigate why this could happen and what should be done if it happens
+            Exit Function
+        End If
+
+        Do While web_feof(web_File) = 0
+            web_Chunk = VBA.Space$(50)
+            web_Read = CLng(web_fread(web_Chunk, 1, VBA.Len(web_Chunk) - 1, web_File))
+            If web_Read > 0 Then
+                web_Chunk = VBA.Left$(web_Chunk, web_Read)
+                ExecuteInShell.Output = ExecuteInShell.Output & web_Chunk
+            End If
+        Loop
+    End If
+#Else
     web_File = web_popen(web_Command, "r")
 
     If web_File = 0 Then
@@ -1658,10 +1719,18 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
             ExecuteInShell.Output = ExecuteInShell.Output & web_Chunk
         End If
     Loop
+#End If
 
 web_Cleanup:
-
+#If Mac Then
+    If VersionAtLeast(16, 22, 0) Then
+        ExecuteInShell.ExitCode = CLng(web_pclose_system(web_File))
+    Else
+        ExecuteInShell.ExitCode = CLng(web_pclose(web_File))
+    End If
+#Else
     ExecuteInShell.ExitCode = CLng(web_pclose(web_File))
+#End If
 #End If
 End Function
 
@@ -2979,6 +3048,36 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
     Dim utc_Chunk As String
 
     On Error GoTo utc_ErrorHandling
+
+#If Mac Then
+    If VersionAtLeast(16, 22, 0) Then
+        utc_File = utc_popen_system(utc_ShellCommand, "r")
+
+        If utc_File = 0 Then: Exit Function
+
+        Do While utc_feof_system(utc_File) = 0
+            utc_Chunk = VBA.Space$(50)
+            utc_Read = CLng(utc_fread_system(utc_Chunk, 1, VBA.Len(utc_Chunk) - 1, utc_File))
+            If utc_Read > 0 Then
+                utc_Chunk = VBA.Left$(utc_Chunk, utc_Read)
+                utc_ExecuteInShell.utc_Output = utc_ExecuteInShell.utc_Output & utc_Chunk
+            End If
+        Loop
+    Else
+        utc_File = utc_popen(utc_ShellCommand, "r")
+
+        If utc_File = 0 Then: Exit Function
+
+        Do While utc_feof(utc_File) = 0
+            utc_Chunk = VBA.Space$(50)
+            utc_Read = CLng(utc_fread(utc_Chunk, 1, VBA.Len(utc_Chunk) - 1, utc_File))
+            If utc_Read > 0 Then
+                utc_Chunk = VBA.Left$(utc_Chunk, utc_Read)
+                utc_ExecuteInShell.utc_Output = utc_ExecuteInShell.utc_Output & utc_Chunk
+            End If
+        Loop
+    End If
+#Else
     utc_File = utc_popen(utc_ShellCommand, "r")
 
     If utc_File = 0 Then: Exit Function
@@ -2991,9 +3090,18 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
             utc_ExecuteInShell.utc_Output = utc_ExecuteInShell.utc_Output & utc_Chunk
         End If
     Loop
+#End If
 
 utc_ErrorHandling:
+#If Mac Then
+    If VersionAtLeast(16, 22, 0) Then
+        utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose_system(utc_File))
+    Else
+        utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose(utc_File))
+    End If
+#Else
     utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose(utc_File))
+#End If
 End Function
 
 #Else
@@ -3203,6 +3311,39 @@ AutoProxy_Cleanup:
 #End If
 End Sub
 
+Function VersionAtLeast(major As Double, minor As Double, patch As Double) As Boolean
+    VersionAtLeast = (MajorVersion >= major) And (MinorVersion >= minor) And (PatchVersion >= patch)
+End Function
+
+Function MajorVersion() As Double
+    MajorVersion = Val(Split(Application.version, ".")(0))
+End Function
+
+Function MinorVersion() As Double
+    If CountCharacters(Application.version, ".") > 0 Then
+        MinorVersion = Val(Split(Application.version, ".")(1))
+    Else
+        MinorVersion = 0
+    End If
+End Function
+
+Function PatchVersion() As Double
+    If CountCharacters(Application.version, ".") > 1 Then
+        PatchVersion = Val(Split(Application.version, ".")(2))
+    Else
+        PatchVersion = 0
+    End If
+End Function
+
+Function CountCharacters(str As String, char As String) As Long
+    Dim i As Integer, count As Integer
+    count = 0
+    For i = 1 To Len(str)
+        If Mid(str, i, 1) = char Then count = count + 1
+    Next
+    CountCharacters = count
+End Function
+
 Public Sub RaiseCurlError(ByRef web_Result As ShellResult, url As String)
     Dim web_ErrorNumber As Long
     Dim web_ErrorMessage As String
@@ -3256,4 +3397,5 @@ Public Sub RaiseCurlError(ByRef web_Result As ShellResult, url As String)
             "Find details at http://curl.haxx.se/libcurl/c/libcurl-errors.html"
     End Select
 End Sub
+
 

@@ -267,7 +267,57 @@ Public Function Execute(Request As WebRequest) As WebResponse
     ' Map to WinHttp error number, as possible
     ' https://msdn.microsoft.com/en-us/library/aa383770(VS.85).aspx
     If web_Result.ExitCode > 0 Then
-        xHelpersWeb.RaiseCurlError web_Result, Me.GetFullUrl(Request)
+        Dim web_ErrorNumber As Long
+        Dim web_ErrorMessage As String
+        Dim web_ErrorDetails As String
+        web_ErrorNumber = web_Result.ExitCode / 256
+
+        Select Case web_ErrorNumber
+        Case 1
+            ' 1 = CURLE_UNSUPPORTED_PROTOCOL
+            ' 12006 = ERROR_WINHTTP_UNRECOGNIZED_SCHEME
+            Err.Raise 12006 + &H30000 + vbObjectError, "The URL does not use a recognized protocol (1: CURLE_UNSUPPORTED_PROTOCOL)" & vbNewLine & _
+                "URL: " & Me.GetFullUrl(Request) & vbNewLine & _
+                "Protocol: " & xHelpersWeb.GetUrlParts(Me.GetFullUrl(Request))("Protocol")
+        Case 3
+            ' 3 = CURLE_URL_MALFORMAT
+            ' 12005 = ERROR_WINHTTP_INVALID_URL
+            Err.Raise 12005 + &H30000 + vbObjectError, "The URL is invalid (3: CURLE_URL_MALFORMAT)" & _
+                "URL: " & Me.GetFullUrl(Request)
+        Case 5, 6
+            ' 5 = CURLE_COULDNT_RESOLVE_PROXY
+            ' 6 = CURLE_COULDNT_RESOLVE_HOST
+            ' 12007 = ERROR_WINHTTP_NAME_NOT_RESOLVED
+            If web_ErrorNumber = 5 Then
+                web_ErrorDetails = "(5: CURLE_COULDNT_RESOLVE_PROXY)"
+            Else
+                web_ErrorDetails = "(6: CURLE_COULDNT_RESOLVE_HOST)"
+            End If
+
+            Err.Raise 12007 + &H30000 + vbObjectError, "WebClient.Execute", "The server name or address could not be resolved " & web_ErrorDetails
+        Case 7
+            ' 7 = CURLE_COULDNT_CONNECT
+            ' 12029 = ERROR_WINHTTP_CANNOT_CONNECT
+            Err.Raise 12029 + &H30000 + vbObjectError, "WebClient.Execute", "A connection with the server could not be established (7: CURLE_COULDNT_CONNECT)"
+        Case 12, 28
+            ' 12 = CURLE_FTP_ACCEPT_TIMEOUT
+            ' 28 = CURLE_OPERATION_TIMEDOUT
+            ' 12002 = ERROR_WINHTTP_TIMEOUT
+            If web_ErrorNumber = 12 Then
+                web_ErrorDetails = "(12: CURLE_FTP_ACCEPT_TIMEOUT)"
+            Else
+                web_ErrorDetails = "(28: CURLE_OPERATION_TIMEDOUT)"
+            End If
+
+            Err.Raise 12002 + &H30000 + vbObjectError, "WebClient.Execute", "The operation timed out " & web_ErrorDetails
+        Case 47
+            ' 47 = CURLE_TOO_MANY_REDIRECTS
+            ' 12156 = ERROR_WINHTTP_REDIRECT_FAILED
+            Err.Raise 12156 + &H30000 + vbObjectError, "WebClient.Execute", "Too many redirects (47: CURLE_TOO_MANY_REDIRECTS)"
+        Case Else
+            Err.Raise 11010 + vbObjectError, "WebClient.Execute", "An unknown cURL error occured, #" & web_ErrorNumber & vbNewLine & _
+                "Find details at http://curl.haxx.se/libcurl/c/libcurl-errors.html"
+        End Select
     End If
 
     web_Response.CreateFromCurl Me, Request, web_Result.Output
