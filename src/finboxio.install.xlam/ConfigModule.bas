@@ -72,11 +72,11 @@ Public Sub SafeMkDir(path As String)
         #If Mac Then
             Dim appleScript As String
             appleScript = "do shell script ""mkdir '" & folder & "'"""
-            MacScript Script
+            MacScript appleScript
         #Else
             VBA.MkDir folder
         #End If
-    End
+    End If
 End Sub
 
 Public Function ExcelVersion() As String
