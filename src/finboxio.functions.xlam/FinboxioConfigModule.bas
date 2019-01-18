@@ -13,8 +13,6 @@ Public Const SIGNUP_URL = "https://finbox.io/signup"
 Public Const HELP_URL = "https://finbox.io/blog/using-the-excel-add-in/"
 Public Const UPGRADE_URL = "https://finbox.io/premium"
 
-Public Const TIER_URL = "https://api.finbox.io/beta/usage"
-Public Const BATCH_URL = "https://api.finbox.io/beta/data/batch"
 Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
 
 Public Const LIMIT_EXCEEDED_ERROR = 20400
@@ -72,6 +70,18 @@ End Function
 Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) As String
     On Error Resume Next
     SafeDir = VBA.Dir(file, attributes)
+End Function
+
+Public Function ApiUrl()
+    ApiUrl = GetSetting("finboxioApiUrl", "https://api.finbox.io/beta")
+End Function
+
+Public Function TierUrl()
+    TierUrl = ApiUrl & "/usage"
+End Function
+
+Public Function BatchUrl()
+    BatchUrl = ApiUrl & "/data/batch"
 End Function
 
 Sub auto_add()

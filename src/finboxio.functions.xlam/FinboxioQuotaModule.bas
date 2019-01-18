@@ -45,7 +45,7 @@ Public Sub CheckQuota(Optional blockEvents As Boolean)
     Dim webClient As New webClient
 
     webClient.BlockEventLoop = blockEvents
-    webClient.BaseUrl = TIER_URL
+    webClient.BaseUrl = TierUrl
     webClient.TimeoutMs = 5000
 
     ' Setup Basic Auth with API key as username and empty password
