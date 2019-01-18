@@ -1,4 +1,10 @@
 
+1.1.7-beta.0 / 2019-01-18
+=========================
+
+  * Update for compatibility with Excel for Mac v16.22
+  * Fix Mac installation bug
+
 1.1.6 / 2018-11-17
 ==================
 
