@@ -71,7 +71,11 @@ Public Function DateStringToPeriod(period As String)
 End Function
 
 Public Function GetAPIHeader() As String
-    GetAPIHeader = "Excel - " & ExcelVersion & " - v" & AddInVersion(AddInFunctionsFile)
+    GetAPIHeader = "{ ""application"": ""Excel" & _
+        """, ""operating_system"": """ & OperatingSystem & _
+        """, ""release_year"": """ & ReleaseYear & _
+        """, ""application_version"": """ & Application.version & _
+        """, ""addin_version"": """ & AddInVersion(AddInFunctionsFile) & """ }"
 End Function
 
 Public Function ExcelVersion() As String
@@ -83,6 +87,8 @@ Public Function ExcelVersion() As String
             ExcelVersion = "Mac2011"
         ElseIf version = 15 Then
             ExcelVersion = "Mac2016"
+        ElseIf VersionAtLeast(16, 17, 0) Then
+            ExcelVersion = "Mac2019"
         ElseIf version = 16 Then
             ExcelVersion = "Mac2016"
         End If
@@ -97,6 +103,23 @@ Public Function ExcelVersion() As String
             ExcelVersion = "Win2016"
         End If
     #End If
+End Function
+
+Public Function OperatingSystem() As String
+    #If Mac Then
+        OperatingSystem = "Mac"
+    #Else
+        OperatingSystem = "Windows"
+    #End If
+End Function
+
+Public Function ReleaseYear() As String
+    Dim version As String
+    If version = "Unsupported" Then
+        ReleaseYear = version
+    Else
+        ReleaseYear = VBA.Right(ExcelVersion, 4)
+    End If
 End Function
 
 ' Returns the version of MS Office being run
