@@ -161,7 +161,7 @@ HandleErrors:
     End If
 
     If Err.Number = MISSING_VALUE_ERROR Then
-        FNBX = CVErr(xlErrNull)
+        FNBX = DefaultNullValue
     ElseIf Err.Number = INVALID_ARGS_ERROR Then
         FNBX = CVErr(xlErrValue)
     ElseIf Err.Number = INVALID_KEY_ERROR Then

@@ -133,8 +133,17 @@ End Function
 
 Private Function ConvertValue(ByRef data As Variant)
     If IsNull(data) Then
-        data = CVErr(xlErrNull)
-    ElseIf TypeName(data) = "Collection" Then
+        Dim nullValue As String
+        nullValue = GetSetting("defaultNullValue", "0")
+        If nullValue = "xlErrNull" Then
+            data = CVErr(xlErrNull)
+            GoTo FinishConversion
+        Else
+            data = nullValue
+        End If
+    End If
+    
+    If TypeName(data) = "Collection" Then
         Dim i As Long, total As Long, converted As Variant
         total = data.count
         For i = 1 To total
@@ -147,22 +156,8 @@ Private Function ConvertValue(ByRef data As Variant)
     ElseIf VBA.IsDate(data) Then
         data = CDate(data)
     ElseIf TypeName(data) = "String" Then
-        Dim numeric As String, char As String, pos As Long, languageAdjusted As String
-        numeric = "1234567890-.,"
-        languageAdjusted = ""
-        For pos = 1 To VBA.Len(data)
-            char = VBA.Mid(data, pos, 1)
-            If VBA.InStr(numeric, char) = 0 Then
-                languageAdjusted = "x"
-                Exit For
-            ElseIf char = "," Then
-                languageAdjusted = languageAdjusted & Application.International(xlThousandsSeparator)
-            ElseIf char = "." Then
-                languageAdjusted = languageAdjusted & Application.International(xlDecimalSeparator)
-            Else
-                languageAdjusted = languageAdjusted & char
-            End If
-        Next
+        Dim languageAdjusted As String
+        languageAdjusted = AdjustForLanguage(CStr(data))
         If IsNumeric(languageAdjusted) Then
             data = CDbl(languageAdjusted)
         End If
@@ -173,6 +168,8 @@ Private Function ConvertValue(ByRef data As Variant)
     Else
         data = CVErr(xlErrValue)
     End If
+    
+FinishConversion:
     ConvertValue = data
 End Function
 

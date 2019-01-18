@@ -143,3 +143,42 @@ Public Function MSOfficeVersion() As Integer
         MSOfficeVersion = CInt(verStr)
     End If
 End Function
+
+Public Function DefaultNullValue() As Variant
+    Dim data As String
+    data = GetSetting("defaultNullValue", "0")
+    
+    If data = "xlErrNull" Then
+        DefaultNullValue = CVErr(xlErrNull)
+    Else
+        Dim languageAdjusted As String
+        languageAdjusted = AdjustForLanguage(data)
+        If IsNumeric(languageAdjusted) Then
+            DefaultNullValue = CDbl(languageAdjusted)
+        Else
+            DefaultNullValue = data
+        End If
+    End If
+End Function
+
+Public Function AdjustForLanguage(value As String) As String
+    Dim numeric As String, char As String, pos As Long, languageAdjusted As String
+    numeric = "1234567890-.,"
+    languageAdjusted = ""
+    
+    For pos = 1 To VBA.Len(value)
+        char = VBA.Mid(value, pos, 1)
+        If VBA.InStr(numeric, char) = 0 Then
+            languageAdjusted = "x"
+            Exit For
+        ElseIf char = "," Then
+            languageAdjusted = languageAdjusted & Application.International(xlThousandsSeparator)
+        ElseIf char = "." Then
+            languageAdjusted = languageAdjusted & Application.International(xlDecimalSeparator)
+        Else
+            languageAdjusted = languageAdjusted & char
+        End If
+    Next
+    
+    AdjustForLanguage = languageAdjusted
+End Function
