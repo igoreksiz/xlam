@@ -1,4 +1,12 @@
 
+1.1.7-beta.1 / 2019-01-18
+=========================
+
+  * Add workbook name to API header
+  * Make default null value configurable
+  * Send structured client header in X-Finboxio-Addin
+  * Make api url configurable
+
 1.1.7-beta.0 / 2019-01-18
 =========================
 
