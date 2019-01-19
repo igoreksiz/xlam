@@ -1,4 +1,14 @@
 
+1.2.0 / 2019-01-19
+==================
+
+  * Fix an integer overflow error for users with increased quota
+  * Make null value configurable and default to 0
+  * Send structured client header with system info in X-Finboxio-Addon
+  * Adds configuration option for finboxioApiUrl
+  * Update for compatibility with Excel for Mac v16.21+
+  * Fix Mac installation bug
+
 1.1.7-beta.3 / 2019-01-19
 =========================
 
