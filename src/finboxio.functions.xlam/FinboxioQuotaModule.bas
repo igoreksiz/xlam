@@ -65,8 +65,8 @@ Public Sub CheckQuota(Optional blockEvents As Boolean)
     Set webResponse = webClient.Execute(webRequest)
 
     Dim used As Long, remaining As Long, resets As String
-    used = CInt(webResponse.data.Item("data").Item("quota").Item("used"))
-    remaining = CInt(webResponse.data.Item("data").Item("quota").Item("remaining"))
+    used = CLng(webResponse.data.Item("data").Item("quota").Item("used"))
+    remaining = CLng(webResponse.data.Item("data").Item("quota").Item("remaining"))
     UpdateQuota used, remaining
     Exit Sub
     

@@ -91,9 +91,9 @@ Public Function RequestAndCacheKeys(ByRef keys() As String)
         Dim QuotaUsed As Long, QuotaRemaining As Long
         For i = 1 To webResponse.Headers.count
             If VBA.LCase(webResponse.Headers(i).Item("Key")) = "x-quota-used" Then
-                QuotaUsed = CInt(webResponse.Headers(i).Item("Value"))
+                QuotaUsed = CLng(webResponse.Headers(i).Item("Value"))
             ElseIf VBA.LCase(webResponse.Headers(i).Item("Key")) = "x-quota-remaining" Then
-                QuotaRemaining = CInt(webResponse.Headers(i).Item("Value"))
+                QuotaRemaining = CLng(webResponse.Headers(i).Item("Value"))
             End If
         Next i
         UpdateQuota QuotaUsed, QuotaRemaining
