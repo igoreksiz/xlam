@@ -1,4 +1,9 @@
 
+1.1.7-beta.2 / 2019-01-19
+=========================
+
+  * Fix integer overflow error with increased quota
+
 1.1.7-beta.1 / 2019-01-18
 =========================
 
