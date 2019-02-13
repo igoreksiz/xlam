@@ -39,21 +39,22 @@ Finish:
     hasReadSettings = True
 End Sub
 
-'Public Function SetSetting(key As String, value)
-'    If settings.Exists(key) Then Call settings.Remove(key)
-'    Call settings.Add(key, value)
-'    WriteSettings
-'End Function
-'
-'Public Sub WriteSettings()
-'    Dim file As String
-'    file = LocalPath(AddInSettingsFile)
-'    Open file For Output As #1
-'        Dim key
-'        For Each key In settings.keys
-'            Print #1, key & "=" & settings.Item(key)
-'        Next key
-'    Close #1
-'End Sub
+Public Function SetSetting(key As String, value)
+    If settings.Exists(key) Then Call settings.Remove(key)
+    Call settings.Add(key, value)
+    WriteSettings
+End Function
+
+Public Sub WriteSettings()
+    Dim file As String
+    file = LocalPath(AddInSettingsFile)
+    Open file For Output As #1
+        Dim key
+        For Each key In settings.keys
+            Print #1, key & "=" & settings.Item(key)
+        Next key
+    Close #1
+    ReadSettings
+End Sub
 
 

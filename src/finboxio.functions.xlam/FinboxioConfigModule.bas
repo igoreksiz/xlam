@@ -14,6 +14,8 @@ Public Const HELP_URL = "https://finbox.io/blog/using-the-excel-add-in/"
 Public Const UPGRADE_URL = "https://finbox.io/premium"
 
 Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
+Public Const API_URL_BETA = "https://api.finbox.io/beta"
+Public Const API_URL_V3 = "https://public-api.finbox.io/v3"
 
 Public Const LIMIT_EXCEEDED_ERROR = 20400
 Public Const INVALID_AUTH_ERROR = 20401
@@ -73,7 +75,7 @@ Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) 
 End Function
 
 Public Function ApiUrl()
-    ApiUrl = GetSetting("finboxioApiUrl", "https://api.finbox.io/beta")
+    ApiUrl = GetSetting("finboxioApiUrl", API_URL_BETA)
 End Function
 
 Public Function TierUrl()
