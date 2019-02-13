@@ -85,9 +85,9 @@ End Sub
 
 Public Sub FinboxioSPBetaImage(control, ByRef image)
     If ApiUrl = API_URL_V3 Then
-        image = "StarUnratedFull"
+        image = "Undo"
     Else
-        image = "StarUnratedEmpty"
+        image = "AutoFormatChange"
     End If
 End Sub
 
