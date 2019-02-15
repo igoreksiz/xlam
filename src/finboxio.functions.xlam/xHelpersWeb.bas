@@ -1670,7 +1670,7 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
     On Error GoTo web_Cleanup
 
 #If Mac Then
-    If VersionAtLeast(16, 21, 0) Then
+    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
         web_File = web_popen_system(web_Command, "r")
 
         If web_File = 0 Then
@@ -1723,7 +1723,7 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
 
 web_Cleanup:
 #If Mac Then
-    If VersionAtLeast(16, 21, 0) Then
+    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
         ExecuteInShell.ExitCode = CLng(web_pclose_system(web_File))
     Else
         ExecuteInShell.ExitCode = CLng(web_pclose(web_File))
@@ -3050,7 +3050,7 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
     On Error GoTo utc_ErrorHandling
 
 #If Mac Then
-    If VersionAtLeast(16, 21, 0) Then
+    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
         utc_File = utc_popen_system(utc_ShellCommand, "r")
 
         If utc_File = 0 Then: Exit Function
@@ -3094,7 +3094,7 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
 
 utc_ErrorHandling:
 #If Mac Then
-    If VersionAtLeast(16, 21, 0) Then
+    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
         utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose_system(utc_File))
     Else
         utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose(utc_File))
@@ -3310,39 +3310,6 @@ AutoProxy_Cleanup:
     End If
 #End If
 End Sub
-
-Function VersionAtLeast(major As Double, minor As Double, patch As Double) As Boolean
-    VersionAtLeast = (MajorVersion >= major) And (MinorVersion >= minor) And (PatchVersion >= patch)
-End Function
-
-Function MajorVersion() As Double
-    MajorVersion = val(Split(Application.version, ".")(0))
-End Function
-
-Function MinorVersion() As Double
-    If CountCharacters(Application.version, ".") > 0 Then
-        MinorVersion = val(Split(Application.version, ".")(1))
-    Else
-        MinorVersion = 0
-    End If
-End Function
-
-Function PatchVersion() As Double
-    If CountCharacters(Application.version, ".") > 1 Then
-        PatchVersion = val(Split(Application.version, ".")(2))
-    Else
-        PatchVersion = 0
-    End If
-End Function
-
-Function CountCharacters(str As String, char As String) As Long
-    Dim i As Integer, count As Integer
-    count = 0
-    For i = 1 To Len(str)
-        If Mid(str, i, 1) = char Then count = count + 1
-    Next
-    CountCharacters = count
-End Function
 
 Public Sub RaiseCurlError(ByRef web_Result As ShellResult, url As String)
     Dim web_ErrorNumber As Long
