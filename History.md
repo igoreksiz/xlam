@@ -1,4 +1,11 @@
 
+1.3.0 / 2019-02-18
+==================
+
+  * Fix for compatibility with Excel for Mac v16.16.7
+  * Update beta icons for mac compatibility
+  * Add option to toggle beta api
+
 1.3.0-beta.1 / 2019-02-15
 =========================
 
