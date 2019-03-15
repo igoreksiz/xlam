@@ -1670,7 +1670,7 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
     On Error GoTo web_Cleanup
 
 #If Mac Then
-    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
+    If RequiresSystemLibc Then
         web_File = web_popen_system(web_Command, "r")
 
         If web_File = 0 Then
@@ -1723,7 +1723,7 @@ Public Function ExecuteInShell(web_Command As String) As ShellResult
 
 web_Cleanup:
 #If Mac Then
-    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
+    If RequiresSystemLibc Then
         ExecuteInShell.ExitCode = CLng(web_pclose_system(web_File))
     Else
         ExecuteInShell.ExitCode = CLng(web_pclose(web_File))
@@ -3050,7 +3050,7 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
     On Error GoTo utc_ErrorHandling
 
 #If Mac Then
-    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
+    If RequiresSystemLibc Then
         utc_File = utc_popen_system(utc_ShellCommand, "r")
 
         If utc_File = 0 Then: Exit Function
@@ -3094,7 +3094,7 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
 
 utc_ErrorHandling:
 #If Mac Then
-    If VersionAtLeast("16.21") Or (VersionLessThan("16.17") And Application.Build = 210) Then
+    If RequiresSystemLibc Then
         utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose_system(utc_File))
     Else
         utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose(utc_File))
@@ -3364,5 +3364,17 @@ Public Sub RaiseCurlError(ByRef web_Result As ShellResult, url As String)
             "Find details at http://curl.haxx.se/libcurl/c/libcurl-errors.html"
     End Select
 End Sub
+
+Public Function RequiresSystemLibc() As Boolean
+    Dim updateBuildNumbers
+    updateBuildNumbers = Array(210, 312)
+    RequiresSystemLibc = _
+        VersionAtLeast("16.21") Or _
+        (Application.version = "16.16" And IsInArray(Application.Build, updateBuildNumbers))
+End Function
+
+Function IsInArray(num As Integer, arr As Variant) As Boolean
+    IsInArray = Not IsError(Application.Match(num, arr, 0))
+End Function
 
 
