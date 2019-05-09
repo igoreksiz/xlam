@@ -3367,7 +3367,7 @@ End Sub
 
 Public Function RequiresSystemLibc() As Boolean
     Dim updateBuildNumbers
-    updateBuildNumbers = Array(210, 312)
+    updateBuildNumbers = Array(210, 312, 412)
     RequiresSystemLibc = _
         VersionAtLeast("16.21") Or _
         (Application.version = "16.16" And IsInArray(Application.Build, updateBuildNumbers))
