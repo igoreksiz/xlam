@@ -1,4 +1,9 @@
 
+1.3.2-beta.1 / 2019-05-09
+=========================
+
+  * Update button text for reverting to legacy api
+
 1.3.2-beta.0 / 2019-05-09
 =========================
 
