@@ -77,7 +77,7 @@ End Sub
 
 Public Sub FinboxioSPBetaLabel(control, ByRef label)
     If ApiUrl = API_URL_V3 Then
-        label = "Disable S&&P Data (Beta)"
+        label = "Use Legacy API"
     Else
         label = "Enable S&&P Data (Beta)"
     End If
