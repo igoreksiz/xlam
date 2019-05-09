@@ -1,4 +1,10 @@
 
+1.3.2-beta.0 / 2019-05-09
+=========================
+
+  * Change default api version to v3 data
+  * Update to support 16.16.9 on OSX
+
 1.3.1 / 2019-03-14
 ==================
 
