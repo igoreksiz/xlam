@@ -3366,11 +3366,11 @@ Public Sub RaiseCurlError(ByRef web_Result As ShellResult, url As String)
 End Sub
 
 Public Function RequiresSystemLibc() As Boolean
-    Dim updateBuildNumbers
-    updateBuildNumbers = Array(210, 312, 412)
+    Dim legacyBuildNumbers
+    legacyBuildNumbers = Array(812, 814, 910, 1015, 1110, 1208, 114)
     RequiresSystemLibc = _
         VersionAtLeast("16.21") Or _
-        (Application.version = "16.16" And IsInArray(Application.Build, updateBuildNumbers))
+        (Application.version = "16.16" And Not IsInArray(Application.Build, legacyBuildNumbers))
 End Function
 
 Function IsInArray(num As Integer, arr As Variant) As Boolean
