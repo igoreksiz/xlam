@@ -1,4 +1,9 @@
 
+1.4.1-beta.0 / 2019-06-03
+=========================
+
+  * Reverse logic for determining if system libc needs to be used
+
 1.4.0 / 2019-05-09
 ==================
 
