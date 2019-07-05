@@ -75,31 +75,6 @@ Public Sub FinboxioCheckQuota(Optional control)
     End If
 End Sub
 
-Public Sub FinboxioSPBetaLabel(control, ByRef label)
-    If ApiUrl = API_URL_V3 Then
-        label = "Use Legacy Data"
-    Else
-        label = "Enable S&&P Data"
-    End If
-End Sub
-
-Public Sub FinboxioSPBetaImage(control, ByRef image)
-    If ApiUrl = API_URL_V3 Then
-        image = "Undo"
-    Else
-        image = "AutoFormatChange"
-    End If
-End Sub
-
-Public Sub FinboxioToggleSPBeta(Optional control)
-    If ApiUrl = API_URL_V3 Then
-        SetSetting "finboxioApiUrl", API_URL_BETA
-    Else
-        SetSetting "finboxioApiUrl", API_URL_V3
-    End If
-    InvalidateAppRibbon
-End Sub
-
 Public Sub FinboxioShowLogin(Optional control)
     ShowLoginForm
 End Sub

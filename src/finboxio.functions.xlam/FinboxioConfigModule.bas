@@ -75,7 +75,7 @@ Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) 
 End Function
 
 Public Function ApiUrl()
-    ApiUrl = GetSetting("finboxioApiUrl", API_URL_V3)
+    ApiUrl = GetSetting("finboxioApiOverride", API_URL_V3)
 End Function
 
 Public Function TierUrl()
