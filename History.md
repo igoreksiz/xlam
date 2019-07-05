@@ -1,4 +1,9 @@
 
+1.4.2-beta.0 / 2019-07-05
+=========================
+
+  * Remove S&P toggle and patch Mac installation location
+
 1.4.1 / 2019-06-03
 ==================
 
