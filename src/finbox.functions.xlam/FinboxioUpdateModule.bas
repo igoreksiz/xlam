@@ -131,6 +131,22 @@ NoManager:
     
     ' Ensure the manager workbook is opened
     Call Workbooks.Open(LocalPath(AddInInstalledFile))
+        
+    Dim finalInstall As Boolean
+    finalInstall = False
+    For Each i In Application.AddIns
+        If i.name = AddInInstalledFile Then
+            i.installed = True
+            finalInstall = True
+        End If
+    Next i
+    
+    If Not finalInstall Then
+        If Workbooks.count < 1 Then
+            Application.Workbooks.Add
+        End If
+        Set installed = Application.AddIns.Add(LocalPath(AddInInstalledFile), True)
+    End If
     
     LogMessage "Loaded add-in manager v" & AddInVersion(AddInInstalledFile)
     
