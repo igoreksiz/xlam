@@ -1,4 +1,10 @@
 
+1.6.0-beta.0 / 2019-10-22
+=========================
+
+  * JSON parse improvements and rename finboxio to finbox
+  * Update branding & Finbox urls, fix utf encoding issue
+
 1.5.0 / 2019-07-05
 ==================
 
