@@ -1,7 +1,7 @@
 {
   "name": "xlam",
   "private": true,
-  "version": "1.6.0-beta.10",
+  "version": "1.6.0-beta.11",
   "description": "Finbox excel add-in module",
   "main": "index.js",
   "directories": {
