@@ -1,4 +1,8 @@
+finboxio!AppVersion,=finboxio!$B$1,
 AppVersion,=finbox!$B$1,
 AppVersionLabel,=finbox!$A$1,
+AppVerssion,=finboxio!$B$1,
+LegacyAppVersion,=finboxio!$B$1,
+finboxio!ReleaseDate,=finboxio!$B$3,
 ReleaseDate,=finbox!$B$3,
 ReleaseDateLabel,=finbox!$A$3,

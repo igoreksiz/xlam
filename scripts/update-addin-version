@@ -32,11 +32,16 @@ const update = async (filename, { dryRun } = {}) => {
     .async('string')
   let bookJson = await parser.parseAsync(book)
 
-  const versionRange = getAddress(bookJson, 'AppVersion')
-  const dateRange = getAddress(bookJson, 'ReleaseDate')
+  const versionRanges = getAddresses(bookJson, 'AppVersion')
+  const dateRanges = getAddresses(bookJson, 'ReleaseDate')
+
   bookJson.workbook.sheets.forEach((s) => s.sheet.forEach((s) => {
-    if (s.$.name === versionRange.sheet) versionRange.sheet = s.$['r:id']
-    if (s.$.name === dateRange.sheet) dateRange.sheet = s.$['r:id']
+    versionRanges.forEach((versionRange) => {
+      if (s.$.name === versionRange.sheet) versionRange.rel = s.$['r:id']
+    })
+    dateRanges.forEach((dateRange) => {
+      if (s.$.name === dateRange.sheet) dateRange.rel = s.$['r:id']
+    })
   }))
 
   parser.reset()
@@ -45,63 +50,72 @@ const update = async (filename, { dryRun } = {}) => {
     .async('string')
   rels = await parser.parseAsync(rels)
 
-  const sheets = [ versionRange.sheet, dateRange.sheet ]
-  const sheetFiles = rels.Relationships.Relationship
-    .filter((r) => sheets.includes(r.$.Id))
-    .map((r) => r.$.Target)
+  versionRanges.concat(dateRanges).forEach((r) => {
+    r.target = rels.Relationships.Relationship
+      .find((rel) => rel.$.Id === r.rel)
+      .$.Target
+  })
 
-  if (sheetFiles.length > 1) {
-    throw new Error(`[${filename}] Expected version and date in same sheet`)
+  for (const versionRange of versionRanges) {
+    parser.reset()
+    let sheet = await addin
+      .file(`xl/${versionRange.target}`)
+      .async('string')
+    const sheetJson = await parser.parseAsync(sheet)
+    const sheetCells = sheetJson.worksheet.sheetData[0].row.reduce((c, r) => c.concat(r.c), [])
+
+    const versionCell = sheetCells.filter((c) => c.$.r === versionRange.cell)
+
+    if (versionCell.length !== 1) {
+      throw new Error(`[${filename}] Could not find version cell`)
+    }
+
+    if (versionCell[0].$.t !== 's') {
+      throw new Error(`[${filename}] Version is not specified in shared string`)
+    }
+
+    parser.reset()
+    let strings = await addin
+      .file('xl/sharedStrings.xml')
+      .async('string')
+    const stringsJson = await parser.parseAsync(strings)
+    const sst = stringsJson.sst.si.map((s) => s.t.pop())
+
+    const calcFind = new RegExp('calcMode=".*?"')
+    const calcReplace = ""
+    book = book.replace(calcFind, calcReplace)
+    addin.file('xl/workbook.xml', book)
+
+    const versionIndex = +(versionCell[0].v[0])
+    const versionString = sst[versionIndex]
+
+    const versionFind = `<si><t>${versionString}</t></si>`
+    const versionReplace = `<si><t>${version}</t></si>`
+    strings = strings.replace(versionFind, versionReplace)
+    addin.file('xl/sharedStrings.xml', strings)
+
+    addin.file(`xl/${versionRange.target}`, sheet)
+    console.log(`[${filename}/${versionRange.sheet}] Updating from ${versionString} to ${version}`)
   }
 
-  parser.reset()
-  let sheet = await addin
-    .file(`xl/${sheetFiles[0]}`)
-    .async('string')
-  const sheetJson = await parser.parseAsync(sheet)
-  const sheetCells = sheetJson.worksheet.sheetData[0].row.reduce((c, r) => c.concat(r.c), [])
+  for (const dateRange of dateRanges) {
+    parser.reset()
+    let sheet = await addin
+      .file(`xl/${dateRange.target}`)
+      .async('string')
 
-  const versionCell = sheetCells.filter((c) => c.$.r === versionRange.cell)
+    const dateExp = new RegExp(`(<c[^>]*r="${dateRange.cell}"[^>]*><v>)([0-9.]+)(</v></c>)`)
+    const dateTag = dateExp.exec(sheet)
 
-  if (versionCell.length !== 1) {
-    throw new Error(`[${filename}] Could not find version cell`)
+    if (!dateTag || !dateTag[2]) {
+      throw new Error(`[${filename}] Could not find date cell`)
+    }
+
+    const dateFind = `${dateTag[0]}`
+    const dateReplace = `${dateTag[1]}${date}${dateTag[3]}`
+    sheet = sheet.replace(dateFind, dateReplace)
+    addin.file(`xl/${dateRange.target}`, sheet)
   }
-
-  if (versionCell[0].$.t !== 's') {
-    throw new Error(`[${filename}] Version is not specified in shared string`)
-  }
-
-  parser.reset()
-  let strings = await addin
-    .file('xl/sharedStrings.xml')
-    .async('string')
-  const stringsJson = await parser.parseAsync(strings)
-  const sst = stringsJson.sst.si.map((s) => s.t.pop())
-
-  const calcFind = new RegExp('calcMode=".*?"')
-  const calcReplace = ""
-  book = book.replace(calcFind, calcReplace)
-  addin.file('xl/workbook.xml', book)
-
-  const versionIndex = +(versionCell[0].v[0])
-  const versionString = sst[versionIndex]
-
-  const versionFind = `<si><t>${versionString}</t></si>`
-  const versionReplace = `<si><t>${version}</t></si>`
-  strings = strings.replace(versionFind, versionReplace)
-  addin.file('xl/sharedStrings.xml', strings)
-
-  const dateExp = new RegExp(`(<c[^>]*r="${dateRange.cell}"[^>]*><v>)([0-9.]+)(</v></c>)`)
-  const dateTag = dateExp.exec(sheet)
-
-  if (!dateTag || !dateTag[2]) {
-    throw new Error(`[${filename}] Could not find date cell`)
-  }
-
-  const dateFind = `${dateTag[0]}`
-  const dateReplace = `${dateTag[1]}${date}${dateTag[3]}`
-  sheet = sheet.replace(dateFind, dateReplace)
-  addin.file(`xl/${sheetFiles[0]}`, sheet)
 
   parser.reset()
   let props = await addin
@@ -117,7 +131,6 @@ const update = async (filename, { dryRun } = {}) => {
   props = props.replace(titleFind, titleReplace)
   addin.file('docProps/core.xml', props)
 
-  console.log(`[${filename}] Updating from ${versionString} to ${version}`)
   !dryRun && await new Promise((resolve, reject) => {
     addin.generateNodeStream({ type: 'nodebuffer', streamFiles: true, compression: 'DEFLATE' })
       .pipe(fs.createWriteStream(filename))
@@ -138,12 +151,11 @@ const promised = (parser) => {
   return parser
 }
 
-const getAddress = (book, name) => {
+const getAddresses = (book, name) => {
   return book.workbook.definedNames[0].definedName
     .filter((n) => n.$.name === name)
     .map((n) => ({
       sheet: n._.split('!')[0],
       cell: n._.split('!')[1].replace(/\$/g, '')
     }))
-    .pop()
 }
