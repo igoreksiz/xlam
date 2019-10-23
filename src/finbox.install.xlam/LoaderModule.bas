@@ -184,7 +184,6 @@ Public Sub PromoteStagedUpdate()
 
     If Not HasStagedUpdate Then Exit Sub
     
-    Stop
     On Error GoTo Finish
     updatingFunctions = True
     If UnloadAddInFunctions Then

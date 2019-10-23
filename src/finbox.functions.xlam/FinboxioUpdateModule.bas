@@ -57,7 +57,6 @@ Public Sub PromoteStagedUpdate()
     If Not canUnloadManager Then Exit Sub
     
 NoManager:
-    Stop
     Dim appSec As MsoAutomationSecurity
     appSec = Application.AutomationSecurity
     Application.AutomationSecurity = msoAutomationSecurityLow
@@ -124,6 +123,10 @@ NoManager:
     If Not installed Is Nothing Then
         installed.installed = True
     Else
+        Stop
+        If Workbooks.count < 1 Then
+            Application.Workbooks.Add
+        End If
         Set installed = Application.AddIns.Add(LocalPath(AddInInstalledFile), True)
     End If
     
