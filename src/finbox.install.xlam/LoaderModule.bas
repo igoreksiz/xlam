@@ -22,7 +22,7 @@ End Function
 
 ' Check if the functions add-in is installed alongside
 Public Function HasLegacyFunctions() As Boolean
-    HasAddInFunctions = _
+    HasLegacyFunctions = _
         SafeDir(LocalPath(LegacyFunctionsFile)) <> "" Or _
         SafeDir(LocalPath(LegacyFunctionsFile), vbHidden) <> ""
 End Function

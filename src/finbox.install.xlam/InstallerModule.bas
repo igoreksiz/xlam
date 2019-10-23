@@ -406,15 +406,6 @@ Sub CleanUpUninstalledAddIns()
     For Each i In Application.AddIns
         If (VBA.LCase(i.name) = VBA.LCase(AddInInstalledFile) Or VBA.LCase(i.name) = VBA.LCase(LegacyInstalledFile)) And Not i.installed And VBA.LCase(i.FullName) <> VBA.LCase(installPath) Then
             ClearAddInRegKey i.FullName
-            MsgBox _
-                Title:="[Finbox] Installation Succeeded", _
-                Prompt:="The installation succeeded, but Excel must be restarted twice to remove all traces of the previous version. " & _
-                        "This should not be necessary for future updates. Click OK to exit Excel now.", _
-                Buttons:=vbInformation
-            Call Application.Workbooks.Add
-            Application.Quit
-            ThisWorkbook.Close
-            Exit Sub
         End If
     Next i
 End Sub
@@ -428,6 +419,15 @@ Sub ClearAddInRegKey(path As String)
         cmd = "echo 'DELETE FROM HKEY_CURRENT_USER_values WHERE name=""" & path & """;' | sqlite3 '" & Mac2016Registry & "'"
         Debug.Print cmd
         result = xHelpersWeb.ExecuteInShell(cmd)
+        ' MsgBox _
+        '     Title:="[Finbox] Installation Succeeded", _
+        '     Prompt:="The installation succeeded, but Excel must be restarted twice to remove all traces of the previous version. " & _
+        '             "This should not be necessary for future updates. Click OK to exit Excel now.", _
+        '     Buttons:=vbInformation
+        ' Call Application.Workbooks.Add
+        ' Application.Quit
+        ' ThisWorkbook.Close
+        ' Exit Sub
     End If
 End Sub
 
