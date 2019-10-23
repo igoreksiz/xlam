@@ -1,0 +1,4 @@
+finbox!AppVersion,=finbox!$B$1,
+finbox!AppVersionLabel,=finbox!$A$1,
+finbox!ReleaseDate,=finbox!$B$3,
+finbox!ReleaseDateLabel,=finbox!$A$3,

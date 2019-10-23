@@ -12,8 +12,8 @@ const dryRun = false
 
 const run = async () => {
   await Promise.all([
-    update('finboxio.functions.xlam', { dryRun }),
-    update('finboxio.install.xlam', { dryRun })
+    update('finbox.functions.xlam', { dryRun }),
+    update('finbox.install.xlam', { dryRun })
   ])
 }
 

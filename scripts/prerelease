@@ -25,7 +25,7 @@ else
   exit 1
 fi
 
-if [[ -e '~$finboxio.install.xlam' || -e '~$finboxio.functions.xlam' ]]; then
+if [[ -e '~$finbox.install.xlam' || -e '~$finbox.functions.xlam' ]]; then
   echo "The add-in is in use by another application! Aborting."
   exit 1
 fi

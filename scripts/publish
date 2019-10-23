@@ -30,7 +30,7 @@ else
   RELEASE_NOTES=$(
     echo "Release ${PUBLISH_VERSION}"
     echo
-    echo "> To install/upgrade the add-in, download finboxio.install.xlam and open with Excel. If you are using Windows, ensure that the file is unblocked before opening. Instructions on how to do this are included in our [Getting Started Guide](https://finbox.io/blog/using-the-excel-add-in/)"
+    echo "> To install/upgrade the add-in, download finbox.install.xlam and open with Excel. If you are using Windows, ensure that the file is unblocked before opening. Instructions on how to do this are included in our [Getting Started Guide](https://finbox.com/blog/using-the-excel-add-in/)"
     echo
     echo "## Changes"
     echo
@@ -38,7 +38,13 @@ else
     ./scripts/release-notes
   )
 
-  RELEASE_URL=$(echo "$RELEASE_NOTES" | hub release create -F - --draft ${PRERELEASE:+--prerelease} -a finboxio.install.xlam -a finboxio.functions.xlam "v$PUBLISH_VERSION")
+  # Because old versions expect finboxio filenames, we must upload copies with the release for now
+  cp finbox.install.xlam finboxio.install.xlam
+  cp finbox.functions.xlam finboxio.functions.xlam
+
+  RELEASE_URL=$(echo "$RELEASE_NOTES" | hub release create -F - --draft ${PRERELEASE:+--prerelease} -a finbox.install.xlam -a finbox.functions.xlam -a finboxio.install.xlam -a finboxio.functions.xlam "v$PUBLISH_VERSION")
+
+  rm finboxio.install.xlam finboxio.functions.xlam
 
   open $RELEASE_URL
 

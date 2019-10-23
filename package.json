@@ -2,7 +2,7 @@
   "name": "xlam",
   "private": true,
   "version": "1.5.0",
-  "description": "finbox.io excel add-in module",
+  "description": "Finbox excel add-in module",
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -24,7 +24,7 @@
     "xlam",
     "finboxio"
   ],
-  "author": "finbox.io",
+  "author": "Finbox Inc",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/finboxio/xlam/issues"
