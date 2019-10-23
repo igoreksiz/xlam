@@ -17,7 +17,8 @@ End Function
 Public Function HasAddInFunctions() As Boolean
     HasAddInFunctions = _
         SafeDir(LocalPath(AddInFunctionsFile)) <> "" Or _
-        SafeDir(LocalPath(AddInFunctionsFile), vbHidden) <> ""
+        SafeDir(LocalPath(AddInFunctionsFile), vbHidden) <> "" Or _
+        HasLegacyFunctions
 End Function
 
 ' Check if the functions add-in is installed alongside
@@ -55,6 +56,10 @@ Public Sub LoadAddInFunctions()
     
     Dim appSec As MsoAutomationSecurity
     appSec = Application.AutomationSecurity
+    
+    If HasLegacyFunctions Then
+        Name LocalPath(LegacyFunctionsFile) As StagingPath(AddInFunctionsFile)
+    End If
     
     ' If an update is staged, promote it to the active
     ' add-in. Only do this if this is an installed add-in
@@ -114,13 +119,16 @@ Public Function LoadedAddInFunctions() As Boolean
     ' So the safest thing to do is check if the workbook
     ' itself is open. If the call below succeeds, then
     ' we know it's loaded.
-    Dim wb As Workbook
-    For Each wb In Workbooks
-        If wb.name = AddInFunctionsFile Or wb.name = LegacyFunctionsFile Then
-            LoadedAddInFunctions = True
-            Exit Function
-        End If
-    Next wb
+    On Error Resume Next
+    Dim loaded As String
+    loaded = ""
+    loaded = Workbooks(AddInFunctionsFile).name
+    loaded = Workbooks(LegacyFunctionsFile).name
+    If loaded <> "" Then
+        LoadedAddInFunctions = True
+    Else
+        LoadedAddInFunctions = False
+    End If
 End Function
 
 ' Unloads the currently loaded functions add-in.
@@ -168,21 +176,29 @@ End Function
 
 ' Promotes the staged functions add-in to active
 Public Sub PromoteStagedUpdate()
-    If updatingFunctions Or Not HasStagedUpdate Then Exit Sub
+    If updatingFunctions Then Exit Sub
+    
+    If HasLegacyFunctions And Not HasStagedUpdate Then
+        Name LocalPath(LegacyFunctionsFile) As StagingPath(AddInFunctionsFile)
+    End If
+
+    If Not HasStagedUpdate Then Exit Sub
     
     Stop
     On Error GoTo Finish
     updatingFunctions = True
     If UnloadAddInFunctions Then
         LogMessage "Promoting staged add-in functions"
-        If HasAddInFunctions Then
+        If HasAddInFunctions And Not HasLegacyFunctions Then
             SetAttr LocalPath(AddInFunctionsFile), vbNormal
             Kill LocalPath(AddInFunctionsFile)
         End If
         
-        If HasLegacyFunctions Then
+        If HasLegacyFunctions And Not HasAddInFunctions Then
             SetAttr LocalPath(LegacyFunctionsFile), vbNormal
             Kill LocalPath(LegacyFunctionsFile)
+        ElseIf HasLegacyFunctions Then
+            Name LocalPath(LegacyFunctionsFile) As StagingPath(AddInFunctionsFile)
         End If
         
         If HasStagedLegacyUpdate Then

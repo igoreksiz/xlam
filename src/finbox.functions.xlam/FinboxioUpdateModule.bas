@@ -68,14 +68,21 @@ NoManager:
     
     ' Uninstall the active manager
     On Error Resume Next
-    Dim i As addIn, installed As addIn
+    Dim i As addIn, installed As addIn, legacy As addIn
     For Each i In Application.AddIns
-        If i.name = AddInInstalledFile Or i.name = LegacyInstalledFile Then
+        If i.name = AddInInstalledFile Then
             i.installed = False
             Workbooks(i.name).Close
             SetAttr i.FullName, vbNormal
             Kill i.FullName
             If i.path = ThisWorkbook.path Then Set installed = i
+        End If
+        If i.name = LegacyInstalledFile Then
+            i.installed = False
+            Workbooks(i.name).Close
+            SetAttr i.FullName, vbNormal
+            Kill i.FullName
+            If i.path = ThisWorkbook.path Then Set legacy = i
         End If
     Next i
     On Error GoTo ReportError

@@ -32,7 +32,7 @@ Public Sub FinishInstalling()
     On Error GoTo HandleError
     
     installing = True
-    Dim installPath As String
+    Dim installPath As String, legacyPath As String
     installPath = SavePath(AddInInstalledFile)
     legacyPath = SavePath(LegacyInstalledFile)
     
