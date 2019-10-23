@@ -66,6 +66,11 @@ Public Function DownloadUpdates(Optional blockEvents As Boolean, Optional confir
     End If
     
     functionsVersion = AddInVersion(AddInFunctionsFile)
+    
+    If functionsVersion = "" And HasLegacyFunctions Then
+        functionsVersion = AddInVersion(LegacyFunctionsFile)
+    End If
+    
     If functionsVersion = "" And HasAddInFunctions Then
         Dim functionsWb As Workbook
         Application.AutomationSecurity = msoAutomationSecurityForceDisable

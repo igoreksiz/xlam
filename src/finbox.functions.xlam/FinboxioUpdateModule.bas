@@ -123,7 +123,6 @@ NoManager:
     If Not installed Is Nothing Then
         installed.installed = True
     Else
-        Stop
         If Workbooks.count < 1 Then
             Application.Workbooks.Add
         End If

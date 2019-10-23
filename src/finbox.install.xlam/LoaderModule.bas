@@ -177,12 +177,8 @@ End Function
 ' Promotes the staged functions add-in to active
 Public Sub PromoteStagedUpdate()
     If updatingFunctions Then Exit Sub
-    
-    If HasLegacyFunctions And Not HasStagedUpdate Then
-        Name LocalPath(LegacyFunctionsFile) As StagingPath(AddInFunctionsFile)
-    End If
 
-    If Not HasStagedUpdate Then Exit Sub
+    If Not HasStagedUpdate And Not HasLegacyFunctions Then Exit Sub
     
     On Error GoTo Finish
     updatingFunctions = True
