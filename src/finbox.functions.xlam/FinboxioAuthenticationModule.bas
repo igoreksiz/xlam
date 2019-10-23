@@ -115,6 +115,7 @@ Public Function GetTier()
     tier = "anonymous"
     
     Dim webClient As New webClient
+    webClient.BlockEventLoop = True
     webClient.BaseUrl = TierUrl
     
     ' Setup Basic Auth with API key as username and empty password

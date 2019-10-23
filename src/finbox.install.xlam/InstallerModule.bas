@@ -145,6 +145,7 @@ Public Sub FinishInstalling()
 HandleError:
     installing = False
     Application.ScreenUpdating = True
+    LogMessage "Installation Error: " & Err.Description
     MsgBox _
         Title:="[Finbox] Add-in Error", _
         Prompt:="Unable to install the Finbox add-on. Please try again and contact support@finbox.com if this problem persists.", _

@@ -2294,9 +2294,9 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
             json_BufferAppend json_Buffer, "{", json_BufferPosition, json_BufferLength
             For Each json_Key In JsonValue.keys
                 ' For Objects, undefined (Empty/Nothing) is not added to object
-                json_Converted = ConvertToJson(JsonValue(json_Key), Whitespace, json_CurrentIndentation + 1)
+                json_Converted = ConvertToJson(JsonValue.Item(json_Key), Whitespace, json_CurrentIndentation + 1)
                 If json_Converted = "" Then
-                    json_SkipItem = json_IsUndefined(JsonValue(json_Key))
+                    json_SkipItem = json_IsUndefined(JsonValue.Item(json_Key))
                 Else
                     json_SkipItem = False
                 End If
