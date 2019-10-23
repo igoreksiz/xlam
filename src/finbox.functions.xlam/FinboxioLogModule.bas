@@ -32,7 +32,9 @@ Public Sub LogMessage(ByVal msg As String, Optional ByVal key As String = "")
     If key <> "" Then msg = "(" & key & ") -> " & msg
     msg = "[" & VBA.Format(VBA.Now(), "yyyy-MM-dd hh:mm:ss") & "] " & source & "- " & msg
     Debug.Print msg
-    Open LocalPath(AddInLogFile) For Append As #1
-        Print #1, msg
-    Close #1
+    Dim log As Integer
+    log = FreeFile
+    Open LocalPath(AddInLogFile) For Append As log
+        Print #log, msg
+    Close #log
 End Sub

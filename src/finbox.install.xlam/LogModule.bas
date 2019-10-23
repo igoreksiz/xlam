@@ -11,9 +11,11 @@ Public Sub LogMessage(msg As String)
     If trigger <> "" Then msg = "(" & trigger & ") -> " & msg
     msg = "[" & VBA.Format(VBA.Now(), "yyyy-MM-dd hh:mm:ss") & "] " & source & "- " & msg
     Debug.Print (msg)
-    Open SavePath(AddInLogFile) For Append As #1
-        Print #1, msg
-    Close #1
+    Dim log As Integer
+    log = FreeFile
+    Open SavePath(AddInLogFile) For Append As log
+        Print #log, msg
+    Close #log
 End Sub
 
 Public Sub TrimLog(Optional days As Integer = 0)
@@ -21,21 +23,26 @@ Public Sub TrimLog(Optional days As Integer = 0)
     Dim line As String, timestamp As String, time As Date, trimmed As Integer
     trimmed = 0
     VBA.FileCopy SavePath(AddInLogFile), SavePath(AddInLogFile & ".tmp")
-    Open SavePath(AddInLogFile) For Output As #1
-    Open SavePath(AddInLogFile & ".tmp") For Input As #2
-        While Not EOF(2)
-            Line Input #2, line
+    Dim out As Integer, tmp As Integer
+    out = FreeFile
+    Open SavePath(AddInLogFile) For Output As out
+    tmp = FreeFile
+    Open SavePath(AddInLogFile & ".tmp") For Input As tmp
+        While Not EOF(tmp)
+            Line Input #tmp, line
             line = VBA.Trim(Application.Clean(line))
-            timestamp = VBA.Mid(line, 2, VBA.InStr(line, "]") - 2)
-            time = CDate(timestamp)
-            If time > VBA.Now() - days Then
-                Print #1, line
-            Else
-                trimmed = trimmed + 1
+            If VBA.InStr(line, "]") > 2 Then
+                timestamp = VBA.Mid(line, 2, VBA.InStr(line, "]") - 2)
+                time = CDate(timestamp)
+                If time > VBA.Now() - days Then
+                    Print #out, line
+                Else
+                    trimmed = trimmed + 1
+                End If
             End If
         Wend
-    Close #2
-    Close #1
+    Close #tmp
+    Close #out
     
     VBA.Kill SavePath(AddInLogFile & ".tmp")
     

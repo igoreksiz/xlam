@@ -23,9 +23,11 @@ Public Sub ReadSettings()
     On Error GoTo Finish
     Dim file As String, line As String, key As String, value As String
     file = LocalPath(AddInSettingsFile)
-    Open file For Input As #1
+    Dim out As Integer
+    out = FreeFile
+    Open file For Input As out
         While Not EOF(1)
-            Line Input #1, line
+            Line Input #out, line
             line = VBA.Trim(Application.Clean(line))
             key = VBA.Left(line, VBA.InStr(line, "=") - 1)
             value = VBA.Mid(line, VBA.InStr(line, "=") + 1)
@@ -34,7 +36,7 @@ Public Sub ReadSettings()
             If settings.Exists(key) Then settings.Remove (key)
             Call settings.Add(key, value)
         Wend
-    Close #1
+    Close #out
 Finish:
     hasReadSettings = True
 End Sub
@@ -48,12 +50,14 @@ End Function
 Public Sub WriteSettings()
     Dim file As String
     file = LocalPath(AddInSettingsFile)
-    Open file For Output As #1
+    Dim out As Integer
+    out = FreeFile
+    Open file For Output As out
         Dim key
         For Each key In settings.keys
-            Print #1, key & "=" & settings.Item(key)
+            Print #out, key & "=" & settings.Item(key)
         Next key
-    Close #1
+    Close #out
     ReadSettings
 End Sub
 

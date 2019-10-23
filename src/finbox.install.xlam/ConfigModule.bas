@@ -66,16 +66,19 @@ End Function
 
 Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) As String
     On Error Resume Next
-    SafeDir = VBA.Dir(file, attributes)
+    SafeDir = VBA.dir(file, attributes)
 End Function
 
 Public Sub SafeMkDir(path As String)
     Dim folder As String
-    folder = Left(path, InStrRev(path, "/"))
+    folder = path
+    If Right(path, 1) = Application.PathSeparator Then
+        folder = Left(path, Len(path) - 1)
+    End If
     If SafeDir(folder, vbDirectory) = vbNullString Then
         #If Mac Then
             Dim appleScript As String
-            appleScript = "do shell script ""mkdir '" & folder & "'"""
+            appleScript = "do shell script ""mkdir -p '" & folder & "'"""
             MacScript appleScript
         #Else
             VBA.MkDir folder

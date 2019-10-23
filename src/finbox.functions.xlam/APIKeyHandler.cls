@@ -45,9 +45,11 @@ End Sub
 Private Sub WriteKey(key As String)
     Dim keyfile As String
     keyfile = LocalPath(AddInKeyFile)
-    Open keyfile For Output As #1
-    Write #1, key
-    Close #1
+    Dim file As Integer
+    file = FreeFile
+    Open keyfile For Output As file
+    Write #file, key
+    Close #file
 End Sub
 
 Private Function ReadKey()
@@ -55,10 +57,12 @@ Private Function ReadKey()
     Dim key As String, keyfile As String
     key = ""
     keyfile = LocalPath(AddInKeyFile)
-    Open keyfile For Input As #1
-    Line Input #1, key
+    Dim ipt As Integer
+    ipt = FreeFile
+    Open keyfile For Input As ipt
+    Line Input #ipt, key
     key = VBA.Replace(key, """", "")
-    Close #1
+    Close #ipt
 Finish:
     ReadKey = key
 End Function

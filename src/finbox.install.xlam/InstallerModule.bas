@@ -213,7 +213,7 @@ Public Sub UninstallAddIn()
         SetAttr StagingPath(AddInInstalledFile), vbNormal
         Kill StagingPath(AddInInstalledFile)
     End If
-    
+
     ' Second check to make sure the add-in functions are removed
     Workbooks(AddInFunctionsFile).Close
     If SafeDir(LocalPath(AddInFunctionsFile)) <> "" Then Kill LocalPath(AddInFunctionsFile)
@@ -379,15 +379,6 @@ Sub SaveCopy(wb, path As String)
         Kill path
     End If
     
-    If ExcelVersion = "Mac2016" Then
-        SaveCopyAsExcel2016 wb, path
-    Else
-        wb.SaveCopyAs path
-    End If
-End Sub
-
-Sub SaveCopyAsExcel2016(wb, path As String)
-    SafeMkDir path
     wb.SaveCopyAs path
 End Sub
 

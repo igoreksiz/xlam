@@ -23,9 +23,11 @@ Public Sub ReadSettings()
     On Error GoTo Finish
     Dim file As String, line As String, key As String, value As String
     file = LocalPath(AddInSettingsFile)
-    Open file For Input As #1
-        While Not EOF(1)
-            Line Input #1, line
+    Dim ipt As Integer
+    ipt = FreeFile
+    Open file For Input As ipt
+        While Not EOF(ipt)
+            Line Input #ipt, line
             line = VBA.Trim(Application.Clean(line))
             key = VBA.Left(line, VBA.InStr(line, "=") - 1)
             value = VBA.Mid(line, VBA.InStr(line, "=") + 1)
@@ -34,7 +36,7 @@ Public Sub ReadSettings()
             If settings.Exists(key) Then settings.Remove (key)
             Call settings.Add(key, value)
         Wend
-    Close #1
+    Close #ipt
 Finish:
     hasReadSettings = True
 End Sub
