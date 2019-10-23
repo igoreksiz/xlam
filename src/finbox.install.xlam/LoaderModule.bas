@@ -149,7 +149,14 @@ End Function
 Private Function HasStagedUpdate() As Boolean
     HasStagedUpdate = _
         SafeDir(StagingPath(AddInFunctionsFile)) <> "" Or _
-        SafeDir(StagingPath(AddInFunctionsFile), vbHidden) <> ""
+        SafeDir(StagingPath(AddInFunctionsFile), vbHidden) <> "" Or _
+        HasStagedLegacyUpdate
+End Function
+
+Private Function HasStagedLegacyUpdate() As Boolean
+    HasStagedLegacyUpdate = _
+        SafeDir(StagingPath(LegacyFunctionsFile)) <> "" Or _
+        SafeDir(StagingPath(LegacyFunctionsFile), vbHidden) <> ""
 End Function
 
 ' Promotes the staged functions add-in to active
@@ -164,6 +171,11 @@ Public Sub PromoteStagedUpdate()
             SetAttr LocalPath(AddInFunctionsFile), vbNormal
             Kill LocalPath(AddInFunctionsFile)
         End If
+        
+        If HasStagedLegacyUpdate Then
+            Name StagingPath(LegacyFunctionsFile) As StagingPath(AddInFunctionsFile)
+        End If
+        
         Name StagingPath(AddInFunctionsFile) As LocalPath(AddInFunctionsFile)
         VBA.SetAttr LocalPath(AddInFunctionsFile), vbHidden
         

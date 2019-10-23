@@ -20,17 +20,22 @@ Public Function HasInstalledAddInManager() As Boolean
 End Function
 
 Public Function HasInstalledLegacyManager() As Boolean
-    HasInstalledAddInManager = _
+    HasInstalledLegacyManager = _
         SafeDir(LocalPath(LegacyInstalledFile)) <> "" Or _
         SafeDir(LocalPath(LegacyInstalledFile), vbHidden) <> ""
+End Function
+
+Public Function HasStagedLegacyUpdate() As Boolean
+    HasStagedLegacyUpdate = _
+        SafeDir(StagingPath(LegacyInstalledFile)) <> "" Or _
+        SafeDir(StagingPath(LegacyInstalledFile), vbHidden) <> ""
 End Function
 
 Public Function HasStagedUpdate() As Boolean
     HasStagedUpdate = _
         SafeDir(StagingPath(AddInInstalledFile)) <> "" Or _
         SafeDir(StagingPath(AddInInstalledFile), vbHidden) <> "" Or _
-        SafeDir(StagingPath(LegacyInstalledFile)) <> "" Or _
-        SafeDir(StagingPath(LegacyInstalledFile), vbHidden) <> ""
+        HasStagedLegacyUpdate
 End Function
 
 ' Promotes the staged add-in manager to active
@@ -89,6 +94,10 @@ NoManager:
     If HasInstalledLegacyManager Then
         SetAttr LocalPath(LegacyInstalledFile), vbNormal
         Kill LocalPath(LegacyInstalledFile)
+    End If
+    
+    If HasStagedLegacyUpdate Then
+        Name StagingPath(LegacyInstalledFile) As StagingPath(AddInInstalledFile)
     End If
     
     Name StagingPath(AddInInstalledFile) As LocalPath(AddInInstalledFile)

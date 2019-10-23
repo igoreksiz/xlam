@@ -42,6 +42,8 @@ Public Function AddInManagerFile() As String
     On Error Resume Next
     AddInManagerFile = Workbooks(AddInInstallerFile).name
     AddInManagerFile = Workbooks(LegacyInstallerFile).name
+    AddInManagerFile = Workbooks(AddInInstalledFile).name
+    AddInManagerFile = Workbooks(LegacyInstalledFile).name
 End Function
 
 Public Function StagingPath(file As String) As String
