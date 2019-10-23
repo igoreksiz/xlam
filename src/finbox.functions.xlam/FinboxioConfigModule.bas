@@ -31,6 +31,7 @@ Public Const UNSPECIFIED_API_ERROR = 20500
 Public Const AddInInstalledFile = "finbox.xlam"
 Public Const LegacyInstalledFile = "finboxio.xlam"
 Public Const AddInInstallerFile = "finbox.install.xlam"
+Public Const LegacyInstallerFile = "finboxio.install.xlam"
 Public Const AddInFunctionsFile = "finbox.functions.xlam"
 Public Const LegacyFunctionsFile = "finboxio.functions.xlam"
 Public Const AddInKeyFile = "finbox.key"
@@ -40,6 +41,7 @@ Public Const AddInSettingsFile = "finbox.cfg"
 Public Function AddInManagerFile() As String
     On Error Resume Next
     AddInManagerFile = Workbooks(AddInInstallerFile).name
+    AddInManagerFile = Workbooks(LegacyInstallerFile).name
 End Function
 
 Public Function StagingPath(file As String) As String
