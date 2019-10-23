@@ -20,6 +20,13 @@ Public Function HasAddInFunctions() As Boolean
         SafeDir(LocalPath(AddInFunctionsFile), vbHidden) <> ""
 End Function
 
+' Check if the functions add-in is installed alongside
+Public Function HasLegacyFunctions() As Boolean
+    HasAddInFunctions = _
+        SafeDir(LocalPath(LegacyFunctionsFile)) <> "" Or _
+        SafeDir(LocalPath(LegacyFunctionsFile), vbHidden) <> ""
+End Function
+
 ' Load the functions add-in installed alongside
 Public Sub LoadAddInFunctions()
 
@@ -163,6 +170,7 @@ End Function
 Public Sub PromoteStagedUpdate()
     If updatingFunctions Or Not HasStagedUpdate Then Exit Sub
     
+    Stop
     On Error GoTo Finish
     updatingFunctions = True
     If UnloadAddInFunctions Then
@@ -170,6 +178,11 @@ Public Sub PromoteStagedUpdate()
         If HasAddInFunctions Then
             SetAttr LocalPath(AddInFunctionsFile), vbNormal
             Kill LocalPath(AddInFunctionsFile)
+        End If
+        
+        If HasLegacyFunctions Then
+            SetAttr LocalPath(LegacyFunctionsFile), vbNormal
+            Kill LocalPath(LegacyFunctionsFile)
         End If
         
         If HasStagedLegacyUpdate Then

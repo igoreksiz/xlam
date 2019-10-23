@@ -40,7 +40,6 @@ End Function
 
 ' Promotes the staged add-in manager to active
 Public Sub PromoteStagedUpdate()
-    Stop
     If updatingManager Or Not HasStagedUpdate Then Exit Sub
 
     ' Test open the workbook to guarantee macros are
@@ -58,6 +57,7 @@ Public Sub PromoteStagedUpdate()
     If Not canUnloadManager Then Exit Sub
     
 NoManager:
+    Stop
     Dim appSec As MsoAutomationSecurity
     appSec = Application.AutomationSecurity
     Application.AutomationSecurity = msoAutomationSecurityLow
