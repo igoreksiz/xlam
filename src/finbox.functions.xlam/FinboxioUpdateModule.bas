@@ -28,11 +28,14 @@ End Function
 Public Function HasStagedUpdate() As Boolean
     HasStagedUpdate = _
         SafeDir(StagingPath(AddInInstalledFile)) <> "" Or _
-        SafeDir(StagingPath(AddInInstalledFile), vbHidden) <> ""
+        SafeDir(StagingPath(AddInInstalledFile), vbHidden) <> "" Or _
+        SafeDir(StagingPath(LegacyInstalledFile)) <> "" Or _
+        SafeDir(StagingPath(LegacyInstalledFile), vbHidden) <> ""
 End Function
 
 ' Promotes the staged add-in manager to active
 Public Sub PromoteStagedUpdate()
+    Stop
     If updatingManager Or Not HasStagedUpdate Then Exit Sub
 
     ' Test open the workbook to guarantee macros are
@@ -44,8 +47,8 @@ Public Sub PromoteStagedUpdate()
     ' Make sure manager isn't doing something that would
     ' prevent us from unloading it properly
     canUnloadManager = _
-        Not Application.Run(AddInManagerFile & "!IsLoadingManager") And _
-        Not Application.Run(AddInManagerFile & "!IsUpdatingFunctions")
+        Not Application.Run(openName & "!IsLoadingManager") And _
+        Not Application.Run(openName & "!IsUpdatingFunctions")
         
     If Not canUnloadManager Then Exit Sub
     
