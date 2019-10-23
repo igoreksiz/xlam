@@ -117,12 +117,12 @@ Public Sub FinishInstalling()
     
     If leftover Is Nothing Then
         MsgBox _
-            Title:="[finbox.io] Installation Succeeded", _
-            Prompt:="The finbox.io add-in is now installed and ready to use! Enjoy!", _
+            Title:="[Finbox] Installation Succeeded", _
+            Prompt:="The Finbox add-in is now installed and ready to use! Enjoy!", _
             Buttons:=vbInformation
     Else
         MsgBox _
-            Title:="[finbox.io] Restart Required", _
+            Title:="[Finbox] Restart Required", _
             Prompt:="Excel must be restarted to continue the installation. " & _
                     "You may be required to restart Excel once more before the installation is complete.", _
             Buttons:=vbInformation
@@ -138,8 +138,8 @@ HandleError:
     installing = False
     Application.ScreenUpdating = True
     MsgBox _
-        Title:="[finbox.io] Add-in Error", _
-        Prompt:="Unable to install the finbox.io add-on. Please try again and contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Add-in Error", _
+        Prompt:="Unable to install the Finbox add-on. Please try again and contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
 End Sub
 
@@ -238,8 +238,8 @@ Public Sub UninstallAddIn()
     uninstalling = False
     
     MsgBox _
-        Title:="[finbox.io] Add-In Removed", _
-        Prompt:="The finbox.io add-in has been successfully removed. Hope to see you back soon!", _
+        Title:="[Finbox] Add-In Removed", _
+        Prompt:="The Finbox add-in has been successfully removed. Hope to see you back soon!", _
         Buttons:=vbInformation
     
     LogMessage "Add-in uninstalled"
@@ -267,8 +267,8 @@ HandleError:
     LogMessage "Unable to install add-in functions: " & Err.Description
     
     MsgBox _
-        Title:="[finbox.io] Installation Failed", _
-        Prompt:="The add-in functions could not be installed at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Installation Failed", _
+        Prompt:="The add-in functions could not be installed at this time. Please try again and contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
         
     RemoveAddInFunctions
@@ -364,7 +364,7 @@ Sub CleanUpUninstalledAddIns()
         If VBA.LCase(i.name) = VBA.LCase(AddInInstalledFile) And Not i.installed And VBA.LCase(i.FullName) <> VBA.LCase(installPath) Then
             ClearAddInRegKey i.FullName
             MsgBox _
-                Title:="[finbox.io] Installation Succeeded", _
+                Title:="[Finbox] Installation Succeeded", _
                 Prompt:="The installation succeeded, but Excel must be restarted twice to remove all traces of the previous version. " & _
                         "This should not be necessary for future updates. Click OK to exit Excel now.", _
                 Buttons:=vbInformation

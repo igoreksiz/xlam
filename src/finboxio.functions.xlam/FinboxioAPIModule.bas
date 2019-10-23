@@ -100,8 +100,8 @@ Public Function RequestAndCacheKeys(ByRef keys() As String)
 
         ' Extract any error response
         Dim errStr As String
-        If Not webResponse.data Is Nothing Then
-            errStr = ConvertToJson(webResponse.data.Item("errors"), Whitespace:=2)
+        If Not webResponse.Data Is Nothing Then
+            errStr = ConvertToJson(webResponse.Data.Item("errors"), Whitespace:=2)
         End If
 
         ' If errStr <> "" Then LogMessage "errors: " & errStr
@@ -109,17 +109,17 @@ Public Function RequestAndCacheKeys(ByRef keys() As String)
         If webResponse.statusCode = 429 Then
             If QuotaRemaining = 0 And QuotaUsed = 0 Then UpdateQuota 1, 0
             Err.Raise LIMIT_EXCEEDED_ERROR, "Data Limit Exceeded", "You must wait before making additional requests"
-        ElseIf webResponse.statusCode >= 400 Or webResponse.data Is Nothing Then
+        ElseIf webResponse.statusCode >= 400 Or webResponse.Data Is Nothing Then
             Err.Raise UNSPECIFIED_API_ERROR, "API Response Error", "The API request returned " & webResponse.statusCode
         End If
 
         For i = 1 To UBound(batchKeys)
             k = batchKeys(i)
-            Call SetCachedValue(k, ConvertValue(webResponse.data.Item("data").Item(k)))
+            Call SetCachedValue(k, ConvertValue(webResponse.Data.Item("data").Item(k)))
         Next
         
-        If TypeName(webResponse.data.Item("errors")) = "Collection" Then
-            Set errs = webResponse.data.Item("errors")
+        If TypeName(webResponse.Data.Item("errors")) = "Collection" Then
+            Set errs = webResponse.Data.Item("errors")
             For i = 1 To errs.count
                 Set ep = New ErrorPoint
                 ep.name = errs(i).Item("error")
@@ -131,45 +131,45 @@ Public Function RequestAndCacheKeys(ByRef keys() As String)
     Loop
 End Function
 
-Private Function ConvertValue(ByRef data As Variant)
-    If IsNull(data) Then
+Private Function ConvertValue(ByRef Data As Variant)
+    If IsNull(Data) Then
         Dim nullValue As String
         nullValue = GetSetting("defaultNullValue", "0")
         If nullValue = "xlErrNull" Then
-            data = CVErr(xlErrNull)
+            Data = CVErr(xlErrNull)
             GoTo FinishConversion
         Else
-            data = nullValue
+            Data = nullValue
         End If
     End If
     
-    If TypeName(data) = "Collection" Then
+    If TypeName(Data) = "Collection" Then
         Dim i As Long, total As Long, converted As Variant
-        total = data.count
+        total = Data.count
         For i = 1 To total
-            converted = ConvertValue(data(1))
-            data.Remove 1
-            data.Add converted
+            converted = ConvertValue(Data(1))
+            Data.Remove 1
+            Data.Add converted
         Next
-        Set ConvertValue = data
+        Set ConvertValue = Data
         Exit Function
-    ElseIf VBA.IsDate(data) Then
-        data = CDate(data)
-    ElseIf TypeName(data) = "String" Then
+    ElseIf VBA.IsDate(Data) Then
+        Data = CDate(Data)
+    ElseIf TypeName(Data) = "String" Then
         Dim languageAdjusted As String
-        languageAdjusted = AdjustForLanguage(CStr(data))
+        languageAdjusted = AdjustForLanguage(CStr(Data))
         If IsNumeric(languageAdjusted) Then
-            data = CDbl(languageAdjusted)
+            Data = CDbl(languageAdjusted)
         End If
-    ElseIf TypeName(data) = "Boolean" Then
-        data = data
-    ElseIf IsNumeric(data) Then
-        data = CDbl(data)
+    ElseIf TypeName(Data) = "Boolean" Then
+        Data = Data
+    ElseIf IsNumeric(Data) Then
+        Data = CDbl(Data)
     Else
-        data = CVErr(xlErrValue)
+        Data = CVErr(xlErrValue)
     End If
     
 FinishConversion:
-    ConvertValue = data
+    ConvertValue = Data
 End Function
 

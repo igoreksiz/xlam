@@ -64,12 +64,12 @@ Public Sub FinboxioCheckQuota(Optional control)
     CheckQuota
     If QuotaTotal < 1 Then
         MsgBox _
-            Title:="[finbox.io] Quota Unavailable", _
-            Prompt:="Quota usage is unavailable at this time. Please try again and contact support@finbox.io if this problem persists.", _
+            Title:="[Finbox] Quota Unavailable", _
+            Prompt:="Quota usage is unavailable at this time. Please try again and contact support@finbox.com if this problem persists.", _
             Buttons:=vbCritical
     Else
         MsgBox _
-            Title:="[finbox.io] Quota Usage", _
+            Title:="[Finbox] Quota Usage", _
             Prompt:="You have used " & QuotaUsed & " datapoints of your " & QuotaTotal & " quota limit.", _
             Buttons:=vbInformation
     End If
@@ -118,14 +118,14 @@ Public Sub FinboxioAbout(Optional control)
         "  Contact Information: " & vbCrLf & _
         vbCrLf & _
         "    Please help us improve your experience by reporting " & _
-            "any issues and sending suggestions to support@finbox.io, " & _
-            "or visit https://finbox.io to chat with us live." & vbCrLf & _
+            "any issues and sending suggestions to support@finbox.com, " & _
+            "or visit https://finbox.com to chat with us live." & vbCrLf & _
         vbCrLf & _
         vbCrLf & _
-        "  Thank you for using finbox.io!"
+        "  Thank you for using Finbox!"
         
     MsgBox _
-        Title:="[finbox.io] Add-in Information", _
+        Title:="[Finbox] Add-in Information", _
         Prompt:=msg
 End Sub
 
@@ -189,7 +189,7 @@ Public Sub UpdateCustomMenu()
         For i = 1 To Controls.count
             Dim control
             Set control = Controls.Item(i)
-            If control.Tag = "finbox.io" Then Set CustomMenu = control
+            If control.Tag = "Finbox" Then Set CustomMenu = control
         Next i
         
         On Error GoTo 0
@@ -199,18 +199,18 @@ Public Sub UpdateCustomMenu()
             ' Button definitions:  Cap&tion,MacroName,ToolTip,IconId,BeginGroupBool
             '      (IconId 39 is blue right arrow, and is a good default option)
             
-            ButtonDefs(1) = "Log&in,FinboxioShowLogin,Login to finbox.io API,2882,True"
-            ButtonDefs(2) = "Log&out,FinboxioLogout,Logout from finbox.io API,1019,False"
+            ButtonDefs(1) = "Log&in,FinboxioShowLogin,Login to Finbox API,2882,True"
+            ButtonDefs(2) = "Log&out,FinboxioLogout,Logout from Finbox API,1019,False"
             ButtonDefs(3) = "&Pro,FinboxioUpgrade,Upgrade to premium access,225,False"
             ButtonDefs(4) = "Check &Quota,FinboxioCheckQuota,Check quota usage,52,False"
             
             ButtonDefs(5) = "&Watchlist,FinboxioWatchlist,Go to your watchlist,183,True"
             ButtonDefs(6) = "&Screener,FinboxioScreener,Go to the online screener,601,False"
             ButtonDefs(7) = "&Templates,FinboxioTemplates,Download pre-built templates,357,False"
-            ButtonDefs(8) = "&Help,FinboxioHelp,Read the finbox.io add-in guide,49,False"
+            ButtonDefs(8) = "&Help,FinboxioHelp,Read the Finbox add-in guide,49,False"
             
             ButtonDefs(9) = "&Refresh Data,FinboxioRefresh,Recalculate open Excel Workbooks,37,True"
-            ButtonDefs(10) = "Un&link Formulas,FinboxioUnlink,Unlink finbox.io formulas,2309,False"
+            ButtonDefs(10) = "Un&link Formulas,FinboxioUnlink,Unlink Finbox formulas,2309,False"
             
             ButtonDefs(11) = "&Message Log,FinboxioMessages,Display message log,588,True"
             ButtonDefs(12) = "Check For &Updates,FinboxioUpdate,Check for updates,273,False"
@@ -221,8 +221,8 @@ Public Sub UpdateCustomMenu()
         
             Set CustomMenu = Application.CommandBars("Worksheet Menu Bar").Controls.Add(msoControlPopup, temporary:=True)
             With CustomMenu
-                .Caption = "&finbox.io"
-                .Tag = "finbox.io"
+                .Caption = "&Finbox"
+                .Tag = "Finbox"
                 .enabled = True
                 .Visible = True
             End With
@@ -269,7 +269,7 @@ Public Sub RemoveCustomMenu()
         For i = 1 To Controls.count
             Dim control
             Set control = Controls.Item(i)
-            If control.Tag = "finbox.io" Then control.Delete
+            If control.Tag = "Finbox" Then control.Delete
         Next i
     End If
 End Sub

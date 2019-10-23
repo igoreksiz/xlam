@@ -1,9 +1,9 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Mac2011CredentialsForm 
-   Caption         =   "finbox.io Login"
-   ClientHeight    =   3540
-   ClientLeft      =   45
-   ClientTop       =   -525
+   Caption         =   "Finbox Login"
+   ClientHeight    =   3550
+   ClientLeft      =   50
+   ClientTop       =   -530
    ClientWidth     =   6060
    OleObjectBlob   =   "Mac2011CredentialsForm.frx":0000
    StartUpPosition =   1  'CenterOwner

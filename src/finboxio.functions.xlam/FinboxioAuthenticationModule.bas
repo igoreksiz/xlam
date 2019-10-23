@@ -12,7 +12,7 @@ End Sub
 Public Function ShowLoginForm()
     If ExcelVersion = "Mac2011" Then
         Mac2011CredentialsForm.Show
-    ElseIf ExcelVersion = "Mac2016" Then
+    ElseIf ExcelVersion = "Mac2016" Or ExcelVersion = "Mac2019" Then
         Mac2016CredentialsForm.Show
     Else
         DefaultCredentialsForm.Show
@@ -56,7 +56,7 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
     Select Case webResponse.statusCode
         Case 401
             MsgBox _
-                Title:="[finbox.io] Login Error", _
+                Title:="[Finbox] Login Error", _
                 Prompt:="The provided credentials are invalid.", _
                 Buttons:=vbCritical
         Case 200
@@ -64,8 +64,8 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             APItier = ""
             APIKey = ""
             On Error Resume Next
-            APItier = webResponse.data.Item("pro_status")
-            APIKey = webResponse.data.Item("api_key")
+            APItier = webResponse.Data.Item("pro_status")
+            APIKey = webResponse.Data.Item("api_key")
             On Error GoTo ErrorHandler
             
             LogMessage "Logged in as " & APItier & " user " & email
@@ -73,9 +73,9 @@ Public Function Login(ByVal email As String, ByVal password As String) As Boolea
             ' Process api_tier and api_key
             If APItier = "inactive" Then
                 MsgBox _
-                    Title:="[finbox.io] Login Error", _
+                    Title:="[Finbox] Login Error", _
                     Prompt:="You have not verified your email address yet." & vbCrLf & _
-                            "To resend the verification email, visit https://finbox.io/profile.", _
+                            "To resend the verification email, visit https://finbox.com/profile.", _
                     Buttons:=vbCritical
             Else
                 APIKeyStore.StoreApiKey (APIKey)
@@ -102,8 +102,8 @@ ErrorHandler:
     InvalidateAppRibbon
     Dim answer As Integer
     MsgBox _
-        Title:="[finbox.io] Login Error", _
-        Prompt:="Unable to authenticate with finbox.io at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Login Error", _
+        Prompt:="Unable to authenticate with finbox.com at this time. Please try again and contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
 End Function
 
@@ -133,7 +133,7 @@ Public Function GetTier()
     Dim webResponse As webResponse
     Set webResponse = webClient.Execute(webRequest)
 
-    tier = webResponse.data.Item("data").Item("tier")
+    tier = webResponse.Data.Item("data").Item("tier")
 OnError:
     GetTier = tier
 End Function

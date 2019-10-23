@@ -159,8 +159,8 @@ Confirmation:
 
     If download = vbYes And confirm Then
         download = MsgBox( _
-            Title:="[finbox.io] Update Available", _
-            Prompt:="A newer version (" & latest & ") of the finbox.io add-in is available! Do you have a few seconds to install it now?", _
+            Title:="[Finbox] Update Available", _
+            Prompt:="A newer version (" & latest & ") of the Finbox add-in is available! Do you have a few seconds to install it now?", _
             Buttons:=vbQuestion Or vbYesNo)
             
         If download = vbNo Then
@@ -189,18 +189,18 @@ Confirmation:
 
     If Not HasUpdates And Not silent Then
         MsgBox _
-            Title:="[finbox.io] No Updates Available", _
-            Prompt:="You're already using the latest version of the finbox.io add-in. Stay fresh!", _
+            Title:="[Finbox] No Updates Available", _
+            Prompt:="You're already using the latest version of the Finbox add-in. Stay fresh!", _
             Buttons:=vbInformation
     ElseIf HasUpdates And download = vbYes And confirm Then
         MsgBox _
-            Title:="[finbox.io] Update Successful", _
+            Title:="[Finbox] Update Successful", _
             Prompt:="The update was successfully installed. " & macMsg & "Stay fresh!", _
             Buttons:=vbInformation
     ElseIf HasUpdates And download = vbYes And Not confirm Then
         MsgBox _
-            Title:="[finbox.io] Update Installed", _
-            Prompt:="A new version of the finbox.io add-in was installed. " & macMsg & "Stay fresh!", _
+            Title:="[Finbox] Update Installed", _
+            Prompt:="A new version of the Finbox add-in was installed. " & macMsg & "Stay fresh!", _
             Buttons:=vbInformation
     End If
     
@@ -215,16 +215,16 @@ Confirmation:
 GithubFail:
     LogMessage "Failed to get release information from GitHub: " & Err.Description
     If Not silent Then MsgBox _
-        Title:="[finbox.io] Update Failed", _
-        Prompt:="Unable to check for updates at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Update Failed", _
+        Prompt:="Unable to check for updates at this time. Please try again and contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
     GoTo Finish
 
 DownloadFail:
     LogMessage "Failed to download releases: " & Err.Description
     If Not silent Then MsgBox _
-        Title:="[finbox.io] Update Failed", _
-        Prompt:="Unable to download updates at this time. Please try again and contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Update Failed", _
+        Prompt:="Unable to download updates at this time. Please try again and contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
     RemoveStagedUpdates
     GoTo Finish

@@ -7,7 +7,7 @@ Public Sub UnlinkFormulas()
     
     If Not ActiveWorkbook.Saved Then
         MsgBox _
-            Title:="[finbox.io] Unlink Canceled", _
+            Title:="[Finbox] Unlink Canceled", _
             Prompt:="This workbook contains unsaved changes. You must save before it can be unlinked.", _
             Buttons:=vbExclamation
         Exit Sub
@@ -21,7 +21,7 @@ Public Sub UnlinkFormulas()
 
     Dim choice As Variant
     choice = MsgBox( _
-        Title:="[finbox.io] Unlink Confirmation", _
+        Title:="[Finbox] Unlink Confirmation", _
         Prompt:="This will save a copy of the current workbook with all FNBX formulas replaced by their current values. Do you wish to continue?", _
         Buttons:=vbYesNo Or vbQuestion)
     Select Case choice
@@ -58,8 +58,8 @@ Public Sub UnlinkFormulas()
     
 ShowWarning:
     MsgBox _
-        Title:="[finbox.io] Unlink Error", _
-        Prompt:="This workbook cannot be unlinked. Please contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Unlink Error", _
+        Prompt:="This workbook cannot be unlinked. Please contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
 End Sub
 

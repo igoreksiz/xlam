@@ -81,9 +81,9 @@ RemoveAddInFunctions:
     RemoveAddInFunctions
     
     MsgBox _
-        Title:="[finbox.io] Add-in Error", _
-        Prompt:="The finbox.io add-in functions were not loaded correctly. " & _
-                "Please try restarting Excel and contact support@finbox.io if this problem persists.", _
+        Title:="[Finbox] Add-in Error", _
+        Prompt:="The Finbox add-in functions were not loaded correctly. " & _
+                "Please try restarting Excel and contact support@finbox.com if this problem persists.", _
         Buttons:=vbCritical
 End Sub
 
@@ -169,7 +169,7 @@ Public Sub PromoteStagedUpdate()
         
         #If Mac Then
             MsgBox _
-                Title:="[finbox.io] Add-In Functions Updated", _
+                Title:="[Finbox] Add-In Functions Updated", _
                 Prompt:="A new version of the add-in functions have been installed. " & _
                         "You may be prompted to enable the updated macros. " & _
                         "Macros must be enabled or the add-in will not function properly."

@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DefaultCredentialsForm 
-   Caption         =   "finbox.io Login"
+   Caption         =   "Finbox Login"
    ClientHeight    =   3540
-   ClientLeft      =   45
+   ClientLeft      =   50
    ClientTop       =   390
-   ClientWidth     =   6045
+   ClientWidth     =   6040
    OleObjectBlob   =   "DefaultCredentialsForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

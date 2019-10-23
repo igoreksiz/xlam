@@ -146,18 +146,18 @@ Public Function MSOfficeVersion() As Integer
 End Function
 
 Public Function DefaultNullValue() As Variant
-    Dim data As String
-    data = GetSetting("defaultNullValue", "0")
+    Dim Data As String
+    Data = GetSetting("defaultNullValue", "0")
     
-    If data = "xlErrNull" Then
+    If Data = "xlErrNull" Then
         DefaultNullValue = CVErr(xlErrNull)
     Else
         Dim languageAdjusted As String
-        languageAdjusted = AdjustForLanguage(data)
+        languageAdjusted = AdjustForLanguage(Data)
         If IsNumeric(languageAdjusted) Then
             DefaultNullValue = CDbl(languageAdjusted)
         Else
-            DefaultNullValue = data
+            DefaultNullValue = Data
         End If
     End If
 End Function

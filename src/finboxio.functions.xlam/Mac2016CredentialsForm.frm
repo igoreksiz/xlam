@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Mac2016CredentialsForm 
-   Caption         =   "finbox.io Login"
+   Caption         =   "Finbox Login"
    ClientHeight    =   9480.001
-   ClientLeft      =   45
+   ClientLeft      =   50
    ClientTop       =   390
-   ClientWidth     =   6615
+   ClientWidth     =   6610
    OleObjectBlob   =   "Mac2016CredentialsForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -20,6 +20,7 @@ Private password As String
 Private Sub IssueDetailLink_Click()
     ThisWorkbook.FollowHyperlink "https://appletoolbox.com/2015/10/mouse-cursor-pointer-disappears-invisible-missing-fix/"
 End Sub
+
 
 Private Sub passBox_Change()
     Dim text As String, i As Integer, oldLen As Integer, newLen As Integer, diff As Integer, chars As String

@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} InstallPrompt 
-   Caption         =   "finbox.io Installer"
+   Caption         =   "Finbox Installer"
    ClientHeight    =   2070
-   ClientLeft      =   45
+   ClientLeft      =   50
    ClientTop       =   390
-   ClientWidth     =   7815
+   ClientWidth     =   7810
    OleObjectBlob   =   "InstallPrompt.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

@@ -1732,6 +1732,8 @@ web_Cleanup:
     ExecuteInShell.ExitCode = CLng(web_pclose(web_File))
 #End If
 #End If
+
+    ExecuteInShell.Output = UTF8_Decode(ExecuteInShell.Output)
 End Function
 
 ''
@@ -3376,5 +3378,29 @@ End Function
 Function IsInArray(num As Integer, arr As Variant) As Boolean
     IsInArray = Not IsError(Application.Match(num, arr, 0))
 End Function
+
+Function UTF8_Decode(ByVal sStr As String)
+    Dim l As Long, sUTF8 As String, iChar As Integer, iChar2 As Integer
+    For l = 1 To Len(sStr)
+        iChar = Asc(Mid(sStr, l, 1))
+        If iChar > 127 Then
+            If Not iChar And 32 Then ' 2 chars
+            iChar2 = Asc(Mid(sStr, l + 1, 1))
+            sUTF8 = sUTF8 & ChrW$(((31 And iChar) * 64 + (63 And iChar2)))
+            l = l + 1
+        Else
+            Dim iChar3 As Integer
+            iChar2 = Asc(Mid(sStr, l + 1, 1))
+            iChar3 = Asc(Mid(sStr, l + 2, 1))
+            sUTF8 = sUTF8 & ChrW$(((iChar And 15) * 16 * 256) + ((iChar2 And 63) * 64) + (iChar3 And 63))
+            l = l + 2
+        End If
+            Else
+            sUTF8 = sUTF8 & Chr$(iChar)
+        End If
+    Next l
+    UTF8_Decode = sUTF8
+End Function
+
 
 

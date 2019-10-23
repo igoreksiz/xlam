@@ -5,17 +5,16 @@ Option Private Module
 Public Const CACHE_TIMEOUT_MINUTES = 60
 Public Const MAX_BATCH_SIZE = 99
 
-Public Const PROFILE_URL = "https://finbox.io/profile"
-Public Const WATCHLIST_URL = "https://finbox.io/watchlist"
-Public Const SCREENER_URL = "https://finbox.io/screener"
-Public Const TEMPLATES_URL = "https://finbox.io/templates"
-Public Const SIGNUP_URL = "https://finbox.io/signup"
-Public Const HELP_URL = "https://finbox.io/blog/using-the-excel-add-in/"
-Public Const UPGRADE_URL = "https://finbox.io/premium"
+Public Const PROFILE_URL = "https://finbox.com/profile"
+Public Const WATCHLIST_URL = "https://finbox.com/watchlist"
+Public Const SCREENER_URL = "https://finbox.com/screener"
+Public Const TEMPLATES_URL = "https://finbox.com/templates"
+Public Const SIGNUP_URL = "https://finbox.com/signup"
+Public Const HELP_URL = "https://finbox.com/blog/using-the-excel-add-in/"
+Public Const UPGRADE_URL = "https://finbox.com/pricing"
 
-Public Const AUTH_URL = "https://api.finbox.io/v2/tokens"
-Public Const API_URL_BETA = "https://api.finbox.io/beta"
-Public Const API_URL_V3 = "https://public-api.finbox.io/v3"
+Public Const AUTH_URL = "https://api.finbox.com/v4/tokens"
+Public Const API_URL = "https://addon.finbox.com/v1"
 
 Public Const LIMIT_EXCEEDED_ERROR = 20400
 Public Const INVALID_AUTH_ERROR = 20401
@@ -75,7 +74,7 @@ Public Function SafeDir(file As String, Optional attributes As VbFileAttribute) 
 End Function
 
 Public Function ApiUrl()
-    ApiUrl = GetSetting("finboxioApiOverride", API_URL_V3)
+    ApiUrl = GetSetting("finboxioApiOverride", API_URL)
 End Function
 
 Public Function TierUrl()

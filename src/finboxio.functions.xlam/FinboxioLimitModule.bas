@@ -6,8 +6,8 @@ Private RedisplayWarning As Date
 
 Public Sub ShowRateLimitWarning(Optional reset As Boolean = True)
     MsgBox _
-        Title:="[finbox.io] Limit Exceeded", _
-        Prompt:="You have exhausted your finbox.io data limit. Try again later or contact support@finbox.io to request a limit increase.", _
+        Title:="[Finbox] Limit Exceeded", _
+        Prompt:="You have exhausted your finbox data limit. Try again later or contact support@finbox.com to request a limit increase.", _
         Buttons:=vbCritical
     If reset Then SetRateLimitTimer
 End Sub
