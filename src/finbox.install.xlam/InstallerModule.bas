@@ -31,6 +31,7 @@ End Function
 Public Sub FinishInstalling()
     On Error GoTo HandleError
     
+    Stop
     installing = True
     Dim installPath As String
     installPath = SavePath(AddInInstalledFile)
