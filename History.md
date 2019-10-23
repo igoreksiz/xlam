@@ -1,79 +1,10 @@
 
-1.6.0-beta.14 / 2019-10-23
-==========================
-
-  * Fix mac mkdir, use free handles for file access
-
-1.6.0-beta.13 / 2019-10-23
-==========================
-
-  * Fix circular dependency and json conversion
-
-1.6.0-beta.12 / 2019-10-23
-==========================
-
-  * Final install check
-
-1.6.0-beta.11 / 2019-10-23
-==========================
-
-  * Please work
-
-1.6.0-beta.10 / 2019-10-23
-==========================
-
-  * Debug AddIn.Add
-
-1.6.0-beta.9 / 2019-10-23
-=========================
-
-  * Fix upgrade sequence
-
-1.6.0-beta.8 / 2019-10-23
-=========================
-
-  * Fix add-in cleanup
-
-1.6.0-beta.7 / 2019-10-23
-=========================
-
-  * Fix staged updates
-
-1.6.0-beta.6 / 2019-10-23
-=========================
-
-  * Fix staged updates
-
-1.6.0-beta.5 / 2019-10-23
-=========================
-
-  * Check legacy installer name
-
-1.6.0-beta.4 / 2019-10-23
-=========================
-
-  * Debug upgrade
-
-1.6.0-beta.3 / 2019-10-23
-=========================
-
-  * Add legacy version sheets
-
-1.6.0-beta.2 / 2019-10-22
-=========================
-
-  * Debug upgrade
-
-1.6.0-beta.1 / 2019-10-22
-=========================
-
-  * Update Mac form image clip
-
-1.6.0-beta.0 / 2019-10-22
-=========================
+1.6.0 / 2019-10-23
+==================
 
   * JSON parse improvements and rename finboxio to finbox
   * Update branding & Finbox urls, fix utf encoding issue
+  * Upgrade/installation bug fixes
 
 1.5.0 / 2019-07-05
 ==================
